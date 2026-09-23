@@ -260,7 +260,7 @@ export const SHOTS: Shot[] = [
     order: 5,
     edit: 4.5,
     sound: 'off',
-    audio: 'VO 1 (ElevenLabs, Elias voice) starts on the cut. Gravel footsteps. Music bed under.',
+    audio: `Laid in the edit — host VO (Elias voice, clear, confident, conversational): ${q('B5')} ` + 'VO 1 (ElevenLabs, Elias voice) starts on the cut. Gravel footsteps. Music bed under.',
     lowerThird: 'ELIAS VALE — FIELD LEAD / HOST',
   },
   {
@@ -299,7 +299,7 @@ export const SHOTS: Shot[] = [
     order: 5,
     edit: 5,
     sound: 'off',
-    audio: 'VO 2 (ElevenLabs). Case latch click, gravel.',
+    audio: `Laid in the edit — host VO (Elias voice): ${q('B8')} ` + 'VO 2 (ElevenLabs). Case latch click, gravel.',
     lowerThird: 'MARA CHEN — CAMERA & SYSTEMS',
   },
   {
@@ -374,7 +374,7 @@ export const SHOTS: Shot[] = [
     order: 5,
     edit: 3.5,
     sound: 'off',
-    audio: 'VO 3 (≈7s) starts here and runs on over SH07. Door knob, case, footsteps on stone.',
+    audio: `Laid in the edit — host VO (Elias voice, runs on over SH07): ${q('B13')} ` + 'VO 3 (≈7s) starts here and runs on over SH07. Door knob, case, footsteps on stone.',
     lowerThird: 'OWEN REYES — SAFETY & LOGISTICS',
     note: 'The service door he checks is the one the crew take to the service hall in SH17.',
   },
@@ -1375,7 +1375,7 @@ export const SHOTS: Shot[] = [
       beats: [
         { t: [0, 2], text: `${Cap('clara')} grips the interior handle and pulls once; it does not move.` },
         { t: [2, 3.5], text: `Louder, fear now present but controlled, in ${V('clara')}: ${q('G10')}` },
-        { t: [3.5, 5], text: `A man’s voice, close on the other side of the door and muffled by it, in ${V('elias')}: ${q('G11')}` },
+        { t: [3.5, 5], text: 'She goes still, listening to someone on the other side of the door, her hand still near the handle.' },
         { t: [5, 8], text: 'She lets go of the handle and scans the room — bed, window, floor, the box — eyes darting, breathing fast through her nose, hands low.' },
         { t: [8, 10], text: `Unsteady: ${q('G13')}` },
       ],
@@ -1384,7 +1384,7 @@ export const SHOTS: Shot[] = [
     order: 10,
     edit: 7,
     sound: 'native',
-    audio: 'Clara’s lines native (voice-swapped); Elias through the door: record/voice-swap and muffle with an EQ.',
+    audio: `Laid in the edit at 3.5s — ELIAS through the door (muffled, Elias voice): ${q('G11')} ` + 'Clara’s lines native (voice-swapped); Elias through the door: record/voice-swap and muffle with an EQ.',
     note: 'Cinematic angle: the Woman never appears here.',
   },
   {
@@ -1459,7 +1459,7 @@ export const SHOTS: Shot[] = [
       setting: 'The nursery at night, one small lamp on the right.',
       beats: [
         { t: [0, 2], text: `${Cap('clara')} stands close to the closed door in the lower-left, facing it, hands low at her sides, shoulders tight, breath shallow and quick. She does not know anything is wrong yet.` },
-        { t: [2, 4.5], text: `Off-screen, from the monitor station, ${V('owen')}, lowered: ${q('H6')} Nobody in frame speaks.` },
+        { t: [2, 4.5], text: 'She stays exactly where she is, facing the door, breathing shallowly. Nobody in frame speaks.' },
         { t: [4.5, 5], text: 'She stays facing the door.' },
       ],
       stays: [STAY_LOCKED, STAY_NO_TURN, STAY_FACES_ONLY_MOVE, STAY_PEOPLE],
@@ -1467,7 +1467,7 @@ export const SHOTS: Shot[] = [
     order: 5,
     edit: 3.5,
     sound: 'off',
-    audio: 'Owen’s line laid in post (ElevenLabs, Owen voice, slightly roomy as if heard from the monitor station). Night room tone.',
+    audio: `Laid in the edit at 2s — OWEN from the monitor station (lowered, Owen voice): ${q('H6')} ` + 'Owen’s line laid in post (ElevenLabs, Owen voice, slightly roomy as if heard from the monitor station). Night room tone.',
     post: 'Composite the Woman at P1: mask her out of KF_SH34_W.png and lay her as a STILL over the whole clip. NURSERY FIXED overlay, cold grade, grain.',
   },
   {
@@ -1927,14 +1927,14 @@ export const SHOTS: Shot[] = [
       beats: [
         { t: [0, 2], text: `${Cap('clara')} pulls in a short breath; it lands, but only barely — her shoulders rise with it, eyes wide and wet.` },
         { t: [2, 3], text: 'One hand stays pressed at her throat; she keeps her eyes on the door.' },
-        { t: [3, 5], text: `A woman’s voice through the door, muffled, controlled, in ${V('naomi')}: ${q('K10')}` },
+        { t: [3, 5], text: 'She holds still, listening toward the door, her hand still at her throat. Nobody in frame speaks.' },
       ],
       stays: [STAY_LOCKED, STAY_NO_TURN, STAY_FACES_ONLY_MOVE, STAY_PEOPLE],
     },
     order: 5,
     edit: 4,
     sound: 'off',
-    audio: 'Naomi’s line laid in post (Naomi voice, muffled through wood). Clara’s barely-landing breath.',
+    audio: `Laid in the edit at 3s — NAOMI through the door (muffled, controlled, Naomi voice): ${q('K10')} ` + 'Naomi’s line laid in post (Naomi voice, muffled through wood). Clara’s barely-landing breath.',
     post: 'Composite the Woman at P3 from KF_SH47_W.png as a STILL. The same layer is reused, untouched, in SH51.',
   },
 

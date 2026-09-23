@@ -116,7 +116,7 @@ function Overview({ done, setTab, findings }: { done: Record<string, boolean>; s
         <div className="stats">
           <div className="stat"><b>{SHOTS.length}</b><span>shots, one generation each</span></div>
           <div className="stat"><b>{ALL_BEATS.length}</b><span>script beats, all covered</span></div>
-          <div className="stat"><b>{lines}</b><span>scripted lines, verbatim in prompts</span></div>
+          <div className="stat"><b>{lines}</b><span>scripted lines, word for word (on-screen in prompts, VO and off-screen in edit notes)</span></div>
           <div className="stat"><b>{fmtTime(total)}</b><span>full script cut (script: ~2:38–2:45)</span></div>
           <div className="stat"><b>{shotsDone}/{SHOTS.length}</b><span>shots marked done</span></div>
           <div className="stat"><b>{assetsDone}/{buildOrder().length}</b><span>images marked done</span></div>
@@ -226,7 +226,7 @@ function ScriptCheck() {
   return (
     <section className="section">
       <h2>Script, line by line, against the shots</h2>
-      <p className="lead">Every beat of the locked script and the shot that carries it. For dialogue and VO, the tick means the exact line is inside that shot’s video prompt.</p>
+      <p className="lead">Every beat of the locked script and the shot that carries it. Dialogue spoken by someone in frame must be word for word in that shot’s video prompt. Host VO and off-screen lines are laid in the edit, so they must be word for word in the shot’s audio notes instead.</p>
       <div className="tablewrap">
         <table>
           <thead>
@@ -234,7 +234,7 @@ function ScriptCheck() {
               <th>Beat</th>
               <th>Script</th>
               <th>Shot</th>
-              <th>Line in prompt</th>
+              <th>Line</th>
             </tr>
           </thead>
           <tbody>
@@ -242,13 +242,14 @@ function ScriptCheck() {
               <FragmentRows key={sec.id} head={`${sec.time} · ${sec.heading}`}>
                 {sec.beats.map((b) => {
                   const shot = SHOTS.find((s) => s.id === cover[b.id]);
-                  const hasLine = b.line ? shot && normLine(videoPrompt(shot)).includes(normLine(b.line)) : null;
+                  const inShot = b.kind === 'line' && !b.offScreen;
+                  const hasLine = b.line ? !!shot && normLine(inShot ? videoPrompt(shot) : shot.audio).includes(normLine(b.line)) : null;
                   return (
                     <tr key={b.id}>
                       <td className="mono">{b.id}</td>
                       <td>{b.text}</td>
                       <td className="mono">{shot ? <a href={`#shots`} onClick={() => { try { sessionStorage.setItem('jump', shot.id); } catch { /* ignore */ } }}>{shot.id}</a> : <span className="pill rec">missing</span>}</td>
-                      <td>{hasLine === null ? '' : hasLine ? <span className="pill ok">verbatim</span> : <span className="pill rec">missing</span>}</td>
+                      <td>{hasLine === null ? '' : hasLine ? <span className="pill ok">{b.kind === 'line' && !b.offScreen ? 'in video prompt' : 'in edit notes'}</span> : <span className="pill rec">missing</span>}</td>
                     </tr>
                   );
                 })}

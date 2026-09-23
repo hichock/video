@@ -19,9 +19,9 @@ export const OLD_PACK_PROBLEMS: Note[] = [
     fix: 'Every person in every shot has structured staging: view (from behind / profile / facing), position against landmarks, action and eyeline. Seen-from-behind people get hair and clothes, never a face. Prompts say the sheets are for identity only, not pose. Every video prompt opens with the exact start frame. Every keyframe and plate has an approve-or-reroll checklist. Regenerate the character sheets from the new sheet prompts before any keyframe.',
   },
   {
-    title: 'Host VO lines were not in the video prompts',
-    body: 'All three Elias VO lines lived only in “Audio” notes, breaking rule 1 (“every scripted line appears IN the video prompt”).',
-    fix: 'SH03, SH04 and SH06 carry the exact VO line with the voice description and “no one on screen moves their mouth”. QA fails the build if any scripted line is missing from its shot’s prompt.',
+    title: 'Scripted lines were not tracked to their shots',
+    body: 'Lines lived in loose “Audio” notes with nothing checking that every scripted line landed somewhere.',
+    fix: 'On-screen dialogue is word for word in the video prompt; host VO and off-screen lines are word for word in the shot’s audio notes. QA fails the build if any scripted line is missing.',
   },
   {
     title: 'Script beats were merged, dropped or moved',
@@ -101,6 +101,11 @@ export const OLD_PACK_PROBLEMS: Note[] = [
 ];
 
 export const DECISIONS: Note[] = [
+  {
+    title: 'Video prompts carry only on-screen dialogue (producer decision)',
+    body: 'Host VO (SH03, SH04, SH06) and off-screen lines (Elias through the door in SH32, Owen from the monitor in SH34, Naomi through the door in SH47) are no longer in the video prompts. This replaces the earlier rule that every scripted line must be in the video prompt. VO shots now say “nobody on screen speaks”; off-screen moments are written as silent listening beats.',
+    fix: 'Each of those lines is word for word in its shot’s audio notes, with the timing and voice. QA fails if one is missing there or leaks into a video prompt.',
+  },
   {
     title: 'Cold open: mark stage',
     body: 'The rules say the cold open equals the final-cliff pose; the script says “a faint pressure mark is forming” and “Clara presses two fingers to the mark”. Built: the final pose, cropped, two fingers pressed into the mark by the hooked hand, with the FAINT mark (the script wins on what happens).',

@@ -161,7 +161,7 @@ export function videoPrompt(s: Shot): string {
     lines.push('Every action continues FORWARD from the start frame; nothing that is already done in the start frame is undone or repeated.');
   }
   for (const b of v.beats) lines.push(`${fmt(b.t[0])}–${fmt(b.t[1])}s: ${b.text}`);
-  if (v.vo) lines.push(`Voice-over across the clip, added in the edit — nobody on screen speaks and no one on screen moves their mouth. ${v.vo}`);
+  if (v.vo) lines.push('Nobody on screen speaks; no one moves their mouth to talk.');
   const stays = [...v.stays];
   if (s.people.some((p) => p.view !== 'hands')) stays.push('Nobody looks into the lens.');
   lines.push(stays.join(' '));

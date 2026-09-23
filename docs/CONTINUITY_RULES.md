@@ -122,6 +122,10 @@ Prompt rules that come from this card:
 - The video prompt's first line restates the **start frame** (who, where, facing), then
   the moves, each with a destination landmark.
 - Timings in the prompt add up to the clip length, and one action lands per beat.
+- **Dialogue in the video prompt only if the speaker is in frame.** Voice-over and
+  off-screen lines go in the shot's audio notes (word for word, with timing and voice) and
+  are laid in the edit. In the prompt they become silent beats (*“she goes still,
+  listening toward the door”*; *“nobody on screen speaks”*).
 
 ## 6b. Lessons from test generations (image → video)
 

@@ -55,16 +55,20 @@ export function runQA(): Finding[] {
     const lineBeats = s.covers.map((id) => BEAT_BY_ID[id]).filter((b) => b && (b.kind === 'line' || b.kind === 'vo'));
 
     // 2. Every scripted line verbatim in the video prompt ---------------------
+    // On-screen dialogue goes in the video prompt; VO and off-screen lines only in the edit notes.
     for (const b of lineBeats) {
-      if (!norm(vp).includes(norm(b.line!))) add('error', 'Lines in prompt', `Line ${b.id} missing from the video prompt: “${b.line}”`, s.id);
+      const inShot = b.kind === 'line' && !b.offScreen;
+      if (inShot && !norm(vp).includes(norm(b.line!))) add('error', 'Lines in prompt', `Line ${b.id} missing from the video prompt: “${b.line}”`, s.id);
+      if (!inShot && norm(vp).includes(norm(b.line!))) add('error', 'Lines in prompt', `${b.id} is VO/off-screen and must not be in the video prompt`, s.id);
+      if (!inShot && !norm(s.audio).includes(norm(b.line!))) add('error', 'Lines in edit', `${b.id} (VO/off-screen) missing from the audio notes: “${b.line}”`, s.id);
     }
     // 3. VO clips silent and say so
     if (lineBeats.some((b) => b.kind === 'vo')) {
       if (s.sound !== 'off') add('error', 'VO', 'VO shot must be generated with sound off', s.id);
-      if (!vp.includes('no one on screen moves their mouth')) add('error', 'VO', 'VO prompt must say no one on screen moves their mouth', s.id);
+      if (!vp.includes('Nobody on screen speaks')) add('error', 'VO', 'VO shot must say nobody on screen speaks', s.id);
     }
     // 4. Max two speakers per clip
-    const speakers = new Set(lineBeats.filter((b) => b.kind === 'line').map((b) => b.speaker));
+    const speakers = new Set(lineBeats.filter((b) => b.kind === 'line' && !b.offScreen).map((b) => b.speaker));
     if (speakers.size > 2) add('error', 'Speakers', `${speakers.size} speakers in one clip; split it`, s.id);
 
     // 5. Timing: beats tile 0 → order length
