@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'Props vanished and actions ran backwards (second SH02 test)',
+    body: 'The prompt told the image model the camera was held in front of his chest with “only his elbows show”, so the camera was invisible from behind and the video gave him empty hands. The keyframe showed the case already out of the car while the video prompt said “hauls a case out”, so the video put it back to perform the action again. The tall man was placed “beyond the car”, which the model read as walking toward the car.',
+    fix: 'Every person now has a Hands line saying what each hand holds and how it stays visible from this camera. Every Doing line states how far the action has got in the start frame (ALREADY OUT / STILL INSIDE / CLOSED / not yet pressing), the video continues forward from it, and every video prompt says nothing already done is undone. Positions use frame thirds plus landmarks. QA flags hidden props, unstaged hands and repeated actions.',
+  },
+  {
     title: 'People turned the wrong way (found on the first SH02 test frame)',
     body: 'The facing direction was one clause inside a long paragraph, the prompt then described the face of a man who should be seen from behind, and the character sheets (all facing camera) pulled the pose. The video prompt never stated the start frame, so a wrong keyframe produced a wrong clip. The SH02 test also used the old character sheets (striped tee, gear round Mara’s neck, radio on her hip).',
     fix: 'Every person in every shot has structured staging: view (from behind / profile / facing), position against landmarks, action and eyeline. Seen-from-behind people get hair and clothes, never a face. Prompts say the sheets are for identity only, not pose. Every video prompt opens with the exact start frame. Every keyframe and plate has an approve-or-reroll checklist. Regenerate the character sheets from the new sheet prompts before any keyframe.',

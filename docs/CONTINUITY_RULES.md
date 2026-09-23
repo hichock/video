@@ -101,7 +101,8 @@ For every person in frame:
 - **View:** facing camera / three-quarter front / profile left / profile right /
   three-quarter back / from behind / small in the background / hands only.
 - **Where:** a position against two landmarks.
-- **Doing:** action, which hand, and where the eyes go.
+- **Doing:** action, how far it has got in the start frame, and where the eyes go.
+- **Hands:** what each hand holds and how it stays visible from this camera.
 - **Start → end:** where they are at the first and last frame of the clip.
 
 Prompt rules that come from this card:
@@ -113,6 +114,31 @@ Prompt rules that come from this card:
 - The video prompt's first line restates the **start frame** (who, where, facing), then
   the moves, each with a destination landmark.
 - Timings in the prompt add up to the clip length, and one action lands per beat.
+
+## 6b. Lessons from test generations (image → video)
+
+These failed in real tests. Each one is now a hard rule.
+
+- **Props must be visible from the camera’s side.** Say which hand holds what and how it
+  shows from this angle (*“camera held out to his right side so it shows beyond his arm
+  from behind”*). Never write anything that hides it (“only his elbows show”). A prop the
+  image hides, the video deletes.
+- **State how far each action has got in the start frame:** ALREADY OUT / STILL INSIDE /
+  door CLOSED / just starting to open / not yet pressing. Choose one and write it in
+  capitals.
+- **The video continues forward from that stage only.** Never re-describe an action the
+  frame already shows as done (“lifts it out” when it is already out). The model will undo
+  it to perform it again. Name the destination (*“lowers it onto the gravel beside the rear
+  wheel; it stays on the ground”*) and add *“nothing already done is undone”*.
+- **Place people by frame region plus landmark:** left third / centre / right third,
+  foreground / midground / background, then the landmark. “Beyond the car” is read as
+  “walking to the car”. Give people a clear path with nothing blocking it.
+- **One simple action per person per clip** in short clips. Three people doing three
+  things in 3 seconds means at least one of them goes wrong.
+- **Character sheets pull their pose.** Say that sheets are for identity only.
+- **Seen from behind = no face description,** only hair, build and clothes.
+- **Old references override new text.** If a sheet or plate changed, regenerate it before
+  generating anything that uploads it.
 
 ## 7. Camera continuity
 

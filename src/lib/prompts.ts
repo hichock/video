@@ -95,7 +95,8 @@ const FACE_VISIBLE: View[] = ['front', 'front34', 'profileL', 'profileR'];
 function personLine(p: Person): string {
   const ch = CHARACTERS[p.id];
   const body = FACE_VISIBLE.includes(p.view) ? ch.look : p.view === 'hands' ? 'large tattooed hand and forearm' : `${ch.fromBehind} (face not shown)`;
-  return `• ${ch.short} — ${VIEW_TEXT[p.view]}.\n  Where: ${p.where}.\n  Doing: ${p.doing}.\n  Looks: ${body}.\n  Wearing: ${ch.wardrobe}.`;
+  const hands = p.hands ? `\n  Hands: ${p.hands}.` : '';
+  return `• ${ch.short} — ${VIEW_TEXT[p.view]}.\n  Where: ${p.where}.\n  Doing: ${p.doing}.${hands}\n  Looks: ${body}.\n  Wearing: ${ch.wardrobe}.`;
 }
 
 function peopleBlock(people: Person[]): string {
@@ -156,7 +157,8 @@ export function videoPrompt(s: Shot): string {
   const lines: string[] = [];
   lines.push(`${v.camera} ${v.setting}`);
   if (s.people.length) {
-    lines.push(`Start frame: ${s.people.map((p) => `${CHARACTERS[p.id].short} — ${VIEW_SHORT[p.view]}, ${p.where}`).join('; ')}.`);
+    lines.push(`Start frame: ${s.people.map((p) => `${CHARACTERS[p.id].short} — ${VIEW_SHORT[p.view]}, ${p.where}; ${p.doing}${p.hands ? `; ${p.hands}` : ''}`).join('. ')}.`);
+    lines.push('Every action continues FORWARD from the start frame; nothing that is already done in the start frame is undone or repeated.');
   }
   for (const b of v.beats) lines.push(`${fmt(b.t[0])}–${fmt(b.t[1])}s: ${b.text}`);
   if (v.vo) lines.push(`Voice-over across the clip, added in the edit — nobody on screen speaks and no one on screen moves their mouth. ${v.vo}`);
@@ -189,6 +191,8 @@ export function approvalChecklist(s: Shot): string[] {
     else if (p.view === 'front' || p.view === 'front34') out.push(`${who}: face visible, eyes NOT on the lens`);
     else if (p.view === 'small') out.push(`${who}: small in the background`);
     out.push(`${who}: ${p.where}`);
+    out.push(`${who}: ${p.doing}`);
+    if (p.hands) out.push(`${who} hands: ${p.hands}`);
     if (p.view !== 'hands' && p.view !== 'small') out.push(`${who} wears: ${ch.mustSee}`);
   }
   out.push(...(s.check ?? []));

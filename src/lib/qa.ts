@@ -132,6 +132,20 @@ export function runQA(): Finding[] {
       if (!p.where || !p.doing) add('error', 'Staging', `${CHARACTERS[p.id].name} has no position or action`, s.id);
       if ((p.view === 'back' || p.view === 'back34') && /\b(looks?|looking|eyes) (at|into) the (camera|lens)\b/i.test(p.doing)) add('error', 'Staging', `${CHARACTERS[p.id].name} is seen from behind but told to look at the camera`, s.id);
     }
+    // Props must be visible from the camera's side; a prop carried by someone seen from behind needs its visibility stated.
+    for (const p of s.people) {
+      const carries = /\b(handheld|compact (black )?camera|case|pouch|flashlight|radio|recorder)\b|glowing monitor/i.test(p.doing);
+      if (carries && !p.hands) add('error', 'Hands', `${CHARACTERS[p.id].name} carries a prop but the hands are not staged`, s.id);
+      if ((p.view === 'back' || p.view === 'back34') && p.hands && /camera/i.test(p.hands) && !/visible|show/i.test(p.hands))
+        add('error', 'Hands', `${CHARACTERS[p.id].name} is seen from behind; say how the camera stays visible`, s.id);
+      if (/only (his|her) elbows show|hidden/i.test(`${p.doing} ${p.hands ?? ''}`)) add('error', 'Hands', `${CHARACTERS[p.id].name}: a hidden prop will vanish in the video`, s.id);
+    }
+    // Action phase: the first video beat must not restate an action the start frame already shows as done.
+    const first = s.video.beats[0]?.text ?? '';
+    for (const p of s.people) {
+      if (/ALREADY OUT/.test(p.doing) && /\b(hauls|lifts|takes|pulls)\b[^.]*\bout\b/i.test(first.split(';')[0]) && first.includes(CHARACTERS[p.id].short))
+        add('error', 'Action phase', `${CHARACTERS[p.id].name}: start frame shows the action done, but the video repeats it`, s.id);
+    }
     if (s.people.length && !vp.includes('Start frame:')) add('error', 'Staging', 'Video prompt does not describe the start frame', s.id);
     if (s.people.some((p) => p.view !== 'hands') && !vp.includes('Nobody looks into the lens')) add('error', 'Staging', 'Video prompt must keep eyes off the lens', s.id);
     if (s.cam === 'handheld' && s.operator && ids.includes(s.operator)) add('error', 'Camera grammar', 'The handheld operator cannot be in his own shot', s.id);

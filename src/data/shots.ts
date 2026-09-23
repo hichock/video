@@ -16,8 +16,10 @@ export interface Person {
   view: View;
   /** Position against landmarks in the frame. */
   where: string;
-  /** Action and eyeline at the start frame. */
+  /** Action and eyeline at the start frame, including how far along the action is. */
   doing: string;
+  /** What each hand holds and how it stays visible from this angle. */
+  hands?: string;
 }
 
 export interface VBeat {
@@ -179,13 +181,13 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '24mm',
     blocking:
-      'Master view: the camera stands on the gravel a few metres BEHIND the SUV at eye level, looking at the facade, so the house is ahead of the camera and everyone in frame. The dark green SUV sits slightly left of centre, a few metres from the foot of the front steps, its REAR toward the camera, nose toward the house, tailgate lifted open toward us. The two unloading stand at the two corners of the open tailgate. The tall man has just left the SUV: he is a few steps ahead of it on the gravel, still several metres from the steps, walking away from the camera toward the front door — the camera sees only his back. Low sun from frame-left, long shadows falling right. The people are small in frame; the manor dominates the upper two thirds.',
+      'Master view: the camera stands on the gravel a few metres behind the SUV and slightly to its RIGHT, at eye level, looking at the facade. FRAME LAYOUT: the dark green SUV fills the LEFT half of the frame, its REAR toward the camera, nose toward the house, tailgate lifted open. The RIGHT half of the frame is open gravel leading to the front steps and the front door (right of centre, background). The two unloading stand at the two corners of the open tailgate. The tall man is in the RIGHT third of the frame, in the midground, on the open gravel already past the SUV’s rear bumper, about halfway to the front steps, walking away from the camera toward the front door — nothing stands between him and the steps. Low sun from frame-left, long shadows falling right. The people are small in frame; the manor dominates the upper two thirds.',
     people: [
-      { id: 'owen', view: 'profileR', where: 'standing at the LEFT corner of the open tailgate, full body in frame', doing: 'body turned in profile toward frame-right, both hands hauling a heavy black case out of the boot' },
-      { id: 'mara', view: 'profileL', where: 'standing at the RIGHT corner of the open tailgate, full body in frame', doing: 'in profile toward frame-left, lifting a compact black case out of the boot, eyes on the case' },
-      { id: 'elias', view: 'back', where: 'on the gravel a few steps ahead of the SUV, still several metres from the front steps, walking straight toward the front door', doing: 'mid-stride AWAY from the camera, handheld camera held at chest height in front of him (only his elbows show), head up toward the facade' },
+      { id: 'owen', view: 'profileR', where: 'left third of the frame, at the LEFT corner of the open tailgate, full body', doing: 'the heavy black case is ALREADY OUT of the boot: he holds it at thigh height just clear of the bumper, body turning away from the car toward frame-left', hands: 'both hands on the case handle; the case is clearly outside the car' },
+      { id: 'mara', view: 'profileL', where: 'left half of the frame, at the RIGHT corner of the open tailgate, full body', doing: 'reaching into the boot; a compact black case is STILL INSIDE the boot and her hands are on its handle, eyes on the case', hands: 'both hands inside the boot on the compact case' },
+      { id: 'elias', view: 'back', where: 'RIGHT third of the frame, midground, on open gravel past the SUV’s rear, about halfway to the front steps', doing: 'mid-stride AWAY from the camera toward the front door, head up toward the facade', hands: 'his RIGHT hand holds the black handheld camera by its top handle at chest height, held out to his right side so the camera body and its handle clearly show beyond his right arm from behind; left arm swinging free' },
     ],
-    check: ['The SUV’s REAR faces the camera and the tailgate is open toward us (not parked side-on)', 'The tall man’s FACE IS NOT VISIBLE: only the back of his head and jacket', 'He is a few steps ahead of the SUV, heading for the door, not yet at the steps'],
+    check: ['The SUV’s REAR faces the camera and the tailgate is open toward us (not parked side-on)', 'The tall man’s FACE IS NOT VISIBLE: only the back of his head and jacket', 'The SUV fills the LEFT half; the tall man is in the RIGHT third on open gravel past the car, nothing between him and the steps', 'The bearded man’s case is already OUT of the car; the small woman’s case is still INSIDE the boot', 'The tall man’s camera is clearly visible in his right hand from behind'],
     kf: {
       mode: 'generate',
       uploads: [
@@ -203,9 +205,9 @@ export const SHOTS: Shot[] = [
       camera: 'Slow smooth crane-down push-in toward the manor.',
       setting: 'Bright late afternoon, gravel drive in front of a pale stone manor.',
       beats: [
-        { t: [0, 3], text: `At the open tailgate ${D('owen')} hauls a heavy black case out and sets it on the gravel, and ${D('mara')} lifts out a compact black case. Ahead of them ${D('elias')} keeps walking away from the camera, straight toward the front steps; he is still a few metres short of them when the shot ends. He never turns round. No one speaks.` },
+        { t: [0, 3], text: `${Cap('owen')} turns away from the car and lowers the heavy case he is already holding onto the gravel beside the rear wheel; it stays on the ground. ${Cap('mara')} lifts the compact case up and out of the boot and holds it at her side. On the right, ${D('elias')} keeps walking away from the camera toward the front steps, the camera still in his right hand, and is still a few metres short of the steps when the shot ends. He never turns round. No one speaks.` },
       ],
-      stays: ['The manor, the SUV and the light stay exactly as in the start frame.', 'The tall man’s face is never seen in this shot.', STAY_PEOPLE],
+      stays: ['The manor, the SUV and the light stay exactly as in the start frame.', 'The tall man’s face is never seen in this shot. The camera stays in his right hand. Nothing is put back into the car.', STAY_PEOPLE],
     },
     order: 3,
     edit: 2,
@@ -225,9 +227,9 @@ export const SHOTS: Shot[] = [
     blocking:
       'Reverse view: the camera is on the gravel between the SUV and the house with its BACK TO THE HOUSE (the house is behind the camera, out of frame), moving backward ahead of him. He walks toward the camera — toward the house — in three-quarter front view, handheld camera at chest height, eyes lifted past the lens to the upstairs windows. Behind him, a few metres back and soft: the dark green SUV front-on, and beside it the huge bearded man and the small woman in rust unloading at the open tailgate. Low sun from frame-RIGHT, rim-lighting his right side.',
     people: [
-      { id: 'elias', view: 'front', where: 'in the centre of the frame on the gravel, full body to mid-thigh, walking toward the camera (and toward the house behind the camera)', doing: 'mid-stride, handheld camera at chest height, eyes lifted ABOVE the lens to the upstairs windows' },
-      { id: 'owen', view: 'small', where: 'behind him in the soft background, at the far end of the SUV, half hidden by it', doing: 'unloading a case at the open tailgate' },
-      { id: 'mara', view: 'small', where: 'behind him in the soft background beside the bearded man at the far end of the SUV', doing: 'lifting a small case out of the boot' },
+      { id: 'elias', view: 'front', where: 'in the centre of the frame on the gravel, full body to mid-thigh, walking toward the camera (and toward the house behind the camera)', doing: 'mid-stride, handheld camera at chest height, eyes lifted ABOVE the lens to the upstairs windows', hands: 'right hand holds the black handheld camera at chest height in front of him, lens forward, clearly visible' },
+      { id: 'owen', view: 'small', where: 'behind him in the soft background, at the far end of the SUV, half hidden by it', doing: 'unloading a case at the open tailgate', hands: 'both hands on a black case at the tailgate' },
+      { id: 'mara', view: 'small', where: 'behind him in the soft background beside the bearded man at the far end of the SUV', doing: 'lifting a small case out of the boot', hands: 'both hands on a small black case' },
     ],
     check: ['The manor is NOT in frame; we look away from it', 'The SUV is seen from its FRONT', 'Sun on frame-right'],
     kf: {
@@ -269,8 +271,8 @@ export const SHOTS: Shot[] = [
     blocking:
       'Camera on the gravel beside the rear of the SUV, chest height, looking ACROSS the car side-on: the SUV’s open rear is on frame-LEFT, its nose points frame-RIGHT toward the manor, whose front steps are soft in the background on the RIGHT of frame. The small woman in rust stands at the open boot at the left end of the car, facing into it (toward frame-right), in profile. The huge bearded man is partly cut off at the left edge, also at the boot. The low sun is ahead of the camera, backlighting her hair.',
     people: [
-      { id: 'mara', view: 'profileR', where: 'standing at the open boot at the LEFT end of the car (the SUV’s rear), facing into it toward frame-right', doing: 'both hands lifting a compact black hard case out, thumb on its latch, eyes on the latch' },
-      { id: 'owen', view: 'profileR', where: 'at the left edge of frame, partly cut off by the edge, beside her at the boot', doing: 'dragging a larger black case out, eyes on the case' },
+      { id: 'mara', view: 'profileR', where: 'at the open boot at the LEFT end of the car (the SUV’s rear), facing into it toward frame-right', doing: 'the compact black hard case is STILL INSIDE the boot; she has just gripped it, thumb on its latch, eyes on the latch', hands: 'both hands on the case, which is still inside the boot' },
+      { id: 'owen', view: 'profileR', where: 'at the left edge of frame, partly cut off by the edge, beside her at the boot', doing: 'dragging a larger black case out, eyes on the case', hands: 'both hands on the handle of a larger black case still half inside the boot' },
     ],
     check: ['The manor is soft in the background on frame-RIGHT', 'Backlight: the sun is ahead of the camera'],
     kf: {
@@ -283,7 +285,7 @@ export const SHOTS: Shot[] = [
       camera: 'Smooth gimbal, drifting right with her as she turns toward the house.',
       setting: 'Late afternoon at the open tailgate of the SUV, the manor behind.',
       beats: [
-        { t: [0, 2], text: `${Cap('mara')} lifts the compact black case out of the boot.` },
+        { t: [0, 2], text: `${Cap('mara')} lifts the compact black case up and out of the boot and holds it against her hip.` },
         { t: [2, 5], text: 'She steps back from the boot and walks along the side of the SUV toward frame-right, toward the house and its steps, thumbing the latch open and shut once to check it, eyes on the latch, her profile to the camera.' },
       ],
       vo: vo('B8'),
@@ -343,7 +345,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'Camera just inside the open front door, low and slightly left, looking into the hall (plate direction): the stair ahead, the plain service door on the RIGHT-hand wall. The huge bearded man has just come in past the camera, walking away into the hall, the heavy black case in his LEFT hand, his RIGHT hand reaching for the service-door knob as he passes it, head turned toward the door so his profile shows. A bar of low sun across the floor from the window on the left.',
     people: [
-      { id: 'owen', view: 'back34', where: 'a few steps into the hall, just past the camera on the right side of frame, walking away from the camera toward the stair', doing: 'heavy black case in his LEFT hand; RIGHT hand reaching to the knob of the service door on the right-hand wall; head turned right toward the door so his right profile shows' },
+      { id: 'owen', view: 'back34', where: 'a few steps into the hall, just past the camera on the right side of frame, walking away from the camera toward the stair', doing: 'head turned right toward the service door so his right profile shows; his hand has not reached the knob yet', hands: 'heavy black case in his LEFT hand; RIGHT hand reaching out toward the knob of the service door on the right-hand wall, a hand’s width from it' },
     ],
     check: ['The service door is on the RIGHT-hand wall', 'The bright open front door is behind the camera'],
     kf: {
@@ -356,8 +358,8 @@ export const SHOTS: Shot[] = [
       camera: 'Smooth gimbal following a few steps behind him.',
       setting: 'Bright entrance hall of a manor being cleared, dust sheets, removal boxes.',
       beats: [
-        { t: [0, 1.5], text: `${Cap('owen')} carries the heavy case into the hall.` },
-        { t: [1.5, 3.5], text: 'Without slowing he tries the service-door knob with his free right hand; the door gives and opens a crack; he glances in and pushes it back.' },
+        { t: [0, 1.5], text: `${Cap('owen')} takes one more step with the heavy case, his right hand closing on the service-door knob.` },
+        { t: [1.5, 3.5], text: 'Without slowing he turns the knob; the door gives and opens a crack; he glances in and pushes it shut again.' },
         { t: [3.5, 5], text: 'He keeps walking toward the foot of the stair.' },
       ],
       vo: vo('B13'),
@@ -382,11 +384,11 @@ export const SHOTS: Shot[] = [
     blocking:
       'Camera in the hall at shoulder height, a step behind and to the right of the tall man in olive (over his right shoulder). He stands in the right foreground, back three-quarter to camera, holding his handheld camera up; its flip-out side monitor shows the staircase. Ahead, halfway up the central stair and climbing away from camera side by side: the copper-haired woman on the left, the very tall woman with locs on the right. At the foot of the stair, starting up behind the two women with his back to us: the huge bearded man with the heavy case. At the lower-left edge, just coming in from the front door behind the camera: the small woman in rust with her compact case. Sun bar across the floor from the left.',
     people: [
-      { id: 'elias', view: 'back34', where: 'in the right foreground, from the waist up, a step ahead of the camera', doing: 'holding his handheld camera up at eye height, framing the staircase; its flip-out side monitor shows the stair' },
+      { id: 'elias', view: 'back34', where: 'in the right foreground, from the waist up, a step ahead of the camera', doing: 'holding his handheld camera up at eye height, framing the staircase; its flip-out side monitor shows the stair', hands: 'both hands hold the handheld camera up at eye height; the camera and its flip-out monitor are clearly visible beside his right ear' },
       { id: 'clara', view: 'back', where: 'halfway up the central staircase, on the LEFT of the pair', doing: 'climbing away from the camera, one hand on the banister' },
       { id: 'naomi', view: 'back', where: 'halfway up the central staircase, on the RIGHT of the pair, taller', doing: 'climbing away from the camera beside her' },
-      { id: 'owen', view: 'back', where: 'at the foot of the central staircase, one step up, behind the two women', doing: 'starting up the stair with the heavy black case, back to camera' },
-      { id: 'mara', view: 'small', where: 'at the lower-left edge, just coming in from the front door behind the camera', doing: 'carrying her compact case toward the stair, back to camera' },
+      { id: 'owen', view: 'back', where: 'at the foot of the central staircase, one step up, behind the two women', doing: 'starting up the stair with the heavy black case, back to camera', hands: 'heavy black case in his right hand, clearly visible at his side' },
+      { id: 'mara', view: 'small', where: 'at the lower-left edge, just coming in from the front door behind the camera', doing: 'carrying her compact case toward the stair, back to camera', hands: 'compact black case in her right hand' },
     ],
     check: ['Both women are seen from behind, climbing', 'The front door is behind the camera'],
     kf: {
@@ -575,9 +577,9 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'clara', view: 'front', where: 'at the very front of frame on the right, nearest the right wall, about to pass the camera on the right', doing: 'walking, eyes ahead' },
       { id: 'naomi', view: 'front', where: 'at the very front of frame, just left of her companion, about to pass the camera on the right', doing: 'walking beside her' },
-      { id: 'mara', view: 'small', where: 'halfway down the corridor, coming toward the camera from the landing, near the open nursery door on the right wall', doing: 'carrying a compact black camera and a small metal bracket' },
-      { id: 'elias', view: 'small', where: 'one step behind the small woman', doing: 'holding his handheld camera' },
-      { id: 'owen', view: 'profileR', where: 'in the left foreground against the left wall, partly cut off by the frame edge', doing: 'kneeling at an open black case, unpacking a compact black camera and a small canvas tool pouch, eyes on the case' },
+      { id: 'mara', view: 'small', where: 'halfway down the corridor, coming toward the camera from the landing, near the open nursery door on the right wall', doing: 'carrying a compact black camera and a small metal bracket', hands: 'compact black camera in her right hand, small metal bracket in her left' },
+      { id: 'elias', view: 'small', where: 'one step behind the small woman', doing: 'holding his handheld camera', hands: 'handheld camera in his right hand' },
+      { id: 'owen', view: 'profileR', where: 'in the left foreground against the left wall, partly cut off by the frame edge', doing: 'kneeling at an open black case, unpacking a compact black camera and a small canvas tool pouch, eyes on the case', hands: 'both hands in the open case' },
     ],
     kf: {
       mode: 'generate',
@@ -623,7 +625,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'Handheld view from the doorway, looking in: ahead-right, high in the corner where the window wall meets the wall ahead, the small woman in rust stands on a small step stool, arms up, tightening a compact black camera onto one small metal wall bracket. The camera’s tiny flip-out preview screen faces us. Below her the window with thin curtains; to the left the low chest with the grey box on the rug and the white iron bed beyond. Daylight from the window.',
     people: [
-      { id: 'mara', view: 'back34', where: 'ahead-right, high in the corner above the window, standing on a small step stool', doing: 'arms raised, tightening a compact black camera onto a wall bracket, face turned up to the mount in partial profile' },
+      { id: 'mara', view: 'back34', where: 'ahead-right, high in the corner above the window, standing on a small step stool', doing: 'arms raised, tightening a compact black camera onto a wall bracket, face turned up to the mount in partial profile', hands: 'both arms raised, both hands on the compact camera and its bracket, the camera clearly visible above her hands' },
     ],
     check: ['No person other than her; the doorway operator is never seen', 'The bracket is in the corner above the window, ahead-right'],
     kf: {
@@ -660,10 +662,10 @@ export const SHOTS: Shot[] = [
     blocking:
       'Camera in the corridor with its back to the wall opposite the nursery door, eye level. In the open doorway, back three-quarter to camera, the tall man in olive stands filming into the room, handheld raised toward the far corner. Through the doorway, high in the corner ahead-right above the window, the small woman in rust on a step stool tightening the compact camera onto its bracket. In the corridor foreground, entering from frame-RIGHT and walking LEFT (toward the landing): the huge bearded man carrying a second compact black camera and a small canvas tool pouch; a few steps behind him, the very tall woman with locs holding her silver cassette recorder.',
     people: [
-      { id: 'elias', view: 'back34', where: 'standing in the open nursery doorway in the midground, facing into the room', doing: 'handheld camera raised, pointed at the far corner ahead-right' },
-      { id: 'mara', view: 'small', where: 'seen through the doorway, high in the corner ahead-right above the window, on a step stool', doing: 'tightening the compact camera on its bracket, face in partial profile' },
-      { id: 'owen', view: 'profileL', where: 'in the corridor foreground, entering from frame-RIGHT, full body', doing: 'walking slowly toward frame-LEFT carrying a compact black camera and a small canvas tool pouch, eyes ahead down the corridor' },
-      { id: 'naomi', view: 'profileL', where: 'in the corridor foreground a few steps behind him, on the right', doing: 'walking toward frame-LEFT, looking down at the cassette recorder in her hands' },
+      { id: 'elias', view: 'back34', where: 'standing in the open nursery doorway in the midground, facing into the room', doing: 'handheld camera raised, pointed at the far corner ahead-right', hands: 'both hands hold the handheld camera raised in front of his face, its body visible beyond his right shoulder' },
+      { id: 'mara', view: 'small', where: 'seen through the doorway, high in the corner ahead-right above the window, on a step stool', doing: 'tightening the compact camera on its bracket, face in partial profile', hands: 'both hands on the camera on its bracket' },
+      { id: 'owen', view: 'profileL', where: 'in the corridor foreground, entering from frame-RIGHT, full body', doing: 'walking slowly toward frame-LEFT carrying a compact black camera and a small canvas tool pouch, eyes ahead down the corridor', hands: 'compact black camera in his right hand, canvas tool pouch in his left, both clearly visible' },
+      { id: 'naomi', view: 'profileL', where: 'in the corridor foreground a few steps behind him, on the right', doing: 'walking toward frame-LEFT, looking down at the cassette recorder in her hands', hands: 'silver cassette recorder held in both hands in front of her' },
     ],
     check: ['The bearded man walks toward frame-LEFT (the landing side)', 'The doorway is in the corridor wall; the room is seen through it'],
     kf: {
@@ -701,7 +703,7 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'owen', view: 'profileL', where: 'in the centre of the corridor foreground, passing between the camera and the doorway', doing: 'walking toward frame-LEFT, eyes ahead, not turning his head' },
       { id: 'naomi', view: 'profileL', where: 'on the right of the foreground, a few steps behind him', doing: 'walking toward frame-LEFT, head turning toward the man in the doorway with a small knowing smile, her profile to the camera' },
-      { id: 'elias', view: 'back34', where: 'in the open doorway, facing into the room', doing: 'handheld raised, starting to turn his head back toward the corridor (toward the camera side)' },
+      { id: 'elias', view: 'back34', where: 'in the open doorway, facing into the room', doing: 'handheld raised, starting to turn his head back toward the corridor (toward the camera side)', hands: 'handheld camera still raised in both hands, visible beyond his right shoulder' },
       { id: 'mara', view: 'small', where: 'through the doorway, high in the far corner on the stool', doing: 'still working on the mount' },
     ],
     kf: {
@@ -737,7 +739,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'Same locked corridor angle, doorway now empty: through it, the small woman in rust on the step stool in the high corner gives the mounted camera a final twist; a small black hard-case monitor stands on the floor below her.',
     people: [
-      { id: 'mara', view: 'small', where: 'through the empty doorway, high in the corner ahead-right on the step stool', doing: 'giving the mounted camera a final twist; the small black monitor case on the floor below her' },
+      { id: 'mara', view: 'small', where: 'through the empty doorway, high in the corner ahead-right on the step stool', doing: 'giving the mounted camera a final twist; the small black monitor case on the floor below her', hands: 'both hands on the mounted camera; the monitor case stands on the floor below her' },
     ],
     kf: {
       mode: 'generate',
@@ -774,9 +776,9 @@ export const SHOTS: Shot[] = [
     blocking:
       'Entrance hall from near the front door (plate direction): the central staircase ahead, the plain service door on the RIGHT-hand wall. Coming down the stair toward camera in single file: the huge bearded man in front with the tool pouch and compact camera, then the tall man in olive with his handheld raised on him, then the small woman in rust with the monitor case, then the very tall woman with locs.',
     people: [
-      { id: 'owen', view: 'front', where: 'first in line, on the last steps of the central staircase, coming down toward the camera', doing: 'tool pouch and compact camera in hand, eyes on the service door on the right-hand wall (to HIS left, frame-right)' },
-      { id: 'elias', view: 'front', where: 'second in line, a few steps above him', doing: 'handheld camera raised on the bearded man' },
-      { id: 'mara', view: 'front', where: 'third in line', doing: 'carrying the small black monitor case' },
+      { id: 'owen', view: 'front', where: 'first in line, on the last steps of the central staircase, coming down toward the camera', doing: 'tool pouch and compact camera in hand, eyes on the service door on the right-hand wall (to HIS left, frame-right)', hands: 'tool pouch in his left hand, compact black camera in his right hand, both visible' },
+      { id: 'elias', view: 'front', where: 'second in line, a few steps above him', doing: 'handheld camera raised on the bearded man', hands: 'handheld camera raised in both hands in front of his chest, lens toward the bearded man' },
+      { id: 'mara', view: 'front', where: 'third in line', doing: 'carrying the small black monitor case', hands: 'small black monitor case in her right hand' },
       { id: 'naomi', view: 'front', where: 'last, near the top of the visible stair', doing: 'coming down behind them' },
     ],
     check: ['The service door is on the RIGHT-hand wall', 'They come DOWN the stair toward the camera'],
@@ -812,11 +814,11 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'Service hall from the passage entrance (plate direction): the bell board on the back wall, the lower wooden panel below it, the narrow lower service door immediately to its right. The huge bearded man crouches at the board, setting his tool pouch and the compact camera on the floor. The tall man in olive stands just behind his left shoulder, handheld raised on him. The small woman in rust sets the monitor case down by the left wall; the very tall woman with locs stands behind her. Cold shaft of light from the small high window on the left.',
+      'Service hall from the passage entrance (plate direction): the bell board on the back wall, the lower wooden panel below it, the narrow lower service door immediately to its right. The huge bearded man stands at the board, about to crouch, the tool pouch still in his hand. The tall man in olive stands just behind his left shoulder, handheld raised on him. The small woman in rust sets the monitor case down by the left wall; the very tall woman with locs stands behind her. Cold shaft of light from the small high window on the left.',
     people: [
-      { id: 'owen', view: 'back34', where: 'crouching at the foot of the bell board on the back wall', doing: 'setting the tool pouch and compact camera on the floor, reaching for the lower wooden panel' },
-      { id: 'elias', view: 'back34', where: 'standing just behind the bearded man’s left shoulder', doing: 'handheld camera aimed at the panel' },
-      { id: 'mara', view: 'profileL', where: 'by the left wall', doing: 'setting the monitor case down on the floor' },
+      { id: 'owen', view: 'back34', where: 'standing at the foot of the bell board on the back wall', doing: 'about to crouch; the lower wooden panel is still CLOSED', hands: 'tool pouch and the compact camera still in his right hand, clearly visible at his side' },
+      { id: 'elias', view: 'back34', where: 'standing just behind the bearded man’s left shoulder', doing: 'handheld camera aimed at the panel', hands: 'handheld camera raised in both hands, visible beyond his right shoulder, pointed at the panel' },
+      { id: 'mara', view: 'profileL', where: 'by the left wall', doing: 'setting the monitor case down on the floor', hands: 'both hands on the monitor case handle as it touches the floor' },
       { id: 'naomi', view: 'back34', where: 'behind the small woman, nearer the camera', doing: 'watching the board' },
     ],
     kf: {
@@ -829,7 +831,7 @@ export const SHOTS: Shot[] = [
       camera: 'Smooth gimbal, slight drift in.',
       setting: 'Ground-floor service hall with an antique servant-bell board.',
       beats: [
-        { t: [0, 2], text: `${Cap('owen')} sets the tool pouch down and crouches at the board.` },
+        { t: [0, 2], text: `${Cap('owen')} crouches, sets the tool pouch and the compact camera on the floor beside the board.` },
         { t: [2, 4], text: 'He swings open the hinged lower wooden panel below the board.' },
         { t: [4, 5], text: `${Cap('elias')} leans in with his handheld toward the opening; ${D('mara')} picks up the compact camera and a spring clamp.` },
       ],
@@ -889,8 +891,8 @@ export const SHOTS: Shot[] = [
     blocking:
       'Handheld from the host, just behind the huge bearded man’s right shoulder: he stands square in front of the board, facing it, so we see the back of his right shoulder and his right profile, his right index finger on the small brass flag under the readable NURSERY label. Beside the board on the left, the small woman in rust faces the board at an angle, tightening a compact camera onto a simple spring clamp on a pipe, aimed at the board. The narrow lower service door is to the right of the board.',
     people: [
-      { id: 'owen', view: 'back34', where: 'standing square in front of the board; the camera is just behind his right shoulder so his right profile shows', doing: 'right index finger on the brass flag under the NURSERY label, eyes on the mechanism' },
-      { id: 'mara', view: 'front34', where: 'on the left of the board, beside it', doing: 'tightening a compact camera onto a spring clamp on a pipe, eyes on the clamp' },
+      { id: 'owen', view: 'back34', where: 'standing square in front of the board; the camera is just behind his right shoulder so his right profile shows', doing: 'the NURSERY flag is still in the neutral UP position; eyes on the mechanism', hands: 'right index finger resting on the brass flag under the NURSERY label, not yet pressing' },
+      { id: 'mara', view: 'front34', where: 'on the left of the board, beside it', doing: 'tightening a compact camera onto a spring clamp on a pipe, eyes on the clamp', hands: 'both hands on the spring clamp and the compact camera' },
     ],
     check: ['NURSERY label readable', 'The lower service door is to the RIGHT of the board'],
     kf: {
@@ -928,9 +930,9 @@ export const SHOTS: Shot[] = [
     blocking:
       'Service hall from the passage entrance, slightly left: the bearded man at the board picking up his tool pouch; the narrow lower service door immediately to the RIGHT of the board; the tall man in olive at his shoulder with the handheld raised; the small woman in rust by the left wall with the monitor case; the very tall woman with locs behind her.',
     people: [
-      { id: 'owen', view: 'profileR', where: 'at the board, beside the narrow lower door on its right', doing: 'picking up the tool pouch, free hand on the lower door’s handle' },
-      { id: 'elias', view: 'back34', where: 'just behind the bearded man', doing: 'handheld camera raised on him' },
-      { id: 'mara', view: 'profileR', where: 'by the left wall', doing: 'bending to lift the monitor case' },
+      { id: 'owen', view: 'profileR', where: 'at the board, beside the narrow lower door on its right', doing: 'the lower door is still CLOSED; he is turning to it', hands: 'tool pouch already in his LEFT hand; RIGHT hand on the lower door’s handle' },
+      { id: 'elias', view: 'back34', where: 'just behind the bearded man', doing: 'handheld camera raised on him', hands: 'handheld camera raised in both hands, visible beyond his right shoulder' },
+      { id: 'mara', view: 'profileR', where: 'by the left wall', doing: 'bending to lift the monitor case', hands: 'right hand reaching for the monitor case handle; the case still on the floor' },
       { id: 'naomi', view: 'back34', where: 'behind the small woman, nearer the camera', doing: 'waiting to follow' },
     ],
     kf: {
@@ -943,7 +945,7 @@ export const SHOTS: Shot[] = [
       camera: 'Smooth gimbal, slight pan right.',
       setting: 'Ground-floor service hall.',
       beats: [
-        { t: [0, 1.5], text: `${Cap('owen')} picks up the pouch and immediately opens the narrow door to the right of the board, revealing the foot of a narrow wooden stair, and steps through.` },
+        { t: [0, 1.5], text: `${Cap('owen')} immediately opens the narrow door to the right of the board, revealing the foot of a narrow wooden stair, and steps through.` },
         { t: [1.5, 3], text: `${Cap('elias')} follows right behind him, handheld camera held up on him.` },
         { t: [3, 5], text: `${Cap('mara')} lifts the monitor case and follows; ${D('naomi')} follows behind her.` },
       ],
@@ -966,9 +968,9 @@ export const SHOTS: Shot[] = [
     blocking:
       'Camera on the middle-turn landing at chest height looking DOWN the lower flight (handrail on frame-left; the upper flight begins just off frame-right). Climbing toward camera at a quick walking pace: the huge bearded man two steps from the top, tool pouch in hand; behind him the tall man in olive with the handheld up on him; behind him the small woman in rust with the monitor case; at the bottom, the very tall woman with locs just stepping in through the open lower service door.',
     people: [
-      { id: 'owen', view: 'front', where: 'two steps below the camera, climbing toward it, first in line', doing: 'tool pouch in hand, eyes on the turn above him' },
-      { id: 'elias', view: 'front', where: 'behind the bearded man', doing: 'handheld camera held up on him' },
-      { id: 'mara', view: 'front', where: 'behind the tall man', doing: 'carrying the monitor case' },
+      { id: 'owen', view: 'front', where: 'two steps below the camera, climbing toward it, first in line', doing: 'tool pouch in hand, eyes on the turn above him', hands: 'tool pouch in his left hand; right hand on the handrail' },
+      { id: 'elias', view: 'front', where: 'behind the bearded man', doing: 'handheld camera held up on him', hands: 'handheld camera held up in both hands in front of his chest, lens up toward the bearded man' },
+      { id: 'mara', view: 'front', where: 'behind the tall man', doing: 'carrying the monitor case', hands: 'monitor case in her right hand' },
       { id: 'naomi', view: 'small', where: 'at the bottom of the flight', doing: 'just stepping in through the open lower service door' },
     ],
     check: ['Handrail on frame-LEFT', 'The open lower door is visible at the bottom'],
@@ -1005,8 +1007,8 @@ export const SHOTS: Shot[] = [
     blocking:
       'Landing plate framing (tripod, eye level, facing the panelled wall): the narrow upper service door now open away from camera into the dark stairwell; the huge bearded man half out of it, stepping onto the landing; the small wooden table immediately to the LEFT of the door, lamp off, nothing on it; in the stairwell behind him, the tall man in olive with his handheld.',
     people: [
-      { id: 'owen', view: 'front34', where: 'half out of the open service door, stepping onto the landing, the table immediately to the left of the door', doing: 'mid-step, eyes on the landing, tool pouch in hand' },
-      { id: 'elias', view: 'small', where: 'in the dark stairwell behind him, framed by the door', doing: 'handheld camera up' },
+      { id: 'owen', view: 'front34', where: 'half out of the open service door, stepping onto the landing, the table immediately to the left of the door', doing: 'mid-step, eyes on the landing, tool pouch in hand', hands: 'tool pouch in his left hand; right hand free, about to point back' },
+      { id: 'elias', view: 'small', where: 'in the dark stairwell behind him, framed by the door', doing: 'handheld camera up', hands: 'handheld camera held up in both hands' },
     ],
     check: ['The table is immediately LEFT of the door; nothing on it but the lamp (lamp off)'],
     kf: {
@@ -1042,7 +1044,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'EXACT landing plate framing, locked (this is the match-cut frame): camera facing the panelled wall, the closed service door on the right, the small table immediately to its left, the dust-sheeted chair at the table’s left end, the window further left. The small black hard-case monitor stands on the table beside the lamp, angled toward the chair on the left so both screens are also partly visible to the camera. The small woman in rust stands at the left end of the table by the chair, in profile facing frame-right, hands on the case latches. The huge bearded man stands to the right of the table, between the table and the door, in profile facing frame-left, looking at the monitor.',
     people: [
-      { id: 'mara', view: 'profileR', where: 'standing at the LEFT end of the table beside the dust-sheeted chair', doing: 'hands on the latches of the small black hard-case monitor she has just set on the table, angled toward her' },
+      { id: 'mara', view: 'profileR', where: 'standing at the LEFT end of the table beside the dust-sheeted chair', doing: 'the monitor case lid is still CLOSED', hands: 'both hands on the latches of the small black hard-case monitor she has just set on the table, angled toward her' },
       { id: 'owen', view: 'profileL', where: 'standing to the RIGHT of the table, between the table and the closed service door', doing: 'looking down at the monitor' },
     ],
     check: ['Framing identical to the landing plate (match cut)', 'The monitor is angled toward the chair on the left, both screens partly visible to the camera'],
@@ -1087,7 +1089,7 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'mara', view: 'profileR', where: 'seated on the chair at the LEFT end of the table', doing: 'facing the open monitor, which is angled toward her' },
       { id: 'owen', view: 'profileR', where: 'standing just behind her left shoulder, on the window side', doing: 'arms folded, eyes on the screens' },
-      { id: 'elias', view: 'front34', where: 'at the RIGHT edge of frame, just stepping in from the corridor opening', doing: 'handheld camera lowered at his side, looking toward the table' },
+      { id: 'elias', view: 'front34', where: 'at the RIGHT edge of frame, just stepping in from the corridor opening', doing: 'handheld camera lowered at his side, looking toward the table', hands: 'handheld camera lowered in his right hand, clearly visible at his side' },
     ],
     check: ['Framing identical to the day shot', 'Window black, lamp on'],
     kf: {
@@ -1199,7 +1201,7 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'clara', view: 'front34', where: 'about two metres beyond the open nursery door, on the far-window side, standing still', doing: 'turned toward the open doorway (camera-left), shoulders tight, hands still at her sides, eyes on the doorway' },
       { id: 'naomi', view: 'front34', where: 'a step behind her', doing: 'eyes on her' },
-      { id: 'elias', view: 'back', where: 'in the right foreground, walking away from the camera toward her', doing: 'handheld camera lowered at his side' },
+      { id: 'elias', view: 'back', where: 'in the right foreground, walking away from the camera toward her', doing: 'walking, head toward her', hands: 'his right hand carries the handheld camera lowered at his side, clearly visible beside his right thigh' },
     ],
     check: ['The open nursery door is on the LEFT wall in the foreground', 'Her face is toward the doorway, not toward the lens'],
     kf: {
@@ -1277,7 +1279,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'Night, camera in the corridor at shoulder height behind the tall man in olive (left) and the very tall woman with locs (right), both seen from behind. Between them, a step ahead, the copper-haired woman walking into the open nursery doorway, back to camera. Through the doorway: the lamp pool over the rug, the chest and grey box to the left; high in the far corner ahead-right above the dark window, the compact camera with its small red REC light.',
     people: [
-      { id: 'elias', view: 'back', where: 'in the left foreground, from the shoulders up', doing: 'facing the doorway' },
+      { id: 'elias', view: 'back', where: 'in the left foreground, from the shoulders up', doing: 'facing the doorway', hands: 'handheld camera lowered in his right hand, its top just visible at the bottom edge' },
       { id: 'naomi', view: 'back', where: 'in the right foreground, from the shoulders up, taller', doing: 'facing the doorway' },
       { id: 'clara', view: 'back', where: 'between them, a step ahead, in the open doorway', doing: 'walking into the room' },
     ],
@@ -1782,7 +1784,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'Same reverse angle as SH27, a little wider: the small woman in rust seated at the far end of the table, a black flashlight and a radio on the table by her right hand; the huge bearded man standing behind her left shoulder, staring at his LEFT-hand screen. The service door is just behind the camera on the right.',
     people: [
-      { id: 'mara', view: 'front34', where: 'seated at the far end of the table behind the monitor', doing: 'eyes on the screens; a black flashlight and a radio on the table by her right hand' },
+      { id: 'mara', view: 'front34', where: 'seated at the far end of the table behind the monitor', doing: 'eyes on the screens; a black flashlight and a radio on the table by her right hand', hands: 'both hands empty and resting on the table; the flashlight and radio lie on the table by her right hand' },
       { id: 'owen', view: 'front34', where: 'standing behind her left shoulder', doing: 'eyes on the LEFT-hand screen' },
     ],
     kf: {
@@ -1820,8 +1822,8 @@ export const SHOTS: Shot[] = [
     blocking:
       'Landing plate framing at night (as SH25): the small woman in rust at the narrow service door on the right, back three-quarter to camera, one hand pushing it open into the black stairwell, flashlight and radio in the other hand; the huge bearded man beside the empty chair at the table, hands going to the glowing monitor; the corridor opening at the right edge.',
     people: [
-      { id: 'mara', view: 'back34', where: 'at the narrow service door to the RIGHT of the table', doing: 'one hand pushing the door open into the dark stairwell, flashlight and radio in the other' },
-      { id: 'owen', view: 'profileR', where: 'at the table beside the empty chair', doing: 'both hands going to the glowing monitor' },
+      { id: 'mara', view: 'back34', where: 'at the narrow service door to the RIGHT of the table', doing: 'the door is just starting to open into the dark stairwell', hands: 'one hand pushing the door; the flashlight and the radio in the other hand, both visible' },
+      { id: 'owen', view: 'profileR', where: 'at the table beside the empty chair', doing: 'the monitor is still ON the table', hands: 'both hands just reaching the glowing monitor' },
     ],
     kf: {
       mode: 'generate',
@@ -1858,7 +1860,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'Upper flight at night from the top (handrail on frame-LEFT, the turn at the bottom goes RIGHT). Camera behind the small woman in rust and slightly above her shoulder: she is on the top steps, left hand free near the rail, flashlight held low in her right hand, beam on the steps below, radio clipped on her vest.',
     people: [
-      { id: 'mara', view: 'back', where: 'on the top steps, just below and ahead of the camera', doing: 'running down, left hand free near the rail, flashlight low in her right hand, radio clipped on her vest' },
+      { id: 'mara', view: 'back', where: 'on the top steps, just below and ahead of the camera', doing: 'running down, left hand free near the rail, flashlight low in her right hand, radio clipped on her vest', hands: 'left hand free, skimming the rail; right hand holds the flashlight low, beam visible on the steps; radio clipped to her vest' },
     ],
     check: ['Handrail on frame-LEFT; the stair turns RIGHT at the bottom'],
     kf: {
@@ -1945,7 +1947,7 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'elias', view: 'profileR', where: 'at the closed nursery door on the right wall', doing: 'one hand braced on the doorframe, the other on the handle' },
       { id: 'naomi', view: 'profileR', where: 'beside him at the door, nearest the camera', doing: 'palm flat on the door' },
-      { id: 'owen', view: 'front34', where: 'several steps further toward the landing, beyond the other two, facing them and the camera side', doing: 'holding the small glowing monitor angled toward himself, eyes on its screen' },
+      { id: 'owen', view: 'front34', where: 'several steps further toward the landing, beyond the other two, facing them and the camera side', doing: 'holding the small glowing monitor angled toward himself, eyes on its screen', hands: 'both hands hold the small glowing monitor at chest height, screen toward himself' },
     ],
     kf: {
       mode: 'generate',
@@ -1982,7 +1984,7 @@ export const SHOTS: Shot[] = [
     blocking:
       'On the middle-turn landing at night, camera at shoulder height looking DOWN the lower flight (handrail on frame-LEFT; the upper flight comes in from frame-RIGHT). The small woman in rust is entering frame from the right mid-stride, coming off the upper flight, flashlight beam sweeping down the lower steps. The bottom of the flight is black; no door visible.',
     people: [
-      { id: 'mara', view: 'back34', where: 'entering the turn landing from frame-RIGHT, coming off the upper flight', doing: 'mid-stride, turning to run down the lower flight, flashlight beam sweeping down the steps' },
+      { id: 'mara', view: 'back34', where: 'entering the turn landing from frame-RIGHT, coming off the upper flight', doing: 'mid-stride, turning to run down the lower flight, flashlight beam sweeping down the steps', hands: 'flashlight in her right hand, beam visible on the lower steps; left hand free' },
     ],
     check: ['Handrail on frame-LEFT; the bottom of the stair is black — no door visible'],
     kf: {
@@ -2021,7 +2023,7 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'elias', view: 'profileR', where: 'at the closed nursery door, ear near the wood', doing: 'listening' },
       { id: 'naomi', view: 'profileR', where: 'beside him, nearest the camera', doing: 'palm flat on the door, eyes on the wood' },
-      { id: 'owen', view: 'front34', where: 'several steps further toward the landing', doing: 'holding the glowing monitor' },
+      { id: 'owen', view: 'front34', where: 'several steps further toward the landing', doing: 'holding the glowing monitor', hands: 'both hands hold the glowing monitor at chest height' },
     ],
     kf: {
       mode: 'plate',
