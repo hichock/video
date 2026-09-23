@@ -214,6 +214,20 @@ export function runQA(): Finding[] {
   };
   for (const n of deps.keys()) visit(n, []);
 
+  // 16b. Coverage: vary size and setup between consecutive shots (continuity rules §12)
+  const setupKey = (x: string) => x.split(' ')[0];
+  SHOTS.forEach((s, i) => {
+    if (!s.size || !s.setup) add('error', 'Coverage', 'Every shot needs a size and a camera setup', s.id);
+    const prev = SHOTS[i - 1];
+    if (!prev || s.matchCut) return;
+    if (setupKey(prev.setup) === setupKey(s.setup) && prev.size === s.size) {
+      // Test scope is SH01–SH20; later shots are flagged for rework but do not block the build yet.
+      add(i < 20 ? 'error' : 'warn', 'Coverage', `Same setup (${setupKey(s.setup)}) and size (${s.size}) as ${prev.id} — the cut will jump. Change the size or the angle.`, s.id);
+    }
+    const prev2 = SHOTS[i - 2];
+    if (prev2 && prev2.size === prev.size && prev.size === s.size) add('warn', 'Coverage', `Third ${s.size} in a row (${prev2.id}, ${prev.id}, ${s.id})`, s.id);
+  });
+
   // 17. Runtime vs script
   const total = SHOTS.reduce((a, s) => a + s.edit, 0);
   add('info', 'Runtime', `Full script cut: ${total.toFixed(1)}s (${fmtTime(total)}). Script expects ~2:38–2:45.`);

@@ -193,11 +193,41 @@ Reject and reroll the keyframe unless:
 - Nobody turns toward the lens, and nothing that must stay still moves.
 - The last frame matches what the next shot's staging card expects.
 
+## 7b. Coverage: vary size and angle at every cut
+
+A scene shot as a string of same-size wides looks like security footage. Nothing in the
+bible or script asks for it. Plan coverage like a crew would:
+
+- Every shot has a **named setup** (camera position, e.g. `HALL-B`) and a **size**
+  (EWS · WS · MWS · MS · MCU · CU · ECU · INSERT). Both are fields in `shots.ts`.
+- **Never cut between two shots that share both the setup and the size.** Change at least
+  one: move the camera 30°+ (new setup) or change size by at least one step. The only
+  exception is a deliberate match cut (`matchCut: true`, e.g. SH24 → SH25 day → night).
+  QA fails the build on this for SH01–SH20.
+- Avoid three shots of the same size in a row (QA warning).
+- Within a scene, walk the size ladder on one axis (wide → medium → close, as
+  SH08 → SH10 → SH11) and use reverses (SH06 looks back at the front door, SH07 looks down
+  from the stair) so a new room or a new beat gets a new angle.
+- Before writing prompts, write a coverage table per scene: shot · setup · size · lens ·
+  why this angle. Put the size in the keyframe CAMERA line ("medium shot — from the waist
+  up, 50mm") so the image model frames it.
+- Every new setup gets its own shot map; re-draw the map whenever the setup changes.
+
+## 7c. Mood lives in one place
+
+The look lines (`LOOKS` in `assets.ts`) are shared by every day plate and keyframe. One
+cheerful word there ("warm, bright, elegant, inviting") turns the whole film into a
+property advert. Keep the approved wording: *elegant and real, not a ruin, but frozen in
+time … muted, slightly desaturated, deep soft shadows, a heavy stillness*. If a generated
+plate is approved, its prompt text is locked: change it only to fix a real error, and say
+in the Changes tab what changed.
+
 ## 11. Order of work for a new scene
 
 1. Read the scene in the script and list every beat.
 2. Draw the overhead map (§1) and the line of action (§2).
-3. Plan the coverage: camera IDs, one per shot, with which beats each covers.
+3. Plan the coverage (§7b): setup ID and size per shot, with which beats each covers; no
+   consecutive pair shares both.
 4. Fill a staging card per shot (§6), including the start and end positions.
 5. Run the cut check (§5) on paper for every pair of consecutive shots.
 6. Only then write the plate, keyframe and video prompts.

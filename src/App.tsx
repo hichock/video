@@ -14,6 +14,7 @@ import { NurseryMap, UpperFloorMap } from './components/Diagrams';
 const TABS = [
   ['overview', 'Overview'],
   ['shots', 'Shotlist'],
+  ['maps', 'Shot maps'],
   ['script', 'Script check'],
   ['bible', 'Bible & maps'],
   ['build', 'Build order'],
@@ -84,6 +85,7 @@ export default function App() {
       <main>
         {tab === 'overview' && <Overview done={done} setTab={setTab} findings={findings} />}
         {tab === 'shots' && <Shots done={done} toggle={toggle} findings={findings} />}
+        {tab === 'maps' && <ShotMaps findings={findings} />}
         {tab === 'script' && <ScriptCheck />}
         {tab === 'bible' && <Bible />}
         {tab === 'build' && <Build done={done} toggle={toggle} />}
@@ -97,6 +99,59 @@ export default function App() {
 }
 
 // ---------------------------------------------------------------------------
+
+/** Quick visual check: every shot map of the test scope side by side, with size and setup. */
+function ShotMaps({ findings }: { findings: Finding[] }) {
+  const scope = SHOTS.slice(0, 20);
+  const coverage = findings.filter((f) => f.rule === 'Coverage' && scope.some((s) => s.id === f.shot));
+  return (
+    <section className="section">
+      <h2>Shot maps, SH01–SH20</h2>
+      <p className="lead">Top-down plan of every shot of the test scope, in cut order. Read them in sequence: the camera setup or the shot size should change at every cut, and people should leave one map where they start the next. Click a map to open it full size.</p>
+      <div className="sizestrip" aria-label="Shot sizes in cut order">
+        {scope.map((s) => (
+          <span key={s.id} className={`sizechip size-${s.size}`} title={`${s.id} · ${s.setup}`}>
+            <b>{s.id.slice(2)}</b>
+            {s.size}
+          </span>
+        ))}
+      </div>
+      {coverage.length > 0 && (
+        <div>
+          {coverage.map((f, i) => (
+            <div className="finding" key={i}>
+              <span className={`pill ${f.severity === 'error' ? 'rec' : 'warn'}`}>{f.severity}</span>
+              <span className="mono">{f.shot}</span>
+              <span>{f.msg}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="mapgrid">
+        {scope.map((s) => (
+          <figure key={s.id} className="mapcell">
+            {s.map ? (
+              <a href={s.map} target="_blank" rel="noreferrer">
+                <img src={s.map} alt={`Top-down map of ${s.id}`} loading="lazy" />
+              </a>
+            ) : (
+              <div className="nomap">No map — {s.cam === 'fixed-nursery' ? 'locked NURSERY FIXED frame' : 'not drawn yet'}</div>
+            )}
+            <figcaption>
+              <div className="pills">
+                <span className="pill mono">{s.id}</span>
+                <span className="pill brass">{s.size}</span>
+                <span className="pill">{s.lens}</span>
+              </div>
+              <div className="setup">{s.setup}</div>
+              <div className="dim">{s.title}</div>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function Overview({ done, setTab, findings }: { done: Record<string, boolean>; setTab: (t: Tab) => void; findings: Finding[] }) {
   const total = SHOTS.reduce((a, s) => a + s.edit, 0);
@@ -520,7 +575,7 @@ function QA({ findings }: { findings: Finding[] }) {
     <section className="section">
       <h2>Automated QA</h2>
       <p className="lead">
-        The same checks run in <code>npm test</code> and block the Vercel build on any error: every beat covered in script order; every scripted line verbatim in its prompt; VO clips silent; two speakers at most per clip; timings add up to the ordered length; lines fit at natural speed; no names or file names in prompts; 2–5 uploads, each with a job; identity reference for everyone visible; the Woman only on NURSERY FIXED and never animated; handheld only with an established operator; the mark and distance ladders in order.
+        The same checks run in <code>npm test</code> and block the Vercel build on any error: every beat covered in script order; every scripted line verbatim in its prompt; VO clips silent; two speakers at most per clip; timings add up to the ordered length; lines fit at natural speed; no names or file names in prompts; 2–5 uploads, each with a job; identity reference for everyone visible; the Woman only on NURSERY FIXED and never animated; handheld only with an established operator; the mark and distance ladders in order; no two consecutive shots from the same setup at the same size.
       </p>
       <div>
         {sorted.map((f, i) => (

@@ -9,6 +9,16 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'Flat coverage: every shot a full-body wide',
+    body: 'Most shots were written as full-figure wides at 24–35mm, and SH06 and SH07 were the same hall angle at the same size with the people moved around. Nothing in the bible or script asks for this; it was a staging shortcut.',
+    fix: 'Every shot now has a named camera setup and a shot size, and the size goes into the keyframe CAMERA line. SH06 is a low waist-up medium beside the service door looking back at the front door; SH07 is a high wide from the top of the stair; SH08 → SH10 → SH11 walks wide → medium → close-up; SH12 turns round to the landing end; SH15 is a frontal medium; SH16 is a reverse from the far end of the nursery. QA fails the build if two consecutive shots share both setup and size (unless marked as a match cut). New maps for SH06, SH07, SH11, SH12, SH15 and SH16, and a Shot maps tab to check them side by side.',
+  },
+  {
+    title: 'The day mood drifted to “bright and happy”',
+    body: 'While aligning the plates, the shared day look was rewritten with “warm, bright, elegant” and the exterior with “elegant, inviting, well kept”. Because LOOKS is shared, this changed every day plate and keyframe at once, and the hall came out like a property advert.',
+    fix: 'Restored the approved wording (elegant and real, not a ruin, frozen in time, muted and slightly desaturated, deep soft shadows, heavy stillness) in the shared day looks, the hall plate (now the approved prompt word for word, plus the door and window sides). The exterior keeps the script’s own words (B1: elegant and inviting, not ruined) but with the same muted, frozen-in-time palette. Night looks were never touched.',
+  },
+  {
     title: 'The corridor did not match the generated nursery',
     body: 'The corridor plates were text-only: they never uploaded the nursery or hall images, so the door, wallpaper and the view through the doorway were invented. The nursery map also no longer matched the approved plate (bed along the right wall, lamp in the far-right corner, window beside the camera).',
     fix: 'The approved nursery plate is now the source of truth. One room description taken from it (NURSERY_LAYOUT) is used by every nursery prompt; the corridor plates upload the nursery (door, surround, wallpaper) and the hall (woodwork, floors). The floor plan was re-drawn so the corridor runs on past the nursery door to the far window, and the Veiled Woman positions moved off the lamp table.',

@@ -4,7 +4,7 @@
 
 import { ASSETS, HYGIENE, LOOKS, type Asset, type Upload } from '../data/assets';
 import { CHARACTERS, CAST, type CharId } from '../data/characters';
-import { SHOTS, visibleOf, type Person, type Shot, type View } from '../data/shots';
+import { SHOTS, visibleOf, SIZE_TEXT, type Person, type Shot, type View } from '../data/shots';
 
 /** How reused shot stills are described when uploaded (never by file name). */
 export const KF_REFS: Record<string, string> = {
@@ -129,7 +129,7 @@ export function keyframePrompt(s: Shot): string {
   if (people) parts.push(people);
   const h = heightsLine(visibleOf(s));
   if (h) parts.push(h);
-  parts.push(`CAMERA: ${s.lens}.`);
+  parts.push(`CAMERA: ${SIZE_TEXT[s.size]}, ${s.lens}.`);
   parts.push(`LOOK: ${lookFor(s)}`);
   if (k.keep?.length) parts.push(`KEEP UNCHANGED: ${k.keep.join('; ')}.`);
   parts.push(HYGIENE);

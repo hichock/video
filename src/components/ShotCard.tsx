@@ -47,7 +47,9 @@ export function ShotCard({
         <div className="pills">
           <span className={`pill ${fixed ? 'rec' : shot.cam === 'handheld' ? 'brass' : ''}`}>{CAM_LABEL[shot.cam]}</span>
           <span className={`pill ${shot.time === 'night' ? 'night' : ''}`}>{shot.time}</span>
+          <span className="pill brass">{shot.size}</span>
           <span className="pill">{shot.lens}</span>
+          <span className="pill">setup {shot.setup}</span>
           <span className="pill">order {fmt(shot.order)}s</span>
           <span className="pill">edit {fmt(shot.edit)}s</span>
           <span className={`pill ${shot.sound === 'native' ? 'ok' : ''}`}>{shot.sound === 'native' ? 'native audio' : 'sound off'}</span>
