@@ -1,0 +1,1897 @@
+// The shotlist. One shot per generation, keyframe first, in script order.
+// People are referred to by what is visible (CHARACTERS[x].short); scripted
+// lines are inserted with q(beatId) so they can never drift from the script.
+
+import { BEAT_BY_ID } from './script';
+import { CHARACTERS, type CharId } from './characters';
+import { MAPS, type Upload } from './assets';
+
+export type CamKind = 'cinematic' | 'handheld' | 'tripod' | 'fixed-nursery' | 'fixed-bellboard';
+
+export interface VBeat {
+  t: [number, number];
+  text: string;
+}
+
+export interface Keyframe {
+  /** generate: new image from references. edit: edit of the first upload. plate: an existing plate is the start frame. startEnd: two plates as start and end frames. */
+  mode: 'generate' | 'edit' | 'plate' | 'startEnd';
+  uploads: Upload[];
+  frame: string;
+  keep?: string[];
+  saveAs: string;
+  endFrame?: string;
+}
+
+export interface WomanLayer {
+  /** Still image the figure is masked out of. */
+  file: string;
+  position: 'P1' | 'P2' | 'P3';
+  /** Present when this shot generates the layer. */
+  prompt?: string;
+  uploads?: Upload[];
+  /** Tight-crop shot: separate clean frame with the figure removed. */
+  cleanPrompt?: string;
+  cleanSaveAs?: string;
+}
+
+export interface Shot {
+  id: string;
+  section: string;
+  covers: string[];
+  title: string;
+  cam: CamKind;
+  operator?: CharId;
+  location: string;
+  time: 'day' | 'night';
+  lens: string;
+  blocking: string;
+  visible: CharId[];
+  kf: Keyframe;
+  woman?: WomanLayer;
+  video: {
+    camera: string;
+    setting: string;
+    beats: VBeat[];
+    /** Host VO laid over this clip in the edit. */
+    vo?: string;
+    stays: string[];
+  };
+  order: number;
+  edit: number;
+  sound: 'off' | 'native';
+  audio: string;
+  lowerThird?: string;
+  post?: string;
+  note?: string;
+  trim?: string;
+}
+
+// ---- helpers --------------------------------------------------------------
+
+const D = (id: CharId) => CHARACTERS[id].short;
+const Cap = (id: CharId) => {
+  const s = CHARACTERS[id].short;
+  return s[0].toUpperCase() + s.slice(1);
+};
+const V = (id: CharId) => CHARACTERS[id].voiceInPrompt ?? '';
+export const q = (beatId: string) => {
+  const b = BEAT_BY_ID[beatId];
+  if (!b?.line) throw new Error(`Beat ${beatId} has no line`);
+  return `“${b.line}”`;
+};
+const sheet = (id: CharId, job = 'identity: face, hair, build and full wardrobe'): Upload => ({ file: CHARACTERS[id].sheetFile, job });
+const bg = (id: CharId) => sheet(id, 'identity of a smaller background figure');
+const up = (file: string, job: string): Upload => ({ file, job });
+const LINEUP_BG = up('CH_LINEUP.png', 'identities of the small background figures and everyone’s relative heights');
+
+const STAY_PEOPLE = 'Faces, hair, body size and full wardrobe stay exactly as in the start frame.';
+const STAY_LOCKED = 'The camera stays perfectly locked like a security camera: no zoom, no drift, no shake.';
+const STAY_NO_FIGURE = 'The room stays empty apart from her: no figure, shadow or shape appears anywhere.';
+const STAY_NO_TURN = 'She never turns around and never looks behind her.';
+const STAY_FACES_ONLY_MOVE = 'Only she moves. Every object in the room stays exactly where it is.';
+
+const vo = (beatId: string) =>
+  `The host’s warm, confident American male voice, ${BEAT_BY_ID[beatId].delivery}, says: ${q(beatId)}`;
+
+const NURSERY_NIGHT_REF = up('LOC_NURSERY_FIXED_NIGHT.png', 'the exact camera, room, furniture and lamp light — change nothing');
+const WOMAN_REF = up('CH_VEILED_sheet.png', 'the figure: dress, veil, proportions');
+
+// ---------------------------------------------------------------------------
+
+export const SHOTS: Shot[] = [
+  // ======================= A — COLD OPEN ===================================
+  {
+    id: 'SH01',
+    section: 'A',
+    covers: ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8'],
+    title: 'Cold open: tight crop of NURSERY FIXED. Clara’s throat, two fingers on a faint mark, broken breath; a dark slice of the Woman at the edge.',
+    cam: 'fixed-nursery',
+    location: 'LOC_NURSERY_FIXED_NIGHT.png',
+    time: 'night',
+    lens: 'Tight crop of the NURSERY FIXED wide',
+    blocking:
+      'A tight crop out of the NURSERY FIXED frame, same high corner camera looking down, same warm lamp spill from frame-right. Only the copper-haired woman’s lower face, throat, right hand and part of her right shoulder, seen from above and behind her right shoulder. She faces the door (out of frame to the left). The top-right corner of the crop clips a dark slice of the veiled figure’s dress and veil. No door, no furniture, no room geography.',
+    visible: ['clara'],
+    kf: {
+      mode: 'edit',
+      uploads: [
+        up('KF_SH51.png', 'the exact final-cliff frame to crop from: camera angle, light, pose, blouse'),
+        up('KF_SH47_W.png', 'the veiled figure standing one body length behind her — only a slice of her will show'),
+        up('MARK_STAGES.png', 'use the LEFT panel (faint thin red line) for the throat'),
+        sheet('clara', 'face, freckles and skin detail at close range'),
+      ],
+      frame:
+        'Re-render a tight vertical crop of the uploaded high-corner night frame of the copper-haired woman at the door, at full detail, as if the same security camera had zoomed in: same angle from above and behind her right shoulder, same warm lamp spill from the right, same pose. In frame ONLY: the right side of her lower face and jaw, her throat, her right hand and part of her right shoulder in the ice-blue blouse. Her right hand is hooked at her own throat with two fingers pressed into a faint thin red pressure line that is just forming across it (the left panel of the throat reference), as if pulling at an invisible grip from behind; her chin is dragged up and back, neck straining, lips parted on a stopped breath. At the top-right edge of the frame, cut off by the edge, a dark slice of the veiled figure’s black dress and smoke-grey veil, flat and ambiguous against the shadow — no face, no way to judge how close she stands. No door, no furniture.',
+      keep: ['the camera angle and lamp direction of the uploaded final frame', 'her blouse, freckles and hair colour'],
+      saveAs: 'KF_SH01.png',
+    },
+    woman: {
+      file: 'KF_SH01.png',
+      position: 'P3',
+      cleanPrompt:
+        'Edit the uploaded tight crop: remove the dark slice of black dress and grey veil at the top-right edge and replace it with the plain dark wall shadow that would be there. Change nothing else.',
+      cleanSaveAs: 'KF_SH01_CLEAN.png',
+    },
+    video: {
+      camera: 'Fixed high-corner security camera, tight crop, completely static.',
+      setting: 'Night. A dark room lit only by weak warm lamp spill from the right.',
+      beats: [
+        { t: [0, 1.5], text: `The copper-haired woman’s two fingers press into the faint red line on her throat, pulling at something that is not there; her jaw tightens, chin dragged up and back.` },
+        { t: [1.5, 3.5], text: 'She tries to inhale: her shoulder lifts, the breath catches and stops halfway with a small choked sound; her lips stay parted, her throat works against it.' },
+        { t: [3.5, 5], text: 'She holds there, straining, fingers still pressed to the mark, eyes fixed forward. She does not turn her head.' },
+      ],
+      stays: [STAY_LOCKED, 'The dark edge at the top right stays black and completely still.', STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'off',
+    audio: 'Clara’s interrupted inhale only (recorded/ElevenLabs SFX, cut exactly where the breath stops). No ghost sound. HARD CUT on the broken breath to bright exterior ambience.',
+    post: 'Animate from KF_SH01_CLEAN.png; composite the slice from KF_SH01.png as a masked still over the whole clip. NURSERY FIXED overlay + grain.',
+    note: 'Script: faint mark forming, two fingers at the mark. Rules: cold open = the final-cliff pose. Built as the final pose, cropped, with the script’s faint mark. See Decisions.',
+  },
+
+  // ======================= B — ARRIVAL =====================================
+  {
+    id: 'SH02',
+    section: 'B',
+    covers: ['B1', 'B2'],
+    title: 'Bright wide of the manor. The crew are already unloading at the SUV; Elias heads for the steps.',
+    cam: 'cinematic',
+    location: 'LOC_EXT_DAY.png',
+    time: 'day',
+    lens: '24mm',
+    blocking:
+      'Master view: camera on the gravel behind the SUV at eye level, looking at the facade. The dark green SUV is a few metres from the foot of the front steps, slightly left of centre, rear toward camera, tailgate open. At the tailgate: the huge bearded man on the left lifting out a heavy black case, the small woman in rust on the right taking out a compact black case. Between the SUV and the steps, walking away from camera toward the front door with his back to us: the tall lean man in olive, handheld camera at chest height. Low sun from frame-left, long shadows falling right. Everyone small in frame; the manor dominates.',
+    visible: ['owen', 'mara', 'elias'],
+    kf: {
+      mode: 'generate',
+      uploads: [
+        up('LOC_EXT_DAY.png', 'location, exact framing, SUV position and light — keep exactly'),
+        sheet('owen'),
+        sheet('mara'),
+        sheet('elias'),
+        up('CH_LINEUP.png', 'relative heights'),
+      ],
+      frame: 'A documentary moment, nobody posing, nobody looking at the camera: the crew already at work. The manor is bright, elegant and inviting.',
+      keep: ['the manor, SUV and light exactly as in the uploaded photo'],
+      saveAs: 'KF_SH02.png',
+    },
+    video: {
+      camera: 'Slow smooth crane-down push-in toward the manor.',
+      setting: 'Bright late afternoon, gravel drive in front of a pale stone manor.',
+      beats: [
+        { t: [0, 3], text: `At the open tailgate ${D('owen')} hauls a heavy black case out and sets it on the gravel; ${D('mara')} lifts out a compact black case. ${Cap('elias')} keeps walking away from camera toward the front steps. Nobody looks at the camera. No one speaks.` },
+      ],
+      stays: ['The manor, the SUV and the light stay exactly as in the start frame.', STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 2,
+    sound: 'off',
+    audio: 'Gravel, case handles, a car door. Light investigative music bed starts here and runs under the whole intro.',
+    trim: 'Could shrink to 1s; the wide is required by B1.',
+  },
+  {
+    id: 'SH03',
+    section: 'B',
+    covers: ['B3', 'B4', 'B5'],
+    title: 'Elias walks toward the house with the handheld at chest height; SUV and crew behind him. VO 1.',
+    cam: 'cinematic',
+    location: 'LOC_EXT_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Reverse view: the camera is on the gravel between the SUV and the house with its BACK TO THE HOUSE (the house is behind the camera, out of frame), moving backward ahead of him. He walks toward the camera — toward the house — in three-quarter front view, handheld camera at chest height, eyes lifted past the lens to the upstairs windows. Behind him, a few metres back and soft: the dark green SUV front-on, and beside it the huge bearded man and the small woman in rust unloading at the open tailgate. Low sun from frame-RIGHT, rim-lighting his right side.',
+    visible: ['elias', 'owen', 'mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [
+        up('LOC_EXT_REV_DAY.png', 'location and light: the view away from the house, SUV front-on'),
+        sheet('elias'),
+        up('PROP_HANDHELD_CAM.png', 'his camera'),
+        bg('owen'),
+        bg('mara'),
+      ],
+      frame: 'He looks curious and at ease, a small half-smile, weight forward, mid-stride. The house is NOT in the frame: it is behind the camera, where he is looking.',
+      saveAs: 'KF_SH03.png',
+    },
+    video: {
+      camera: 'Gimbal moving slowly backward ahead of him at walking pace; the house is behind the camera.',
+      setting: 'Bright late afternoon on the gravel drive, looking away from the house toward the SUV.',
+      beats: [
+        { t: [0, 5], text: `${Cap('elias')} walks steadily toward the camera across the gravel, handheld camera at chest height, glancing up past the lens at the upstairs windows with a small curious half-smile. Behind him the two at the SUV keep unloading cases.` },
+      ],
+      vo: vo('B5'),
+      stays: [STAY_PEOPLE, 'The SUV stays parked where it is.'],
+    },
+    order: 5,
+    edit: 4.5,
+    sound: 'off',
+    audio: 'VO 1 (ElevenLabs, Elias voice) starts on the cut. Gravel footsteps. Music bed under.',
+    lowerThird: 'ELIAS VALE — FIELD LEAD / HOST',
+  },
+  {
+    id: 'SH04',
+    section: 'B',
+    covers: ['B6', 'B7', 'B8'],
+    title: 'Mara lifts the compact fixed-camera case from the SUV and checks the latch while walking toward the entrance. VO 2.',
+    cam: 'cinematic',
+    location: 'LOC_EXT_DAY.png',
+    time: 'day',
+    lens: '50mm',
+    blocking:
+      'Camera beside the rear corner of the SUV at chest height, looking across the open tailgate; the manor’s front steps are soft in the background on the RIGHT of frame. The small woman in rust stands at the tailgate lifting a compact black hard case out of the boot with both hands, thumb already on its latch. At the left edge, partly cut off, the huge bearded man drags out a larger case. The low sun is ahead of the camera, backlighting her hair.',
+    visible: ['mara', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_EXT_DAY.png', 'the SUV, gravel, manor and light'), sheet('mara'), bg('owen')],
+      frame: 'Focused, practical, a faint unimpressed half-frown. Nobody looks at the camera.',
+      saveAs: 'KF_SH04.png',
+    },
+    video: {
+      camera: 'Smooth gimbal, drifting right with her as she turns toward the house.',
+      setting: 'Late afternoon at the open tailgate of the SUV, the manor behind.',
+      beats: [
+        { t: [0, 2], text: `${Cap('mara')} lifts the compact black case out of the boot.` },
+        { t: [2, 5], text: 'She turns toward the house and starts walking toward the front steps, thumbing the latch open and shut once to check it, eyes on the latch.' },
+      ],
+      vo: vo('B8'),
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 5,
+    sound: 'off',
+    audio: 'VO 2 (ElevenLabs). Case latch click, gravel.',
+    lowerThird: 'MARA CHEN — CAMERA & SYSTEMS',
+  },
+  {
+    id: 'SH05',
+    section: 'B',
+    covers: ['B9', 'B10'],
+    title: 'Naomi already walking beside Clara toward the front door; Clara gestures to an upstairs window, Naomi listens.',
+    cam: 'cinematic',
+    location: 'LOC_EXT_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Reverse view, back to the house: camera moving backward ahead of two women walking toward it — toward the house, which is behind the camera. On the left, the very tall woman with locs in the camel coat; on the right, half a step ahead, the copper-haired woman in the ice-blue blouse, her right arm raised pointing up past the camera at an upstairs window. The SUV small and soft far behind them. Low sun from frame-right.',
+    visible: ['naomi', 'clara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_EXT_REV_DAY.png', 'location and light'), sheet('naomi'), sheet('clara'), up('CH_LINEUP.png', 'relative heights')],
+      frame: 'The woman with locs is clearly taller and listens with warm attention; the copper-haired woman is composed and guarded, explaining.',
+      saveAs: 'KF_SH05.png',
+    },
+    video: {
+      camera: 'Gimbal moving backward ahead of them; the house is behind the camera.',
+      setting: 'Late afternoon on the gravel drive, looking away from the house.',
+      beats: [
+        { t: [0, 3], text: `${Cap('clara')} points up past the camera at an upstairs window as she walks, talking quietly — no voice is heard; ${D('naomi')} follows the gesture with her eyes, listening, and keeps walking beside her.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 2,
+    sound: 'off',
+    audio: 'Music bed and footsteps; VO 2 may tail over the head of this shot.',
+    lowerThird: 'NAOMI BROOKS — EVIDENCE & INTERVIEWS',
+  },
+  {
+    id: 'SH06',
+    section: 'B',
+    covers: ['B11', 'B12', 'B13'],
+    title: 'Owen carries the heavier case into the hall and checks the old service door with his free hand without slowing. VO 3.',
+    cam: 'cinematic',
+    location: 'LOC_HALL_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Camera just inside the open front door, low and slightly left, looking into the hall (plate direction): the stair ahead, the plain service door on the RIGHT-hand wall. The huge bearded man has just come in past the camera, walking away into the hall, the heavy black case in his LEFT hand, his RIGHT hand reaching for the service-door knob as he passes it, head turned toward the door so his profile shows. A bar of low sun across the floor from the window on the left.',
+    visible: ['owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_HALL_DAY.png', 'the hall, stair, service door and light — keep'), sheet('owen')],
+      frame: 'Mid-stride, not slowing, deadpan and practical.',
+      saveAs: 'KF_SH06.png',
+    },
+    video: {
+      camera: 'Smooth gimbal following a few steps behind him.',
+      setting: 'Bright entrance hall of a manor being cleared, dust sheets, removal boxes.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('owen')} carries the heavy case into the hall.` },
+        { t: [1.5, 3.5], text: 'Without slowing he tries the service-door knob with his free right hand; the door gives and opens a crack; he glances in and pushes it back.' },
+        { t: [3.5, 5], text: 'He keeps walking toward the foot of the stair.' },
+      ],
+      vo: vo('B13'),
+      stays: [STAY_PEOPLE, 'The service door stays on the right-hand wall.'],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'off',
+    audio: 'VO 3 (≈7s) starts here and runs on over SH07. Door knob, case, footsteps on stone.',
+    lowerThird: 'OWEN REYES — SAFETY & LOGISTICS',
+    note: 'The service door he checks is the one the crew take to the service hall in SH17.',
+  },
+  {
+    id: 'SH07',
+    section: 'B',
+    covers: ['B14', 'B15', 'B16', 'B17', 'B18'],
+    title: 'Elias frames the central stair with the handheld; Naomi and Clara go up; Mara and Owen carry the gear in behind them.',
+    cam: 'cinematic',
+    location: 'LOC_HALL_DAY.png',
+    time: 'day',
+    lens: '24mm',
+    blocking:
+      'Camera in the hall at shoulder height, a step behind and to the right of the tall man in olive (over his right shoulder). He stands in the right foreground, back three-quarter to camera, holding his handheld camera up; its flip-out side monitor shows the staircase. Ahead, halfway up the central stair and climbing away from camera side by side: the copper-haired woman on the left, the very tall woman with locs on the right. At the lower-left edge, just coming in from the front door behind the camera: the huge bearded man with the heavy case and the small woman in rust with her compact case. Sun bar across the floor from the left.',
+    visible: ['elias', 'clara', 'naomi', 'owen', 'mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [
+        up('LOC_HALL_DAY.png', 'the hall and staircase — keep'),
+        sheet('elias'),
+        sheet('clara'),
+        sheet('naomi'),
+        LINEUP_BG,
+      ],
+      frame: 'Everyone busy and moving; nobody looks at the camera.',
+      saveAs: 'KF_SH07.png',
+    },
+    video: {
+      camera: 'Gimbal starts over his shoulder, then rises and tilts up to follow the two women up the stair in one continuous movement.',
+      setting: 'Bright entrance hall with a central staircase.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('elias')} frames the stair with his handheld camera; ${D('owen')} and ${D('mara')} come in at the lower edge with their cases, heading for the foot of the stair.` },
+        { t: [1.5, 5], text: `The camera rises past his shoulder and follows ${D('clara')} and ${D('naomi')} up the staircase as they reach the top and turn into the upper corridor.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'off',
+    audio: 'VO 3 finishes over this shot. The music bed falls away as the two women reach the upper floor.',
+  },
+
+  // ======================= C — CORRIDOR, DAY ===============================
+  {
+    id: 'SH08',
+    section: 'C',
+    covers: ['C1', 'C2', 'C10'],
+    title: 'Naomi and Clara walk the bright upper corridor side by side; Clara slows at the open nursery door to look inside.',
+    cam: 'cinematic',
+    location: 'LOC_CORRIDOR_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Reverse corridor view from the far-window end looking back toward the landing. The two women walk side by side toward camera, the landing behind them. The copper-haired woman is on frame-RIGHT, nearest the wall with the open white nursery door; the very tall woman with locs on frame-left. They are one step before the open doorway, which is on the right wall right beside the copper-haired woman. Daylight from behind the camera, soft on their faces.',
+    visible: ['clara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [
+        up('LOC_CORRIDOR_REV_DAY.png', 'the corridor, nursery door position and light — keep'),
+        sheet('clara'),
+        sheet('naomi'),
+        up('LOC_NURSERY_DOORWAY_DAY.png', 'what is visible through the nursery doorway'),
+      ],
+      frame: 'Walking, not posing, not an interview. The woman with locs is clearly taller, eyes on her companion.',
+      saveAs: 'KF_SH08.png',
+    },
+    video: {
+      camera: 'Gimbal moving slowly backward ahead of them; they never stop walking.',
+      setting: 'Bright upper corridor of the manor, daytime.',
+      beats: [
+        { t: [0, 2.5], text: `${Cap('clara')} and ${D('naomi')} walk side by side toward the camera, easy pace, not stopping.` },
+        { t: [2.5, 5], text: `As they reach the open doorway, ${D('clara')} slows just enough to look to her left through it into the room, her face going still and guarded.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3,
+    sound: 'off',
+    audio: 'Daytime house ambience, soft footsteps, distant equipment movement (whole corridor section).',
+  },
+  {
+    id: 'SH09',
+    section: 'C',
+    covers: ['C3'],
+    title: 'Through the doorway: the room in one clean view — child bed, low chest, archival box.',
+    cam: 'cinematic',
+    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking: 'Plate framing: from the corridor straight through the open white door into the nursery. Chest and grey box on the rug to the left, bed beyond, window on the right, empty high corner ahead-right.',
+    visible: [],
+    kf: {
+      mode: 'plate',
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'start frame as is')],
+      frame: 'No new keyframe. The plate is the start frame.',
+      saveAs: 'LOC_NURSERY_DOORWAY_DAY.png',
+    },
+    video: {
+      camera: 'Gimbal gliding slowly left to right past the open doorway at eye level.',
+      setting: 'A small, sunlit child’s room seen from the corridor.',
+      beats: [
+        { t: [0, 3], text: 'The camera glides past the open doorway, holding one clean view into the room: the simple white iron bed, the low wooden chest, the grey archival box on its lid. Dust hangs in the pale light. Nothing in the room moves.' },
+      ],
+      stays: ['The room stays exactly as in the start frame; no person, figure or shadow appears.'],
+    },
+    order: 3,
+    edit: 1.5,
+    sound: 'off',
+    audio: 'House ambience continues.',
+    trim: 'Candidate: can be covered by the view through the door in SH08.',
+  },
+  {
+    id: 'SH10',
+    section: 'C',
+    covers: ['C4', 'C5', 'C6'],
+    title: 'NAOMI: “This is the room?” Clara looks in but keeps moving past it: “My mother said, ‘If the nursery bell rings, do not enter.’ I didn’t believe her.”',
+    cam: 'cinematic',
+    location: 'LOC_CORRIDOR_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Same reverse corridor view: the two women are level with the open nursery doorway on the right wall. The copper-haired woman on frame-right, still looking through the doorway to her left; the woman with locs on frame-left, walking, eyes on her.',
+    visible: ['clara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi')],
+      frame: 'Controlled and direct on the outside; grief held underneath.',
+      saveAs: 'KF_SH10.png',
+    },
+    video: {
+      camera: 'Gimbal moving backward ahead of them.',
+      setting: 'Bright upper corridor, daytime.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('naomi')}, still walking, eyes on her, asks gently in ${V('naomi')}: ${q('C4')}` },
+        { t: [1.5, 2.5], text: `${Cap('clara')} keeps looking through the doorway but keeps moving past it without slowing.` },
+        { t: [2.5, 8], text: `Walking, controlled and direct, in ${V('clara')}: ${q('C6')} On the last words a thin, tight half-smile that does not reach her eyes. ${Cap('naomi')} listens, walking, eyes on her.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 8,
+    edit: 6,
+    sound: 'native',
+    audio: 'Naomi and Clara lines, native then voice-swapped.',
+  },
+  {
+    id: 'SH11',
+    section: 'C',
+    covers: ['C7', 'C8', 'C9'],
+    title: 'Clara looks back once at the box. “Her last letter is in that box…” Naomi follows her glance, keeps pace, asks nothing.',
+    cam: 'cinematic',
+    location: 'LOC_CORRIDOR_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Same reverse corridor view, further on: the open nursery doorway is now several metres behind them on the right wall. Both women walk toward camera; the copper-haired woman on frame-right, the woman with locs on frame-left.',
+    visible: ['clara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi')],
+      frame: 'Quieter now, the guard slipping.',
+      saveAs: 'KF_SH11.png',
+    },
+    video: {
+      camera: 'Gimbal moving backward ahead of them.',
+      setting: 'Bright upper corridor, daytime.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} looks back once over her left shoulder toward the open doorway behind them — at the box inside — then turns forward again.` },
+        { t: [1.5, 7], text: `Quieter, still walking, her voice thinning, in ${V('clara')}: ${q('C8')}` },
+        { t: [7, 8], text: `${Cap('naomi')} follows her glance back toward the doorway, then keeps pace beside her and says nothing.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 8,
+    edit: 6,
+    sound: 'native',
+    audio: 'Clara’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH12',
+    section: 'C',
+    covers: ['C11'],
+    title: 'Transition: Clara and Naomi leave frame; Mara carries NURSERY FIXED into the nursery, Elias follows with the handheld; Owen works on the landing.',
+    cam: 'tripod',
+    location: 'LOC_CORRIDOR_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Same reverse corridor view, locked. The two women are at the very front of frame, about to pass the camera on the left. Down the corridor, coming from the landing: the small woman in rust carrying a compact black camera and a small metal bracket toward the open nursery door on the right wall, the tall man in olive right behind her with his handheld camera. At the far end, on the landing, the huge bearded man setting down a case.',
+    visible: ['clara', 'naomi', 'mara', 'elias', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [
+        up('LOC_CORRIDOR_REV_DAY.png', 'the corridor — keep'),
+        sheet('clara'),
+        sheet('naomi'),
+        LINEUP_BG,
+        up('PROP_FIXED_CAM.png', 'the camera and bracket she carries'),
+      ],
+      frame: 'One connected flow of work, nobody posing.',
+      saveAs: 'KF_SH12.png',
+    },
+    video: {
+      camera: 'Locked tripod.',
+      setting: 'Bright upper corridor, daytime.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} and ${D('naomi')} walk out of frame past the camera on the left.` },
+        { t: [1.5, 4], text: `Down the corridor, ${D('mara')} carries the compact camera to the open nursery door and turns in through it; ${D('elias')} follows her in, raising his handheld camera.` },
+        { t: [4, 5], text: `At the far end ${D('owen')} keeps working on the landing.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3,
+    sound: 'off',
+    audio: 'House ambience, distant cases.',
+    note: 'Naomi exits with Clara here and is back working in the corridor in SH14 (“Owen and Naomi continue working nearby”).',
+    trim: 'Candidate.',
+  },
+
+  // ======================= D — SETUP ROUTE =================================
+  {
+    id: 'SH13',
+    section: 'D',
+    covers: ['D1', 'D2'],
+    title: 'Handheld from Elias at the doorway: Mara mounts NURSERY FIXED in the high corner; its preview shows door, box and open depth.',
+    cam: 'handheld',
+    operator: 'elias',
+    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Handheld view from the doorway, looking in: ahead-right, high in the corner where the window wall meets the wall ahead, the small woman in rust stands on a small step stool, arms up, tightening a compact black camera onto one small metal wall bracket. The camera’s tiny flip-out preview screen faces us. Below her the window with thin curtains; to the left the low chest with the grey box on the rug and the white iron bed beyond. Daylight from the window.',
+    visible: ['mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket')],
+      frame: 'Concentrated, quick, precise hands.',
+      saveAs: 'KF_SH13.png',
+    },
+    video: {
+      camera: 'Handheld investigation camera held by the host standing in the doorway (he is never seen): gentle natural sway, slight push in.',
+      setting: 'A sunlit child’s nursery.',
+      beats: [
+        { t: [0, 3], text: `${Cap('mara')} tightens the bracket with short firm twists, eyes on the mount, then angles the camera down toward the door and the box.` },
+        { t: [3, 5], text: 'She checks the tiny preview screen once and gives the bracket one last twist.' },
+      ],
+      stays: [STAY_PEOPLE, 'The bracket stays in that one high corner.'],
+    },
+    order: 5,
+    edit: 2,
+    sound: 'off',
+    audio: 'Bracket clicks (SFX).',
+    post: 'Track and replace the tiny preview screen with LOC_NURSERY_FIXED_DAY so it clearly shows the door, the box and the open depth.',
+    note: 'Operator is established in SH12 (Elias follows her in raising the handheld).',
+  },
+  {
+    id: 'SH14',
+    section: 'D',
+    covers: ['D3', 'D4', 'D5'],
+    title: 'Corridor angle: Owen passes with BELL BOARD FIXED and his pouch, Naomi behind with her recorder. ELIAS: “Very polite house so far.” MARA: “You’ve been here twenty minutes.”',
+    cam: 'tripod',
+    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Camera in the corridor with its back to the wall opposite the nursery door, eye level. In the open doorway, back three-quarter to camera, the tall man in olive stands filming into the room, handheld raised toward the far corner. Through the doorway, high in the corner ahead-right above the window, the small woman in rust on a step stool tightening the compact camera onto its bracket. In the corridor foreground, entering from frame-RIGHT and walking LEFT (toward the landing): the huge bearded man carrying a second compact black camera and a small canvas tool pouch; a few steps behind him, the very tall woman with locs holding her silver cassette recorder.',
+    visible: ['elias', 'mara', 'owen', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('mara'), sheet('owen'), sheet('naomi')],
+      frame: 'Relaxed crew banter while everyone keeps working.',
+      saveAs: 'KF_SH14.png',
+    },
+    video: {
+      camera: 'Locked tripod in the corridor.',
+      setting: 'Sunlit upper corridor, looking into the nursery doorway.',
+      beats: [
+        { t: [0, 2], text: `${Cap('owen')} walks slowly into the foreground from the right carrying the compact camera and tool pouch, heading left; ${D('naomi')} follows a few steps behind, checking her cassette recorder.` },
+        { t: [2, 4], text: `In the doorway ${D('elias')}, watching the woman in the corner work, says lightly and fondly in ${V('elias')}: ${q('D4')}` },
+        { t: [4, 7], text: `Up in the corner, without looking down and still tightening the same mount, ${D('mara')} answers dryly in ${V('mara')}: ${q('D5')}` },
+      ],
+      stays: [STAY_PEOPLE, 'The bearded man keeps walking slowly and never turns his head; nobody stops working.'],
+    },
+    order: 7,
+    edit: 3.5,
+    sound: 'native',
+    audio: 'Elias and Mara lines, native then voice-swapped.',
+  },
+  {
+    id: 'SH15',
+    section: 'D',
+    covers: ['D6', 'D7', 'D8', 'D9'],
+    title: 'Owen keeps walking without turning: “That’s usually enough for him.” Naomi’s knowing smile to Elias; Elias grins and follows Owen.',
+    cam: 'tripod',
+    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Same locked corridor angle, a moment later: the huge bearded man at the centre of the foreground, passing behind the tall man in the doorway, walking LEFT; the woman with locs a few steps behind him on the right; the small woman in rust still working in the corner beyond the doorway.',
+    visible: ['owen', 'elias', 'naomi', 'mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH14.png', 'exact framing, light and everyone’s look — continue from it'), sheet('owen'), sheet('elias'), sheet('naomi')],
+      frame: 'Continue the uploaded frame a moment later with the new positions.',
+      saveAs: 'KF_SH15.png',
+    },
+    video: {
+      camera: 'Locked tripod in the corridor.',
+      setting: 'Sunlit upper corridor, looking into the nursery doorway.',
+      beats: [
+        { t: [0, 2.5], text: `${Cap('owen')} keeps walking left past the doorway without turning around and says, low and deadpan, in ${V('owen')}: ${q('D7')}` },
+        { t: [2.5, 3.5], text: `Passing behind the man in the doorway, ${D('naomi')} gives him one knowing smile and keeps going with her recorder.` },
+        { t: [3.5, 5], text: `${Cap('elias')} grins once, lowers his camera and immediately follows the bearded man out of frame to the left.` },
+      ],
+      stays: [STAY_PEOPLE, 'The woman in the corner keeps working throughout.'],
+    },
+    order: 5,
+    edit: 2.5,
+    sound: 'native',
+    audio: 'Owen’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH16',
+    section: 'D',
+    covers: ['D10'],
+    title: 'Mara finishes the mount, lifts the small monitor case and follows.',
+    cam: 'tripod',
+    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Same locked corridor angle, doorway now empty: through it, the small woman in rust on the step stool in the high corner gives the mounted camera a final twist; a small black hard-case monitor stands on the floor below her.',
+    visible: ['mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH14.png', 'exact framing and light'), sheet('mara'), up('PROP_MONITOR.png', 'the monitor case on the floor'), up('PROP_FIXED_CAM.png', 'the mounted camera')],
+      frame: 'The doorway is empty; only she is in the room.',
+      saveAs: 'KF_SH16.png',
+    },
+    video: {
+      camera: 'Locked tripod in the corridor.',
+      setting: 'Sunlit nursery seen through its doorway.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('mara')} gives the mounted camera a final twist.` },
+        { t: [1.5, 2.5], text: 'She steps down off the stool.' },
+        { t: [2.5, 3.5], text: 'She lifts the small black monitor case off the floor.' },
+        { t: [3.5, 5], text: 'She walks out through the doorway toward the camera and turns left down the corridor after the others, out of frame.' },
+      ],
+      stays: [STAY_PEOPLE, 'The mounted camera stays on its bracket in the corner.'],
+    },
+    order: 5,
+    edit: 1.5,
+    sound: 'off',
+    audio: 'Last bracket click, footsteps.',
+    trim: 'Candidate: could be covered by her following in SH17.',
+  },
+  {
+    id: 'SH17',
+    section: 'D',
+    covers: ['D11'],
+    title: 'Continuous: Owen leads Elias, Mara and Naomi down the main stair and through the hall service door.',
+    cam: 'cinematic',
+    location: 'LOC_HALL_DAY.png',
+    time: 'day',
+    lens: '24mm',
+    blocking:
+      'Entrance hall from near the front door (plate direction): the central staircase ahead, the plain service door on the RIGHT-hand wall. Coming down the stair toward camera in single file: the huge bearded man in front with the tool pouch and compact camera, then the tall man in olive with his handheld raised on him, then the small woman in rust with the monitor case, then the very tall woman with locs.',
+    visible: ['owen', 'elias', 'mara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_HALL_DAY.png', 'the hall, stair and service door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
+      frame: 'Brisk, practical movement down the stair.',
+      saveAs: 'KF_SH17.png',
+    },
+    video: {
+      camera: 'Smooth gimbal, slow pan right with them.',
+      setting: 'Bright entrance hall with a central staircase.',
+      beats: [
+        { t: [0, 2], text: 'The four come down the last steps of the stair in single file.' },
+        { t: [2, 4], text: `At the bottom ${D('owen')} turns right to the service door on the right-hand wall, opens it and goes through without breaking stride.` },
+        { t: [4, 5], text: 'The others follow him through it in the same order.' },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 2,
+    sound: 'off',
+    audio: 'Footsteps on the stair, service door.',
+    trim: 'Candidate, but it is the geography link between the upper floor and the service hall.',
+  },
+  {
+    id: 'SH18',
+    section: 'D',
+    covers: ['D12'],
+    title: 'At the bell board Owen sets the tool pouch down and opens the lower wooden panel.',
+    cam: 'cinematic',
+    location: 'LOC_BELLBOARD_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Service hall from the passage entrance (plate direction): the bell board on the back wall, the lower wooden panel below it, the narrow lower service door immediately to its right. The huge bearded man crouches at the board, setting his tool pouch and the compact camera on the floor. The tall man in olive stands just behind his left shoulder, handheld raised on him. The small woman in rust sets the monitor case down by the left wall; the very tall woman with locs stands behind her. Cold shaft of light from the small high window on the left.',
+    visible: ['owen', 'elias', 'mara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_BELLBOARD_DAY.png', 'the service hall, board, panel and door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
+      frame: 'Everyone focused on the board.',
+      saveAs: 'KF_SH18.png',
+    },
+    video: {
+      camera: 'Smooth gimbal, slight drift in.',
+      setting: 'Ground-floor service hall with an antique servant-bell board.',
+      beats: [
+        { t: [0, 2], text: `${Cap('owen')} sets the tool pouch down and crouches at the board.` },
+        { t: [2, 4], text: 'He swings open the hinged lower wooden panel below the board.' },
+        { t: [4, 5], text: `${Cap('elias')} leans in with his handheld toward the opening; ${D('mara')} picks up the compact camera and a spring clamp.` },
+      ],
+      stays: [STAY_PEOPLE, 'The board and the lower service door stay where they are.'],
+    },
+    order: 5,
+    edit: 1.5,
+    sound: 'off',
+    audio: 'Wood panel opening (SFX).',
+  },
+  {
+    id: 'SH19',
+    section: 'D',
+    covers: ['D13', 'D14'],
+    title: 'One clean handheld view of the cut wiring; Owen closes the panel.',
+    cam: 'handheld',
+    operator: 'elias',
+    location: 'LOC_BELLBOARD_DAY.png',
+    time: 'day',
+    lens: '50mm',
+    blocking:
+      'Close handheld insert from the host’s camera looking down into the open lower panel under the bell board: bundles of old cloth-covered bell wires hanging inside, clearly cut straight through, frayed copper ends; the bearded man’s large tattooed hand and indigo cuff hold the panel open on the right.',
+    visible: [],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_BELLBOARD_DAY.png', 'wood, board and light'), sheet('owen', 'his hand, forearm tattoos and indigo sleeve only')],
+      frame: 'The cut is unmistakable: clean severed ends, a gap between them.',
+      saveAs: 'KF_SH19.png',
+    },
+    video: {
+      camera: 'Handheld investigation camera, close, slight natural sway.',
+      setting: 'Inside the lower panel of an antique bell board.',
+      beats: [
+        { t: [0, 2], text: 'The panel is held open; the cut wires hang still; the camera eases in on the severed ends.' },
+        { t: [2, 3], text: 'The large hand swings the panel shut.' },
+      ],
+      stays: ['The wires stay clearly cut.'],
+    },
+    order: 3,
+    edit: 1.5,
+    sound: 'off',
+    audio: 'Panel closing.',
+    note: 'The only wiring insert, as scripted.',
+  },
+  {
+    id: 'SH20',
+    section: 'D',
+    covers: ['D15', 'D16', 'D17'],
+    title: 'Mara clamps BELL BOARD FIXED facing the board while Owen lowers the NURSERY flag, holds it, resets it. OWEN: “The wiring’s dead. The flags still reset by hand.”',
+    cam: 'handheld',
+    operator: 'elias',
+    location: 'LOC_BELLBOARD_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Handheld from the host, a step back from the board: the huge bearded man in profile at the board, facing it, right index finger on the small brass flag under the readable NURSERY label; beside him on the left, the small woman in rust tightens a compact camera onto a simple spring clamp on a pipe to the left of the board, aimed at the board. The narrow lower service door on the right.',
+    visible: ['owen', 'mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_BELLBOARD_DAY.png', 'board, labels, door — keep; NURSERY must stay readable'), sheet('owen'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its spring clamp')],
+      frame: 'He looks at the mechanism, never at the camera.',
+      saveAs: 'KF_SH20.png',
+    },
+    video: {
+      camera: 'Handheld investigation camera, slight natural sway.',
+      setting: 'Service hall at the antique servant-bell board.',
+      beats: [
+        { t: [0, 1], text: `${Cap('mara')} tightens the clamp on the camera.` },
+        { t: [1, 2], text: `${Cap('owen')} pushes the brass flag under the NURSERY label down with one finger.` },
+        { t: [2, 3], text: 'He holds it down; the NURSERY label is clearly readable.' },
+        { t: [3, 4], text: 'He pushes it back up to neutral by hand: a dry brass click.' },
+        { t: [4, 7], text: `Looking at the mechanism, not at the camera, practical and unhurried, in ${V('owen')}: ${q('D17')}` },
+      ],
+      stays: [STAY_PEOPLE, 'The woman keeps working on the clamp throughout.'],
+    },
+    order: 7,
+    edit: 4.5,
+    sound: 'native',
+    audio: 'Owen’s line, native then voice-swapped. One dry brass reset click.',
+  },
+  {
+    id: 'SH21',
+    section: 'D',
+    covers: ['D18', 'D19', 'D20', 'D30'],
+    title: 'Owen picks up the pouch and opens the lower service door beside the board; Elias follows with the handheld, Mara with the monitor case, Naomi behind.',
+    cam: 'cinematic',
+    location: 'LOC_BELLBOARD_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Service hall from the passage entrance, slightly left: the bearded man at the board picking up his tool pouch; the narrow lower service door immediately to the RIGHT of the board; the tall man in olive at his shoulder with the handheld raised; the small woman in rust by the left wall with the monitor case; the very tall woman with locs behind her.',
+    visible: ['owen', 'elias', 'mara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_BELLBOARD_DAY.png', 'service hall, board, lower door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
+      frame: 'Moving on immediately.',
+      saveAs: 'KF_SH21.png',
+    },
+    video: {
+      camera: 'Smooth gimbal, slight pan right.',
+      setting: 'Ground-floor service hall.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('owen')} picks up the pouch and immediately opens the narrow door to the right of the board, revealing the foot of a narrow wooden stair, and steps through.` },
+        { t: [1.5, 3], text: `${Cap('elias')} follows right behind him, handheld camera held up on him.` },
+        { t: [3, 5], text: `${Cap('mara')} lifts the monitor case and follows; ${D('naomi')} follows behind her.` },
+      ],
+      stays: [STAY_PEOPLE, 'The lower service door is to the right of the board.'],
+    },
+    order: 5,
+    edit: 2,
+    sound: 'off',
+    audio: 'Camera bracket clicks, wood panel, one dry brass reset click, footsteps changing from service hall to stair, service doors opening and closing (D30 sound design for the whole route).',
+  },
+  {
+    id: 'SH22',
+    section: 'D',
+    covers: ['D21'],
+    title: 'The narrow back stair: lower door behind them, one turn, the stair continuing up.',
+    cam: 'cinematic',
+    location: 'LOC_STAIR_LOWER_DAY.png',
+    time: 'day',
+    lens: '24mm',
+    blocking:
+      'Camera on the middle-turn landing at chest height looking DOWN the lower flight (handrail on frame-left; the upper flight begins just off frame-right). Climbing toward camera at a quick walking pace: the huge bearded man two steps from the top, tool pouch in hand; behind him the tall man in olive with the handheld up on him; behind him the small woman in rust with the monitor case; at the bottom, the very tall woman with locs just stepping in through the open lower service door.',
+    visible: ['owen', 'elias', 'mara', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_STAIR_LOWER_DAY.png', 'the stair, rail side and lower door — keep, never flip'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
+      frame: 'Tight stairwell, bodies close, quick purposeful climb.',
+      saveAs: 'KF_SH22.png',
+    },
+    video: {
+      camera: 'Static on the turn landing, slight tilt up as they arrive.',
+      setting: 'Narrow wooden back service stair, daylight from a small window at the turn.',
+      beats: [
+        { t: [0, 2], text: 'They climb toward the camera in single file.' },
+        { t: [2, 4], text: `${Cap('owen')} reaches the landing, turns to his left (frame-right) and starts up the next flight out of frame; the man with the handheld follows him round the turn.` },
+        { t: [4, 5], text: 'The other two keep climbing; the open lower door stays visible at the bottom.' },
+      ],
+      stays: [STAY_PEOPLE, 'The handrail stays on the left side of frame.'],
+    },
+    order: 5,
+    edit: 2.5,
+    sound: 'off',
+    audio: 'Footsteps change from stone to wooden stair.',
+  },
+  {
+    id: 'SH23',
+    section: 'D',
+    covers: ['D22', 'D23', 'D24', 'D25'],
+    title: 'Owen opens the upper service door onto the landing, beside the monitor table: “Straight back to the board.”',
+    cam: 'tripod',
+    location: 'LOC_LANDING_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'Landing plate framing (tripod, eye level, facing the panelled wall): the narrow upper service door now open away from camera into the dark stairwell; the huge bearded man half out of it, stepping onto the landing; the small wooden table immediately to the LEFT of the door, lamp off, nothing on it; in the stairwell behind him, the tall man in olive with his handheld.',
+    visible: ['owen', 'elias'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_DAY.png', 'exact framing: door, table to its left, window — keep'), sheet('owen'), sheet('elias')],
+      frame: 'He is mid-step onto the landing, the stairwell dark behind him.',
+      saveAs: 'KF_SH23.png',
+    },
+    video: {
+      camera: 'Locked tripod.',
+      setting: 'The central upper landing of the manor, daytime.',
+      beats: [
+        { t: [0, 1], text: `${Cap('owen')} steps out of the narrow service door onto the landing.` },
+        { t: [1, 3.5], text: `He turns and points back through the open door with his thumb, saying low and matter-of-fact in ${V('owen')}: ${q('D25')}` },
+        { t: [3.5, 5], text: `${Cap('elias')} steps out behind him with his handheld camera up.` },
+      ],
+      stays: [STAY_PEOPLE, 'The table stays immediately to the left of the door.'],
+    },
+    order: 5,
+    edit: 2.5,
+    sound: 'native',
+    audio: 'Owen’s line, native then voice-swapped. Upper service door.',
+  },
+  {
+    id: 'SH24',
+    section: 'D',
+    covers: ['D26', 'D27', 'D28', 'D29', 'D31'],
+    title: 'Mara opens the monitor case on the table: NURSERY FIXED already live, BELL BOARD FIXED comes live; Owen beside the monitor; she checks both once. Hold.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    blocking:
+      'EXACT landing plate framing, locked (this is the match-cut frame). The small woman in rust stands at the table immediately left of the (now closed) service door, hands on the latches of the small black hard-case monitor she has just set down beside the lamp. The huge bearded man stands to the right of the table, next to the monitor, between the table and the door.',
+    visible: ['mara', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_DAY.png', 'EXACT framing for the match cut — do not move the camera'), sheet('mara'), sheet('owen'), up('PROP_MONITOR.png', 'the monitor case')],
+      frame: 'Practical, quick.',
+      keep: ['the framing of the uploaded landing photo exactly'],
+      saveAs: 'KF_SH24.png',
+    },
+    video: {
+      camera: 'Locked tripod — this framing must match the night version exactly.',
+      setting: 'The central upper landing, daytime.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('mara')} flips the latches and opens the lid.` },
+        { t: [1.5, 3], text: 'The left screen is already lit; she presses a switch and the right screen lights up beside it.' },
+        { t: [3, 5], text: `She checks both screens once, left then right, with a small satisfied nod; ${D('owen')} stands beside the table looking at the screens.` },
+        { t: [5, 7], text: 'Both stay still at the monitor. Hold.' },
+      ],
+      stays: [STAY_PEOPLE, 'Both screens show plain flat light (they are replaced in the edit).'],
+    },
+    order: 7,
+    edit: 3.5,
+    sound: 'off',
+    audio: 'Case latches, a switch.',
+    post: 'Screens: left = LOC_NURSERY_FIXED_DAY (already live), right = LOC_BELLBOARD_FIXED_DAY (comes live at ~1.5s). Hold on the working two-feed monitor, then MATCH CUT to SH25.',
+    note: 'Elias and Naomi have walked on into the corridor, off-frame right.',
+  },
+
+  // ======================= E — NIGHT MATCH CUT =============================
+  {
+    id: 'SH25',
+    section: 'E',
+    covers: ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8'],
+    title: 'Match cut to the same monitor at night. Elias crosses in: “All right. We’re live for the night.” The bell rings.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Exact same locked framing as SH24, now night: window black-blue, brass lamp ON. The small woman in rust sits at the table facing the open monitor; the huge bearded man stands to the right of the table, arms folded, looking at the screens; service door closed. At the right edge of frame, just stepping in from the corridor opening, the tall man in olive with his handheld lowered at his side.',
+    visible: ['mara', 'owen', 'elias'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_NIGHT.png', 'EXACT framing and night light — match cut'), sheet('mara'), sheet('owen'), sheet('elias')],
+      frame: 'Quiet, settled, the night has begun.',
+      keep: ['the framing of the uploaded landing photo exactly'],
+      saveAs: 'KF_SH25.png',
+    },
+    video: {
+      camera: 'Locked tripod, identical framing to the daylight shot.',
+      setting: 'The same landing at night, one warm lamp.',
+      beats: [
+        { t: [0, 2], text: `${Cap('elias')} crosses into frame from the right, handheld camera lowered, and stops by the table.` },
+        { t: [2, 4.5], text: `Quietly, marking the start of the night, in ${V('elias')}: ${q('E5')}` },
+        { t: [4.5, 5], text: 'Before anyone answers, one sharp metallic servant-bell ring sounds from somewhere below; all three go still and turn their heads toward the sound.' },
+      ],
+      stays: [STAY_PEOPLE, 'Screens stay plain glowing grey.'],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'native',
+    audio: 'Quiet night room tone; Elias’s line (voice-swapped); then one clean metallic servant-bell ring (SFX). Cut directly on the bell.',
+    post: 'Screens: left = LOC_NURSERY_FIXED_NIGHT (empty nursery), right = LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL (still board).',
+  },
+
+  // ======================= F — THE CALL ====================================
+  {
+    id: 'SH26',
+    section: 'F',
+    covers: ['F1', 'F2', 'F3'],
+    title: 'BELL BOARD FIXED: nobody touching it, the NURSERY flag drops by itself.',
+    cam: 'fixed-bellboard',
+    location: 'LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL.png',
+    time: 'night',
+    lens: 'Fixed clamp camera',
+    blocking: 'BELL BOARD FIXED locked view of the whole board at night, one bare bulb above. No person anywhere.',
+    visible: [],
+    kf: {
+      mode: 'startEnd',
+      uploads: [up('LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL.png', 'start frame'), up('LOC_BELLBOARD_FIXED_NIGHT_DOWN.png', 'end frame')],
+      frame: 'No keyframe to generate: the two plates go in the start and end frame slots.',
+      saveAs: 'LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL.png',
+      endFrame: 'LOC_BELLBOARD_FIXED_NIGHT_DOWN.png',
+    },
+    video: {
+      camera: 'Static security camera on an antique servant-bell board at night.',
+      setting: 'No person present anywhere.',
+      beats: [
+        { t: [0, 1], text: 'Nothing moves.' },
+        { t: [1, 1.5], text: 'The small brass flag under the NURSERY label drops sharply by itself and settles in the down position.' },
+        { t: [1.5, 3], text: 'Stillness.' },
+      ],
+      stays: [STAY_LOCKED, 'Every other flag stays exactly where it is. No hand, shadow or person appears.'],
+    },
+    order: 3,
+    edit: 1.5,
+    sound: 'off',
+    audio: 'One brass flag clack (SFX).',
+    post: 'BELL BOARD FIXED overlay, running timecode, grain.',
+  },
+  {
+    id: 'SH27',
+    section: 'F',
+    covers: ['F4', 'F5'],
+    title: 'Mara and Owen at the monitor lean toward the board feed. MARA: “Nursery.”',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking:
+      'Camera at the left end of the monitor table near the dark window, looking across the open monitor at their faces in three-quarter: the small woman in rust seated nearest camera, the huge bearded man standing close beside her on the right; the open monitor case soft in the lower-left foreground, its screens facing them. Warm lamp and cold screen glow on their faces.',
+    visible: ['mara', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_NIGHT.png', 'the landing at night, lamp and monitor'), sheet('mara'), sheet('owen'), up('PROP_MONITOR.png', 'the monitor case')],
+      frame: 'Both suddenly alert.',
+      saveAs: 'KF_SH27.png',
+    },
+    video: {
+      camera: 'Static tripod.',
+      setting: 'The monitor station on the landing at night.',
+      beats: [
+        { t: [0, 1], text: 'Both lean in toward the right-hand screen.' },
+        { t: [1, 3], text: `${Cap('mara')} says low and factual in ${V('mara')}: ${q('F5')}` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 1.5,
+    sound: 'native',
+    audio: 'Mara’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH28',
+    section: 'F',
+    covers: ['F6', 'F7', 'F8', 'F9', 'F10', 'F11'],
+    title: 'Clara in the corridor has already turned toward the nursery: “That’s what she said.” Naomi beside her; Elias on her other side: “You don’t have to go in.”',
+    cam: 'cinematic',
+    location: 'LOC_CORRIDOR_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Night corridor from the landing end. The open nursery door is on the LEFT wall in the left foreground, dim lamp spill coming out of it. About two metres beyond the door, on the far-window side, the copper-haired woman stands already turned toward the doorway — facing camera-left, face in three-quarter — shoulders tight, hands still at her sides; the very tall woman with locs a step behind her. In the right foreground, walking away from camera toward her, back three-quarter: the tall man in olive with his handheld lowered. Warm sconce on the right wall near camera.',
+    visible: ['clara', 'naomi', 'elias'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_CORRIDOR_NIGHT.png', 'the night corridor and nursery door position — keep'), sheet('clara'), sheet('naomi'), sheet('elias')],
+      frame: 'Her fear is visible under the control: eyes wide and wet, lips pressed together.',
+      saveAs: 'KF_SH28.png',
+    },
+    video: {
+      camera: 'Gimbal, very slow push-in.',
+      setting: 'The upper corridor at night, one warm sconce, lamp spill from the open nursery door.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} stares at the open doorway; her shoulders tighten, her hands go still, her breath stops.` },
+        { t: [1.5, 3], text: `Recognising the exact warning, barely above a whisper, in ${V('clara')}: ${q('F8')}` },
+        { t: [3, 4.5], text: `${Cap('naomi')} steps in beside her; ${D('elias')} comes up on her other side with his camera lowered and stops a respectful step away.` },
+        { t: [4.5, 7], text: `Calm and direct, in ${V('elias')}: ${q('F11')}` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 7,
+    edit: 5,
+    sound: 'native',
+    audio: 'Clara and Elias lines, native then voice-swapped. Night room tone, no music.',
+  },
+  {
+    id: 'SH29',
+    section: 'F',
+    covers: ['F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18'],
+    title: 'Clara looks through the doorway at the box and starts walking before she answers: “If I’m ever opening that letter, it’s tonight.” Elias two steps beside her, then lets her lead; Naomi one pace behind.',
+    cam: 'cinematic',
+    location: 'LOC_CORRIDOR_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Same night corridor from the landing end, camera lower and closer. The copper-haired woman in the centre facing the open nursery door, which is just ahead of her on the left wall; the tall man in olive on her right, camera lowered; the very tall woman with locs one pace behind. The small woman in rust and the huge bearded man stay at the monitor on the landing behind the camera, out of frame.',
+    visible: ['clara', 'elias', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_CORRIDOR_NIGHT.png', 'the night corridor — keep'), sheet('clara'), sheet('elias'), sheet('naomi')],
+      frame: 'Frightened, deliberate, courageous: jaw set, eyes shining.',
+      saveAs: 'KF_SH29.png',
+    },
+    video: {
+      camera: 'Gimbal drifting slowly backward ahead of them.',
+      setting: 'The upper corridor at night.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} looks through the open doorway at the grey box inside, jaw set, eyes shining.` },
+        { t: [1.5, 2.5], text: 'She starts walking toward the door before she answers.' },
+        { t: [2.5, 5.5], text: `Steady while moving, a tremble held under it, in ${V('clara')}: ${q('F14')}` },
+        { t: [5.5, 7], text: `${Cap('elias')} walks beside her for two steps, then drops back and lets her lead; ${D('naomi')} follows one pace behind.` },
+      ],
+      stays: [STAY_PEOPLE, 'Nobody else appears; no one stops for a speech.'],
+    },
+    order: 7,
+    edit: 5,
+    sound: 'native',
+    audio: 'Clara’s line, native then voice-swapped.',
+    note: 'F17 (Mara and Owen remain at the monitor) is a blocking fact: they are behind the camera; SH33 picks them up there.',
+  },
+
+  // ======================= G — THRESHOLD ===================================
+  {
+    id: 'SH30',
+    section: 'G',
+    covers: ['G1', 'G2', 'G3', 'G4', 'G5'],
+    title: 'Clara walks into the doorway; red REC light visible; she looks back once at the crew, then at the box. Elias and Naomi stop at the threshold.',
+    cam: 'cinematic',
+    location: 'LOC_NURSERY_DOORWAY_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Night, camera in the corridor at shoulder height behind the tall man in olive (left) and the very tall woman with locs (right), both seen from behind. Between them, a step ahead, the copper-haired woman walking into the open nursery doorway, back to camera. Through the doorway: the lamp pool over the rug, the chest and grey box to the left; high in the far corner ahead-right above the dark window, the compact camera with its small red REC light.',
+    visible: ['clara', 'elias', 'naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_NURSERY_DOORWAY_NIGHT.png', 'doorway, room, lamp and red REC light — keep'), sheet('clara'), sheet('elias'), sheet('naomi')],
+      frame: 'A controlled pace, not hesitant, not rushed.',
+      saveAs: 'KF_SH30.png',
+    },
+    video: {
+      camera: 'Static at shoulder height behind the two in the corridor.',
+      setting: 'Night; the nursery lamp glows through the open door.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} walks into the doorway at a controlled pace; the small red REC light glows high in the far corner.` },
+        { t: [1.5, 3], text: 'At the threshold she looks back once over her shoulder at the two of them — frightened, decided — then turns her eyes to the grey box.' },
+        { t: [3, 5], text: `${Cap('elias')} stops just outside the threshold; ${D('naomi')} stops beside him.` },
+      ],
+      stays: [STAY_PEOPLE, 'No figure appears in the room.'],
+    },
+    order: 5,
+    edit: 3,
+    sound: 'off',
+    audio: 'Footsteps, night room tone.',
+  },
+  {
+    id: 'SH31',
+    section: 'G',
+    covers: ['G6', 'G7', 'G8'],
+    title: 'Clara crosses in, two steps toward the chest. The door slams. Elias pulls the exterior handle once; it does not move.',
+    cam: 'cinematic',
+    location: 'LOC_NURSERY_DOORWAY_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Same angle as SH30: the tall man in olive and the woman with locs at the threshold, from behind; the copper-haired woman just inside the room, back to camera, heading for the low chest.',
+    visible: ['elias', 'naomi', 'clara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH30.png', 'exact framing and everyone’s look — continue'), sheet('clara'), sheet('elias'), sheet('naomi')],
+      frame: 'Continue the uploaded frame a moment later.',
+      saveAs: 'KF_SH31.png',
+    },
+    video: {
+      camera: 'Static at shoulder height.',
+      setting: 'Night; the nursery doorway.',
+      beats: [
+        { t: [0, 2], text: `${Cap('clara')} crosses into the nursery deliberately and takes two steps toward the low chest.` },
+        { t: [2, 3], text: 'The white door swings shut by itself and slams, cutting her off; the two at the threshold flinch.' },
+        { t: [3, 5], text: `${Cap('elias')} grabs the outside handle at once and pulls once, hard, with his whole weight; it does not move. He stares at it.` },
+      ],
+      stays: [STAY_PEOPLE, 'No figure appears anywhere.'],
+    },
+    order: 5,
+    edit: 3,
+    sound: 'off',
+    audio: 'Door slam, one handle rattle (SFX).',
+  },
+  {
+    id: 'SH32',
+    section: 'G',
+    covers: ['G9', 'G10', 'G11', 'G12', 'G13'],
+    title: 'Inside: Clara tries the handle. “It’s locked.” ELIAS (through the door): “Stay near the door.” She scans the room: “I don’t see anything.”',
+    cam: 'tripod',
+    location: 'LOC_NURSERY_DOOR_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Inside the nursery at night, camera at eye level beside the window wall near the door corner, looking along the left-hand wall: the closed white door in three-quarter view on the LEFT. The copper-haired woman stands a step from the door in profile, facing it (facing frame-left), her right hand reaching for the brass handle. Behind her to the right the room: rug, chest with the box in the lamp pool, bed, dark corners — empty.',
+    visible: ['clara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_NURSERY_DOOR_NIGHT.png', 'the room, door and lamp light — keep'), sheet('clara')],
+      frame: 'Fear arriving but controlled: eyes wide, breath quick.',
+      saveAs: 'KF_SH32.png',
+    },
+    video: {
+      camera: 'Locked tripod, very slow push-in. Never handheld.',
+      setting: 'Inside the nursery at night, one small lamp.',
+      beats: [
+        { t: [0, 2], text: `${Cap('clara')} grips the interior handle and pulls once; it does not move.` },
+        { t: [2, 3.5], text: `Louder, fear now present but controlled, in ${V('clara')}: ${q('G10')}` },
+        { t: [3.5, 5], text: `A man’s voice, close on the other side of the door and muffled by it, in ${V('elias')}: ${q('G11')}` },
+        { t: [5, 8], text: 'She lets go of the handle and scans the room — bed, window, floor, the box — eyes darting, breathing fast through her nose, hands low.' },
+        { t: [8, 10], text: `Unsteady: ${q('G13')}` },
+      ],
+      stays: [STAY_NO_FIGURE, STAY_PEOPLE],
+    },
+    order: 10,
+    edit: 7,
+    sound: 'native',
+    audio: 'Clara’s lines native (voice-swapped); Elias through the door: record/voice-swap and muffle with an EQ.',
+    note: 'Cinematic angle: the Woman never appears here.',
+  },
+  {
+    id: 'SH33',
+    section: 'G',
+    covers: ['G14', 'G15', 'G16', 'G17', 'G18', 'G19'],
+    title: 'Owen at the monitor looks at NURSERY FIXED; his casual expression dies. Mara turns to the feed. OWEN: “Mara.”',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '85mm',
+    blocking:
+      'Close on the huge bearded man at the monitor table, camera at the left end of the table near the window looking across the monitor at his face in three-quarter, lit by the cold glow of the screens and the warm lamp; the small woman in rust seated beside him in soft focus. His eyes on the LEFT screen (NURSERY FIXED).',
+    visible: ['owen', 'mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_NIGHT.png', 'the landing at night'), sheet('owen'), sheet('mara')],
+      frame: 'At the very start he still looks relaxed.',
+      saveAs: 'KF_SH33.png',
+    },
+    video: {
+      camera: 'Static tripod.',
+      setting: 'The monitor station at night.',
+      beats: [
+        { t: [0, 2], text: `${Cap('owen')}’s easy expression dies: his mouth closes, his eyes lock on the screen, his shoulders go dead still.` },
+        { t: [2, 3], text: `${Cap('mara')} notices his face and turns to the same screen.` },
+        { t: [3, 5], text: `Without blinking, quiet, dread under the low voice, in ${V('owen')}: ${q('G18')}` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3,
+    sound: 'native',
+    audio: 'Owen’s line, native then voice-swapped. Cut directly to the image they are seeing.',
+  },
+
+  // ======================= H — FIRST REVEAL ================================
+  {
+    id: 'SH34',
+    section: 'H',
+    covers: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
+    title: 'FIRST FULL NURSERY FIXED REVEAL: Clara at the closed door, facing it; the Woman FAR behind her. OWEN (from the monitor): “There’s someone behind her.”',
+    cam: 'fixed-nursery',
+    location: 'LOC_NURSERY_FIXED_NIGHT.png',
+    time: 'night',
+    lens: 'NURSERY FIXED locked wide',
+    blocking: `${MAPS.nursery.text} The copper-haired woman stands on the bare floor half a step from the closed door in the lower-left, facing it, back to the room, hands low at her sides. The Woman is added as a still layer at P1 (far-right corner).`,
+    visible: ['clara'],
+    kf: {
+      mode: 'edit',
+      uploads: [NURSERY_NIGHT_REF, sheet('clara')],
+      frame:
+        'Edit the uploaded night photo of the empty nursery seen from the high corner; keep the camera, room, furniture and lamp light exactly unchanged. Add only the copper-haired woman: standing on the bare floorboards half a step in front of the closed white door in the lower-left, facing the door, her back to the room, hands low at her sides, shoulders tight. The camera sees her from behind her right shoulder in three-quarter rear view: her right cheek, jaw and the right side of her throat face the camera. Lit only by weak warm lamp spill from the right. No mark on her throat yet. Nobody else in the room.',
+      keep: ['the camera, lens, furniture and lamp light exactly'],
+      saveAs: 'KF_SH34.png',
+    },
+    woman: {
+      file: 'KF_SH34_W.png',
+      position: 'P1',
+      uploads: [up('KF_SH34.png', 'the exact frame — change nothing but adding the figure'), WOMAN_REF],
+      prompt:
+        'Edit the uploaded high-corner night frame of the woman at the door; keep everything exactly unchanged. Add ONE figure: the veiled woman from the veiled-figure reference, standing perfectly still in the empty FAR-RIGHT corner at the top of the frame, facing toward the woman at the door, arms straight at her sides, black mourning dress to the floor, smoke-grey veil over her whole face. Half swallowed by shadow but readable as a woman; scaled correctly for the distance. No glow, no transparency.',
+    },
+    video: {
+      camera: 'Fixed high-corner security camera, completely static.',
+      setting: 'The nursery at night, one small lamp on the right.',
+      beats: [
+        { t: [0, 2], text: `${Cap('clara')} stands close to the closed door in the lower-left, facing it, hands low at her sides, shoulders tight, breath shallow and quick. She does not know anything is wrong yet.` },
+        { t: [2, 4.5], text: `Off-screen, from the monitor station, ${V('owen')}, lowered: ${q('H6')} Nobody in frame speaks.` },
+        { t: [4.5, 5], text: 'She stays facing the door.' },
+      ],
+      stays: [STAY_LOCKED, STAY_NO_TURN, STAY_FACES_ONLY_MOVE, STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'off',
+    audio: 'Owen’s line laid in post (ElevenLabs, Owen voice, slightly roomy as if heard from the monitor station). Night room tone.',
+    post: 'Composite the Woman at P1: mask her out of KF_SH34_W.png and lay her as a STILL over the whole clip. NURSERY FIXED overlay, cold grade, grain.',
+  },
+  {
+    id: 'SH35',
+    section: 'H',
+    covers: ['H7', 'H8', 'H9', 'H10'],
+    title: 'Corridor: Elias looks from the door to the monitor and back. Naomi puts a palm flat on the wood: “Clara, stay facing the door.”',
+    cam: 'tripod',
+    location: 'LOC_CORRIDOR_REV_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking:
+      'Night corridor from the far-window side looking back toward the landing. The closed white nursery door on the RIGHT wall in the midground. At the door: the tall man in olive on the landing side, hand still near the handle, and the very tall woman with locs on the camera side, facing the door. At the far end, the lamp-lit landing with the small monitor table where the huge bearded man and the small woman in rust watch the glowing screens.',
+    visible: ['elias', 'naomi', 'owen', 'mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_CORRIDOR_REV_NIGHT.png', 'corridor, closed door, lit landing — keep'), sheet('elias'), sheet('naomi'), LINEUP_BG],
+      frame: 'Both at the door tense and focused.',
+      saveAs: 'KF_SH35.png',
+    },
+    video: {
+      camera: 'Static, 50mm.',
+      setting: 'The upper corridor at night; the landing lamp glows at the end.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('elias')} looks from the locked door down the corridor toward the monitor on the landing, then immediately back to the door.` },
+        { t: [1.5, 2.5], text: `${Cap('naomi')} steps close and puts one palm flat against the wood.` },
+        { t: [2.5, 5], text: `Her own eyes are wide and scared but her voice is warm and firm, in ${V('naomi')}: ${q('H10')}` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'native',
+    audio: 'Naomi’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH36',
+    section: 'H',
+    covers: ['H11', 'H12'],
+    title: 'Inside: Clara fixes her eyes on the door. “Why?”',
+    cam: 'tripod',
+    location: 'LOC_NURSERY_DOOR_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking:
+      'Same inside angle as SH32, a little tighter: the copper-haired woman close to the closed door in profile, facing it, hands low. The empty lamp-lit room behind her to the right.',
+    visible: ['clara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH32.png', 'exact angle, light and her look — tighter'), sheet('clara')],
+      frame: 'Tighter version of the uploaded frame: she is right at the door now.',
+      saveAs: 'KF_SH36.png',
+    },
+    video: {
+      camera: 'Locked tripod.',
+      setting: 'Inside the nursery at night.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} fixes her eyes on the door, very still, breath held.` },
+        { t: [1.5, 3], text: `Thin and frightened, to the door, in ${V('clara')}: ${q('H12')}` },
+      ],
+      stays: [STAY_NO_FIGURE, STAY_NO_TURN, STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 2,
+    sound: 'native',
+    audio: 'Clara’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH37',
+    section: 'H',
+    covers: ['H13', 'H14'],
+    title: 'Naomi does not tell her what is behind her: “Don’t turn around. Stay with my voice.”',
+    cam: 'tripod',
+    location: 'LOC_CORRIDOR_REV_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking: 'Night corridor, closer on the very tall woman with locs at the closed nursery door (right wall), palm flat on the wood, face close to it; the tall man in olive beside her, soft.',
+    visible: ['naomi', 'elias'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH35.png', 'the corridor, door and light — closer'), sheet('naomi'), sheet('elias')],
+      frame: 'Scared eyes, steady voice.',
+      saveAs: 'KF_SH37.png',
+    },
+    video: {
+      camera: 'Static, 50mm.',
+      setting: 'The upper corridor at night, at the closed nursery door.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('naomi')} does not explain; she swallows and presses her palm harder against the wood.` },
+        { t: [1.5, 5], text: `Urgent but gentle, in ${V('naomi')}: ${q('H14')}` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'native',
+    audio: 'Naomi’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH38',
+    section: 'H',
+    covers: ['H15'],
+    title: 'Clara obeys. Hands low. Breathing slightly faster.',
+    cam: 'tripod',
+    location: 'LOC_NURSERY_DOOR_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking: 'Same inside angle as SH36.',
+    visible: ['clara'],
+    kf: {
+      mode: 'plate',
+      uploads: [up('KF_SH36.png', 'start frame as is')],
+      frame: 'Reuse KF_SH36 as the start frame.',
+      saveAs: 'KF_SH36.png',
+    },
+    video: {
+      camera: 'Locked tripod.',
+      setting: 'Inside the nursery at night.',
+      beats: [
+        { t: [0, 3], text: `${Cap('clara')} obeys: eyes on the door, hands staying low at her sides, her breathing slightly faster — shoulders and chest rising quicker, nostrils flaring, a hard swallow.` },
+      ],
+      stays: [STAY_NO_FIGURE, STAY_NO_TURN, STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 2,
+    sound: 'off',
+    audio: 'Her faster breathing (SFX).',
+  },
+  {
+    id: 'SH39',
+    section: 'H',
+    covers: ['H16'],
+    title: 'Brief cut to Mara and Owen watching the feed.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking: 'Same monitor-station angle as SH27: the small woman in rust seated, the huge bearded man standing beside her, both staring at the LEFT screen.',
+    visible: ['mara', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH27.png', 'exact angle and light'), sheet('mara'), sheet('owen')],
+      frame: 'Both completely still, faces lit by the screen.',
+      saveAs: 'KF_SH39.png',
+    },
+    video: {
+      camera: 'Static tripod.',
+      setting: 'The monitor station at night.',
+      beats: [{ t: [0, 3], text: 'Both watch the left screen without moving; her eyes narrow slightly; his jaw tightens.' }],
+      stays: [STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 1,
+    sound: 'off',
+    audio: 'Room tone.',
+  },
+
+  // ======================= I — SECOND REVEAL ===============================
+  {
+    id: 'SH40',
+    section: 'I',
+    covers: ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8'],
+    title: 'SECOND RETURN, same NURSERY FIXED angle: Clara unchanged; the Woman halfway. Faint red line; two fingers rise: “My neck…”',
+    cam: 'fixed-nursery',
+    location: 'LOC_NURSERY_FIXED_NIGHT.png',
+    time: 'night',
+    lens: 'NURSERY FIXED locked wide',
+    blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was in SH34. The Woman is a still layer at P2 (on the rug, right of the chest).`,
+    visible: ['clara'],
+    kf: {
+      mode: 'edit',
+      uploads: [up('KF_SH34.png', 'the exact frame — change only what is listed'), up('MARK_STAGES.png', 'use the LEFT panel (faint thin red line)')],
+      frame:
+        'Edit the uploaded high-corner night frame of the woman at the door; keep the camera, room, lamp light and her position exactly unchanged. Change only: a faint thin red pressure line now crosses her throat, visible on the right side of her neck (like the left panel of the throat reference); her head is tipped very slightly down as if swallowing; hands still low at her sides.',
+      keep: ['her exact position at the door', 'everything else in the frame'],
+      saveAs: 'KF_SH40.png',
+    },
+    woman: {
+      file: 'KF_SH40_W.png',
+      position: 'P2',
+      uploads: [up('KF_SH40.png', 'the exact frame'), up('KF_SH34_W.png', 'the identical veiled figure — same look, only moved')],
+      prompt:
+        'Edit the first uploaded frame; keep everything exactly unchanged. Add the SAME veiled figure as in the second uploaded frame — identical dress, veil, height and pose — now standing on the rug to the right of the low chest, halfway between the far-right corner and the woman at the door, facing her back, arms at her sides. Scaled correctly for the distance: clearly closer and larger than before. Still, readable, face fully covered.',
+    },
+    video: {
+      camera: 'Fixed high-corner security camera, completely static.',
+      setting: 'The nursery at night, one small lamp on the right.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} swallows hard; her brow tightens.` },
+        { t: [1.5, 3], text: 'Two fingers of her right hand rise to her throat and touch the faint red line there.' },
+        { t: [3, 5], text: `Confused, with a shorter breath under the words, in ${V('clara')}: ${q('I8')}` },
+      ],
+      stays: [STAY_LOCKED, STAY_NO_TURN, STAY_FACES_ONLY_MOVE, STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'off',
+    audio: 'Clara’s line laid in post in the Clara voice. Shortening breath.',
+    post: 'Composite the Woman at P2 from KF_SH40_W.png as a STILL. Check P1/P2/P3 side by side. Track the faint mark if the clip loses it.',
+  },
+  {
+    id: 'SH41',
+    section: 'I',
+    covers: ['I9', 'I10'],
+    title: 'Naomi hears the change and presses her palm more firmly: “Stay with me.”',
+    cam: 'tripod',
+    location: 'LOC_CORRIDOR_REV_NIGHT.png',
+    time: 'night',
+    lens: '85mm',
+    blocking: 'Close on the very tall woman with locs at the closed nursery door, palm flat on the wood, her face close to it, profile toward camera.',
+    visible: ['naomi'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH37.png', 'corridor, door and light — closer'), sheet('naomi')],
+      frame: 'She is listening hard through the wood.',
+      saveAs: 'KF_SH41.png',
+    },
+    video: {
+      camera: 'Static, 85mm.',
+      setting: 'At the closed nursery door at night.',
+      beats: [
+        { t: [0, 1], text: `${Cap('naomi')} hears the change in the voice inside; her palm presses harder, fingers spreading on the wood.` },
+        { t: [1, 3], text: `Warm, firm, in ${V('naomi')}: ${q('I10')}` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 2,
+    sound: 'native',
+    audio: 'Naomi’s line, native then voice-swapped.',
+  },
+  {
+    id: 'SH42',
+    section: 'I',
+    covers: ['I11', 'I12'],
+    title: 'Mara at the monitor: her eyes move from NURSERY FIXED to BELL BOARD FIXED.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '85mm',
+    blocking: 'Close on the small woman in rust seated at the monitor, camera at the left end of the table looking across the monitor at her face in three-quarter, screen glow on her face.',
+    visible: ['mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH27.png', 'exact angle and light — closer'), sheet('mara')],
+      frame: 'Eyes on the left screen.',
+      saveAs: 'KF_SH42.png',
+    },
+    video: {
+      camera: 'Static tripod.',
+      setting: 'The monitor station at night.',
+      beats: [{ t: [0, 3], text: `${Cap('mara')}’s eyes move from the left screen to the right screen and stop.` }],
+      stays: [STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 1.5,
+    sound: 'off',
+    audio: 'Room tone.',
+  },
+  {
+    id: 'SH43',
+    section: 'I',
+    covers: ['I13'],
+    title: 'Insert: BELL BOARD FIXED on the monitor — the NURSERY flag is still down.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '50mm',
+    blocking: 'Close insert on the open two-screen monitor case on the table, screens filling most of the frame, the lamp glow at the edge.',
+    visible: [],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_NIGHT.png', 'the table, lamp and monitor at night'), up('PROP_MONITOR.png', 'the monitor case')],
+      frame: 'Both screens glowing flat grey, square to camera for easy screen replacement.',
+      saveAs: 'KF_SH43.png',
+    },
+    video: {
+      camera: 'Static insert.',
+      setting: 'The monitor on the landing table at night.',
+      beats: [{ t: [0, 3], text: 'Static insert on the two glowing screens; nothing moves.' }],
+      stays: ['The camera stays still.'],
+    },
+    order: 3,
+    edit: 1,
+    sound: 'off',
+    audio: 'Room tone.',
+    post: 'Screens: left = SH40 composite (P2), right = LOC_BELLBOARD_FIXED_NIGHT_DOWN, both with their feed overlays.',
+  },
+  {
+    id: 'SH44',
+    section: 'I',
+    covers: ['I14', 'I15', 'I16', 'I17', 'I18'],
+    title: 'Mara looks back to Clara, back to the flag. “The flag.” She grabs flashlight and radio and is moving before Owen looks up.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Monitor station from the left end of the table, wider than SH42: the small woman in rust seated at the monitor, a black flashlight and a radio on the table by her right hand; the huge bearded man standing beside her on the right, staring at the left screen; the narrow service door just behind the table on the right.',
+    visible: ['mara', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH27.png', 'the angle and light — a little wider'), sheet('mara'), sheet('owen')],
+      frame: 'Flashlight and radio clearly on the table by her hand.',
+      saveAs: 'KF_SH44.png',
+    },
+    video: {
+      camera: 'Static tripod, slight push-in.',
+      setting: 'The monitor station at night.',
+      beats: [
+        { t: [0, 1], text: `${Cap('mara')}’s eyes go back to the left screen,` },
+        { t: [1, 1.5], text: 'and immediately back to the right.' },
+        { t: [1.5, 2.5], text: `Recognition, fast and practical — her eyes snap wide; low and immediate, in ${V('mara')}: ${q('I16')}` },
+        { t: [2.5, 4], text: 'She grabs the flashlight and the radio from beside the monitor and is already up.' },
+        { t: [4, 5], text: `She moves toward the service door behind the table while ${D('owen')} is still staring at the left screen.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3.5,
+    sound: 'native',
+    audio: 'Mara’s line (voice-swapped). Quick equipment grab.',
+  },
+  {
+    id: 'SH45',
+    section: 'I',
+    covers: ['I19', 'I20', 'I21', 'I22', 'I23'],
+    title: 'Mara pushes through the upper service door onto the stair; Owen lifts the monitor with both hands and carries it toward the nursery door.',
+    cam: 'tripod',
+    location: 'LOC_LANDING_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Landing plate framing at night (as SH25): the small woman in rust at the narrow service door, one hand pushing it open into the black stairwell, flashlight in the other hand, radio in her fist; the huge bearded man at the table, hands going to the glowing monitor; the corridor opening at the right edge.',
+    visible: ['mara', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_LANDING_NIGHT.png', 'exact framing and night light'), sheet('mara'), sheet('owen')],
+      frame: 'Urgent, not panicked.',
+      saveAs: 'KF_SH45.png',
+    },
+    video: {
+      camera: 'Locked tripod.',
+      setting: 'The landing at night.',
+      beats: [
+        { t: [0, 2], text: `${Cap('mara')} pushes through the narrow service door beside the table into the black stairwell, clipping the radio to her vest as she goes; she is gone.` },
+        { t: [2, 3.5], text: `${Cap('owen')} lifts the small glowing monitor off the table with both hands.` },
+        { t: [3.5, 5], text: 'He carries it out of frame to the right, toward the corridor and the nursery door.' },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 3,
+    sound: 'off',
+    audio: 'Clara’s shortening breath (from the monitor speaker, faint), service door, Mara’s first fast footsteps on the stair.',
+  },
+
+  // ======================= J — STAIR (UPPER FLIGHT) =======================
+  {
+    id: 'SH46',
+    section: 'J',
+    covers: ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7'],
+    title: 'Following Mara from behind, slightly above shoulder level, down the narrow back stair; hand free for the rail, flashlight low; she takes the turn.',
+    cam: 'cinematic',
+    location: 'LOC_STAIR_UPPER_NIGHT.png',
+    time: 'night',
+    lens: '24mm',
+    blocking:
+      'Upper flight at night from the top (handrail on frame-LEFT, the turn at the bottom goes RIGHT). Camera behind the small woman in rust and slightly above her shoulder: she is on the top steps, left hand free near the rail, flashlight held low in her right hand, beam on the steps below, radio clipped on her vest.',
+    visible: ['mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_STAIR_UPPER_NIGHT.png', 'the stair at night — keep, never flip'), sheet('mara')],
+      frame: 'Mid-stride, fast but controlled.',
+      saveAs: 'KF_SH46.png',
+    },
+    video: {
+      camera: 'Stabilized follow camera behind her, slightly above shoulder level.',
+      setting: 'A narrow wooden back stair at night, one weak bulb at the turn.',
+      beats: [
+        { t: [0, 3.5], text: `${Cap('mara')} runs down the narrow stair fast but controlled, left hand skimming the rail, flashlight beam low on the steps, radio bouncing on her vest. She does not stop or speak.` },
+        { t: [3.5, 5], text: 'At the bottom of the flight she swings right into the turn and continues down out of view.' },
+      ],
+      stays: ['Nothing else is on the stair.', 'The handrail stays on the left.', STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'off',
+    audio: 'Fast controlled footsteps, breath, radio against clothing.',
+    note: 'Script says she “takes the stair turn” here and “reaches the middle turn” at 2:29. Built as one continuous turn: SH46 ends as she swings into it; SH49 shows her rounding it.',
+  },
+
+  // ======================= K — THIRD POSITION ==============================
+  {
+    id: 'SH47',
+    section: 'K',
+    covers: ['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8', 'K9', 'K10', 'K11', 'K12'],
+    title: 'NURSERY FIXED, same wide: the Woman one body length behind Clara. Mark darker; a short breath barely lands. NAOMI (O.S.): “Clara. Stay with me.”',
+    cam: 'fixed-nursery',
+    location: 'LOC_NURSERY_FIXED_NIGHT.png',
+    time: 'night',
+    lens: 'NURSERY FIXED locked wide',
+    blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was. The Woman is a still layer at P3 (one body length behind her).`,
+    visible: ['clara'],
+    kf: {
+      mode: 'edit',
+      uploads: [up('KF_SH40.png', 'the exact frame — change only what is listed'), up('MARK_STAGES.png', 'use the MIDDLE panel (darker red line)')],
+      frame:
+        'Edit the uploaded high-corner night frame of the woman at the door; keep the camera, room, lamp light and her position exactly unchanged. Change only: the mark on her throat is now darker, like the middle panel of the throat reference; her right hand rests at her throat; her shoulders are slightly raised; still facing the door.',
+      keep: ['her exact position at the door', 'everything else in the frame'],
+      saveAs: 'KF_SH47.png',
+    },
+    woman: {
+      file: 'KF_SH47_W.png',
+      position: 'P3',
+      uploads: [up('KF_SH47.png', 'the exact frame'), up('KF_SH40_W.png', 'the identical veiled figure — same look, only moved')],
+      prompt:
+        'Edit the first uploaded frame; keep everything exactly unchanged. Add the SAME veiled figure as in the second uploaded frame — identical dress, veil, height and pose — now standing one body length directly behind the woman at the door, just off the rug, facing her back, arms at her sides, not touching her. Scaled correctly: about the same size as the woman. Still, readable, face fully covered.',
+    },
+    video: {
+      camera: 'Fixed high-corner security camera, completely static.',
+      setting: 'The nursery at night, one small lamp on the right.',
+      beats: [
+        { t: [0, 2], text: `${Cap('clara')} pulls in a short breath; it lands, but only barely — her shoulders rise with it, eyes wide and wet.` },
+        { t: [2, 3], text: 'One hand stays pressed at her throat; she keeps her eyes on the door.' },
+        { t: [3, 5], text: `A woman’s voice through the door, muffled, controlled, in ${V('naomi')}: ${q('K10')}` },
+      ],
+      stays: [STAY_LOCKED, STAY_NO_TURN, STAY_FACES_ONLY_MOVE, STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'off',
+    audio: 'Naomi’s line laid in post (Naomi voice, muffled through wood). Clara’s barely-landing breath.',
+    post: 'Composite the Woman at P3 from KF_SH47_W.png as a STILL. The same layer is reused, untouched, in SH51.',
+  },
+
+  // ======================= L — DOOR BEAT 1 =================================
+  {
+    id: 'SH48',
+    section: 'L',
+    covers: ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9'],
+    title: 'Elias braces on the frame, tests the handle once more, stops, listens at the door. Naomi’s palm on the wood. Owen several steps back with the monitor, silent.',
+    cam: 'tripod',
+    location: 'LOC_CORRIDOR_REV_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking:
+      'Night corridor from the far-window side looking toward the landing; the closed nursery door on the RIGHT wall. The tall man in olive at the door, one hand braced on the doorframe, the other on the handle; the very tall woman with locs beside him, palm flat on the door; several steps further toward the landing, the huge bearded man holding the small glowing monitor angled toward himself and the others.',
+    visible: ['elias', 'naomi', 'owen'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('KF_SH35.png', 'the corridor angle and night light'), sheet('elias'), sheet('naomi'), sheet('owen'), up('PROP_MONITOR.png', 'the monitor he holds')],
+      frame: 'Helpless, focused, nobody speaking.',
+      saveAs: 'KF_SH48.png',
+    },
+    video: {
+      camera: 'Static.',
+      setting: 'The upper corridor at night, at the closed nursery door.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('elias')} tests the locked handle once more; it does not move; he stops pulling.` },
+        { t: [1.5, 3], text: `He puts his ear close to the door, eyes shut, listening; ${D('naomi')} keeps her palm flat on the wood in front of where the woman inside is standing.` },
+        { t: [3, 5], text: `${Cap('owen')} watches the monitor screen, face serious. No one speaks.` },
+      ],
+      stays: [STAY_PEOPLE, 'The door stays shut.'],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'off',
+    audio: 'Muffled Clara breathing through the door. Distant fast footsteps from the service stair.',
+  },
+
+  // ======================= M — STAIR TURN ==================================
+  {
+    id: 'SH49',
+    section: 'M',
+    covers: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9'],
+    title: 'Mara rounds the middle turn without stopping; her flashlight catches the next flight; the lower door is not visible yet.',
+    cam: 'cinematic',
+    location: 'LOC_STAIR_LOWER_NIGHT.png',
+    time: 'night',
+    lens: '24mm',
+    blocking:
+      'On the middle-turn landing at night, camera at shoulder height looking DOWN the lower flight (handrail on frame-LEFT; the upper flight comes in from frame-RIGHT). The small woman in rust is entering frame from the right mid-stride, coming off the upper flight, flashlight beam sweeping down the lower steps. The bottom of the flight is black; no door visible.',
+    visible: ['mara'],
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_STAIR_LOWER_NIGHT.png', 'the turn and lower flight at night — keep, never flip'), sheet('mara')],
+      frame: 'Moving fast; the flashlight is the main light on the steps.',
+      saveAs: 'KF_SH49.png',
+    },
+    video: {
+      camera: 'Stabilized camera on the turn landing, panning to follow her down.',
+      setting: 'The middle turn of a narrow back stair at night.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('mara')} comes off the upper flight and rounds the turn without stopping.` },
+        { t: [1.5, 3], text: 'Her flashlight beam catches the next flight of steps descending below her.' },
+        { t: [3, 5], text: 'She keeps running down, away from camera, into the dark; the bottom of the stair stays black.' },
+      ],
+      stays: ['No door, board or anything else appears below.', 'The handrail stays on the left.', STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'off',
+    audio: 'Fast footsteps, controlled breath, radio shifting on her clothing.',
+  },
+
+  // ======================= N — DOOR BEAT 2 =================================
+  {
+    id: 'SH50',
+    section: 'N',
+    covers: ['N1', 'N2', 'N3', 'N4', 'N5'],
+    title: 'Elias hears Clara’s breathing worsen and looks at Naomi; Naomi’s eyes on the wood; Owen glances at the monitor, then toward the service door.',
+    cam: 'tripod',
+    location: 'LOC_CORRIDOR_REV_NIGHT.png',
+    time: 'night',
+    lens: '35mm',
+    blocking: 'Same corridor angle as SH48, same positions: the tall man and the woman with locs at the closed door; the huge bearded man with the monitor several steps behind them toward the landing, the upper service door visible at the far end.',
+    visible: ['elias', 'naomi', 'owen'],
+    kf: {
+      mode: 'plate',
+      uploads: [up('KF_SH48.png', 'start frame as is')],
+      frame: 'Reuse KF_SH48 as the start frame.',
+      saveAs: 'KF_SH48.png',
+    },
+    video: {
+      camera: 'Static.',
+      setting: 'The upper corridor at night.',
+      beats: [
+        { t: [0, 1], text: `${Cap('elias')} hears the breathing inside get worse and looks at ${D('naomi')}.` },
+        { t: [1, 2], text: 'She keeps her palm on the door and her eyes fixed on the wood, as if the woman inside can see her through it.' },
+        { t: [2, 3], text: `${Cap('owen')} glances down at the monitor, then over his shoulder toward the service door at the landing, waiting. No one speaks.` },
+      ],
+      stays: [STAY_PEOPLE],
+    },
+    order: 3,
+    edit: 2.5,
+    sound: 'off',
+    audio: 'Clara’s worsening muffled breath through the door.',
+  },
+
+  // ======================= O — FINAL CLIFF =================================
+  {
+    id: 'SH51',
+    section: 'O',
+    covers: ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7', 'O8', 'O9', 'O10', 'O11', 'O12', 'O13'],
+    title: 'FINAL CLIFF: full locked NURSERY FIXED wide. The Woman exactly one body length behind, unmoved. Mark dark. Clara’s inhale fails halfway. HARD CUT TO BLACK.',
+    cam: 'fixed-nursery',
+    location: 'LOC_NURSERY_FIXED_NIGHT.png',
+    time: 'night',
+    lens: 'NURSERY FIXED locked wide',
+    blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was. The Woman is the SAME still P3 layer as SH47, untouched.`,
+    visible: ['clara'],
+    kf: {
+      mode: 'edit',
+      uploads: [up('KF_SH47.png', 'the exact frame — change only what is listed'), up('MARK_STAGES.png', 'use the RIGHT panel (dark bruised band)')],
+      frame:
+        'Edit the uploaded high-corner night frame of the woman at the door; keep the camera, room, lamp light and her position exactly unchanged. Change only: the mark on her throat is now a dark red bruised band, clearly visible on the right side of her neck (right panel of the throat reference); her right hand is hooked at her own throat; her chin is dragged up and back, neck stretched; her left hand is splayed on the door beside the handle; her knees are just starting to bend; her eyes stay on the door.',
+      keep: ['her exact position at the door', 'everything else in the frame'],
+      saveAs: 'KF_SH51.png',
+    },
+    woman: {
+      file: 'KF_SH47_W.png',
+      position: 'P3',
+    },
+    video: {
+      camera: 'Fixed high-corner security camera, completely static.',
+      setting: 'The nursery at night, one small lamp on the right.',
+      beats: [
+        { t: [0, 1.5], text: `${Cap('clara')} tries to take one full inhale.` },
+        { t: [1.5, 2.5], text: 'It fails halfway in a silent, strangled catch.' },
+        { t: [2.5, 4], text: 'Her shoulders lift involuntarily; one hand presses hard at her throat; the other reaches for the door beside the handle for balance, fingers catching at the paint; her knees start to give.' },
+        { t: [4, 5], text: 'Her eyes stay on the door.' },
+      ],
+      stays: [STAY_LOCKED, STAY_NO_TURN, STAY_FACES_ONLY_MOVE, 'No screaming.', STAY_PEOPLE],
+    },
+    order: 5,
+    edit: 4,
+    sound: 'off',
+    audio: 'Breath only. HARD CUT TO BLACK on the failed breath; cut all sound on black. No cut back to Mara: she is still on the route.',
+    post: 'Same P3 layer as SH47, untouched (the Woman has not moved during the crosscuts).',
+  },
+];
+
+export const SHOT_BY_ID: Record<string, Shot> = Object.fromEntries(SHOTS.map((s) => [s.id, s]));
