@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'People turned the wrong way (found on the first SH02 test frame)',
+    body: 'The facing direction was one clause inside a long paragraph, the prompt then described the face of a man who should be seen from behind, and the character sheets (all facing camera) pulled the pose. The video prompt never stated the start frame, so a wrong keyframe produced a wrong clip. The SH02 test also used the old character sheets (striped tee, gear round Mara’s neck, radio on her hip).',
+    fix: 'Every person in every shot has structured staging: view (from behind / profile / facing), position against landmarks, action and eyeline. Seen-from-behind people get hair and clothes, never a face. Prompts say the sheets are for identity only, not pose. Every video prompt opens with the exact start frame. Every keyframe and plate has an approve-or-reroll checklist. Regenerate the character sheets from the new sheet prompts before any keyframe.',
+  },
+  {
     title: 'Host VO lines were not in the video prompts',
     body: 'All three Elias VO lines lived only in “Audio” notes, breaking rule 1 (“every scripted line appears IN the video prompt”).',
     fix: 'SH03, SH04 and SH06 carry the exact VO line with the voice description and “no one on screen moves their mouth”. QA fails the build if any scripted line is missing from its shot’s prompt.',
@@ -66,7 +71,7 @@ export const OLD_PACK_PROBLEMS: Note[] = [
   {
     title: 'Wardrobe broke the colour lanes and the props',
     body: 'Elias wore a rust-striped tee (Mara’s lane). Mara’s base was all black, with a headlamp and a radio already clipped on, although the script has her grab the radio and flashlight from the table. Owen had a tool belt and a long flashlight, which clash with the scripted tool pouch and Mara’s flashlight. Owen’s voice was “late 30s” for a 42-year-old.',
-    fix: 'Elias: cream-and-stone henley. Mara: slate-grey cargo trousers, nothing round her neck; flashlight and radio live on the monitor table. Owen: canvas tool pouch only, no belt, no flashlight. Voices match the ages.',
+    fix: 'Elias: plain solid cream henley, no stripes. Mara: slate-grey cargo trousers, nothing round her neck; flashlight and radio live on the monitor table. Owen: canvas tool pouch only, no belt, no flashlight. Voices match the ages.',
   },
   {
     title: 'The exterior looked like a ruin',

@@ -63,3 +63,28 @@ export function download(name: string, text: string, type = 'text/markdown') {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/** Approve-or-reroll list for a generated image. Ticks are per viewer. */
+export function Checklist({ id, items }: { id: string; items: string[] }) {
+  const [ticks, setTicks] = useStored<Record<string, boolean>>(`hc.check.${id}`, {});
+  const all = items.every((_, i) => ticks[i]);
+  return (
+    <div className={`checklist${all ? ' ok' : ''}`}>
+      <div className="checklist-head">
+        <span>Approve the image only if</span>
+        <span className={`pill ${all ? 'ok' : 'warn'}`}>{all ? 'approved' : `${items.filter((_, i) => ticks[i]).length}/${items.length}`}</span>
+      </div>
+      <ul>
+        {items.map((it, i) => (
+          <li key={i}>
+            <label>
+              <input type="checkbox" id={`ck-${id}-${i}`} checked={!!ticks[i]} onChange={() => setTicks((t) => ({ ...t, [i]: !t[i] }))} />
+              <span>{it}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      <p className="checklist-foot">Any box you can’t tick: reroll. Every later prompt assumes this image is exactly right.</p>
+    </div>
+  );
+}

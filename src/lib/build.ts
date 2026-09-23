@@ -3,7 +3,7 @@
 import { ASSETS } from '../data/assets';
 import { BEAT_BY_ID } from '../data/script';
 import { SHOTS, type Shot } from '../data/shots';
-import { keyframePrompt, klingSettings, producedFiles, videoPrompt, womanPrompt, fmt } from './prompts';
+import { approvalChecklist, keyframePrompt, klingSettings, producedFiles, videoPrompt, womanPrompt, fmt } from './prompts';
 import { fmtTime } from './qa';
 
 export interface BuildStep {
@@ -14,6 +14,7 @@ export interface BuildStep {
   uploads: { file: string; job: string }[];
   editOf?: string;
   note?: string;
+  check?: string[];
 }
 
 const STAGE: Record<string, string> = {
@@ -27,12 +28,13 @@ const STAGE: Record<string, string> = {
 export function buildOrder(): BuildStep[] {
   const nodes = new Map<string, BuildStep>();
   for (const a of ASSETS) {
-    nodes.set(a.file, { file: a.file, stage: STAGE[a.kind] ?? a.kind, title: a.title, prompt: a.prompt ?? '', uploads: a.uploads ?? [], editOf: a.editOf, note: a.note });
+    nodes.set(a.file, { file: a.file, stage: STAGE[a.kind] ?? a.kind, title: a.title, prompt: a.prompt ?? '', uploads: a.uploads ?? [], editOf: a.editOf, note: a.note, check: a.check });
   }
   for (const p of producedFiles()) {
     const stage = p.kind === 'keyframe' ? '4 · Shot keyframes' : p.kind === 'woman' ? '5 · Veiled Woman layers' : '4 · Shot keyframes';
     const title = p.kind === 'woman' ? `${p.shot} — Veiled Woman layer` : p.kind === 'clean' ? `${p.shot} — clean start frame` : `${p.shot} — keyframe`;
-    nodes.set(p.file, { file: p.file, stage, title, prompt: p.prompt, uploads: p.uploads });
+    const shot = SHOTS.find((x) => x.id === p.shot)!;
+    nodes.set(p.file, { file: p.file, stage, title, prompt: p.prompt, uploads: p.uploads, check: p.kind === 'keyframe' ? approvalChecklist(shot) : undefined });
   }
   const out: BuildStep[] = [];
   const seen = new Set<string>();
@@ -79,6 +81,7 @@ export function exportMarkdown(): string {
     out.push(`### ${b.file} — ${b.title}`, `Stage: ${b.stage}`);
     if (b.uploads.length) out.push(`Uploads: ${b.uploads.map((u) => `${u.file} (${u.job})`).join('; ')}`);
     if (b.prompt) out.push('', '```', b.prompt, '```');
+    if (b.check?.length) out.push('', 'Approve only if:', ...b.check.map((c) => `- [ ] ${c}`));
     out.push('');
   }
   out.push('## Shots', '');
@@ -86,6 +89,8 @@ export function exportMarkdown(): string {
     const s = r.shot;
     out.push(`### ${s.id} · ${fmtTime(r.start)}–${fmtTime(r.end)} · order ${fmt(s.order)}s / edit ${fmt(s.edit)}s`, s.title, '', `Script beats: ${s.covers.join(', ')}`);
     out.push('', '**Keyframe (Nano Banana 2)**', '```', keyframePrompt(s), '```');
+    const ck = approvalChecklist(s);
+    if (s.kf.mode === 'generate' || s.kf.mode === 'edit') out.push('', 'Approve the keyframe only if:', ...ck.map((c) => `- [ ] ${c}`));
     const w = womanPrompt(s);
     if (w) out.push('', '**Veiled Woman layer**', '```', w, '```');
     if (s.woman?.cleanPrompt) out.push('', '**Clean start frame**', '```', s.woman.cleanPrompt, '```');

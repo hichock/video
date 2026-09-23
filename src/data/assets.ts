@@ -23,6 +23,8 @@ export interface Asset {
   editOf?: string;
   note?: string;
   group?: string;
+  /** Approve the image only if all of these are true. */
+  check?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -180,6 +182,7 @@ export const ASSETS: Asset[] = [
     title: 'Exterior master, late afternoon',
     ref: 'the daytime photo of the pale stone manor front with the dark green SUV on the gravel, tailgate open toward the camera',
     prompt: `Photorealistic location plate, vertical 9:16, no people. Late afternoon, bright warm sunlight. Camera at eye level on the gravel drive, 24mm, looking straight at the front of a large pale limestone three-storey English manor: tall sash windows, light ivy on one corner, a central front door at the top of five wide stone steps, clipped box hedges, mature green lawns and trees. On the gravel a few metres from the foot of the steps, slightly left of centre, a dark green SUV with its nose toward the house and its rear toward the camera, tailgate lifted open, black equipment cases inside. Low sun from the LEFT of frame throws long warm shadows to the right. A few upper windows have their inside shutters closed — the only hint that nobody lives here now. Elegant, inviting, well kept, realistic colour. No fog, no storm, no cemetery, no dead plants, no broken windows, no text.`,
+    check: ['The SUV’s REAR faces the camera, nose toward the house, tailgate lifted open toward us — NOT parked side-on', 'The front door and steps are centre, a few metres beyond the SUV', 'Sun from frame-LEFT, shadows falling right', 'Bright and well kept: no weeds, no dead plants, no heavy ivy'],
     group: 'Exterior',
     note: MAPS.exterior.text,
   },
@@ -190,6 +193,7 @@ export const ASSETS: Asset[] = [
     ref: 'the daytime photo looking out along the gravel drive from the foot of the manor steps, with the front of the dark green SUV a few metres ahead',
     prompt: 'Using the uploaded photo of the manor and the SUV for the gravel, lawns, trees, SUV and light: show the reverse view. Camera at chest height on the gravel near the foot of the front steps with its back to the house (the house is behind the camera and not visible), 35mm, looking out along the drive. The same dark green SUV is a few metres ahead with its FRONT toward the camera; its tailgate is open on the far side. The gravel drive curves away between green lawns and mature trees. Low warm sun now comes from the RIGHT of frame. No people, no text.',
     uploads: [{ file: 'LOC_EXT_DAY.png', job: 'same place, SUV, materials and light — reverse the view' }],
+    check: ['The house is NOT in frame', 'The SUV is seen from its FRONT', 'Sun from frame-RIGHT'],
     group: 'Exterior',
   },
 
@@ -200,6 +204,7 @@ export const ASSETS: Asset[] = [
     title: 'Entrance hall, day',
     ref: 'the daytime photo of the entrance hall with the black-and-white floor, the central staircase and the plain service door on the right-hand wall',
     prompt: `Photorealistic location plate, vertical 9:16, no people. Camera just inside the open front door at eye level, 24mm, looking into the entrance hall of an old English manor: a worn black-and-white stone floor; a wide central staircase straight ahead with a dark wood banister rising to an upper landing; on the RIGHT-hand wall a plain panelled service door, closed, with a small brass knob; on the left wall a tall window laying one long warm bar of late sun across the floor. Furniture under white dust sheets, stacked cardboard removal boxes against a wall, pale rectangles where portraits used to hang, a tall long-case clock stopped. Warm, bright, elegant. ${LOOKS.dayInterior}`,
+    check: ['The service door is on the RIGHT-hand wall', 'The central stair is straight ahead'],
     group: 'Hall & service side',
     note: MAPS.hall.text,
   },
@@ -209,6 +214,7 @@ export const ASSETS: Asset[] = [
     title: 'Service hall with bell board, day',
     ref: 'the daytime photo of the service hall with the antique mahogany servant-bell board, the lower wooden panel under it and the narrow service door to its right',
     prompt: `Photorealistic location plate, vertical 9:16, no people. Ground-floor service hall of an old English manor, camera at eye level, 35mm, facing the back wall: a mounted antique mahogany servant-bell board with rows of small glass windows, each with a small brass flag and a painted room label; the label NURSERY is clearly readable in the middle row; the brass is slightly tarnished; every flag is in the neutral up position. Below the board, at knee height, a hinged lower wooden panel, closed. Immediately to the RIGHT of the board, a narrow plain panelled service door, closed. Chipped whitewashed walls, worn stone floor, an old enamel sign, a small high window on the LEFT giving one cold shaft of daylight. ${LOOKS.dayInterior}`,
+    check: ['NURSERY readable in the middle row', 'Lower wooden panel below the board', 'Narrow service door immediately RIGHT of the board'],
     group: 'Hall & service side',
     note: `${MAPS.serviceHall.text} Use a text-capable image model so NURSERY is readable; fix the label in post if needed.`,
   },
@@ -253,6 +259,7 @@ export const ASSETS: Asset[] = [
     title: 'Back stair, lower flight from the turn, day',
     ref: 'the daytime photo of the narrow back service stair seen from the middle-turn landing looking down the lower flight to the open lower door',
     prompt: `Photorealistic location plate, vertical 9:16, no people. The narrow wooden back service stair of an old English manor, seen from the small middle-turn landing, camera at chest height, 24mm, looking DOWN the lower flight: about twelve worn wooden steps between ${STAIR_WALLS}; the handrail runs along the wall on the LEFT of frame. At the bottom a plain panelled lower service door stands open onto a bright stone-floored service hall. Daylight from a small dusty window on the turn landing behind the camera. The stair doubles back here: the upper flight begins just off the RIGHT edge of frame, going up. ${LOOKS.dayInterior}`,
+    check: ['Handrail on frame-LEFT', 'Open lower door at the bottom', 'The upper flight goes off frame-RIGHT'],
     group: 'Back stair',
     note: MAPS.stair.text,
   },
@@ -263,6 +270,7 @@ export const ASSETS: Asset[] = [
     ref: 'the daytime photo of the narrow back stair seen from the top step looking down the upper flight to the turn',
     prompt: `Using the uploaded photo of the lower flight for walls, treads, handrail, colours and light: the same stair seen from the top step just inside the narrow upper service door, camera slightly above shoulder height, 24mm, looking DOWN the upper flight: about ten worn wooden steps between ${STAIR_WALLS}; the handrail on the wall on the LEFT of frame; at the bottom the small middle-turn landing with its small dusty window, where the stair turns to the RIGHT and continues down out of sight. No people, no text.`,
     uploads: [{ file: 'LOC_STAIR_LOWER_DAY.png', job: 'same stair: walls, treads, rail, window' }],
+    check: ['Handrail on frame-LEFT', 'The stair turns RIGHT at the landing below'],
     group: 'Back stair',
     note: 'Handrail frame-left; turn goes right. Never flipped.',
   },
@@ -296,6 +304,7 @@ export const ASSETS: Asset[] = [
     title: 'Central landing, monitor station, day (match-cut framing)',
     ref: 'the daytime photo of the upper landing with the narrow service door and the small wooden table immediately to its left',
     prompt: `Photorealistic location plate, vertical 9:16, no people. The central upper landing of an old English manor, camera on a tripod at eye level, 35mm, facing a dark panelled wall: in it a narrow plain panelled service door, closed; immediately to the LEFT of the door a small wooden side table with a brass table lamp (switched off) and nothing else on it; a dust-sheeted chair beside the table; further left a tall landing window with thin pale daylight; on the right edge of frame the opening into an upper corridor. ${LOOKS.dayInterior}`,
+    check: ['Service door with the table immediately to its LEFT', 'Table empty except the lamp (switched off)', 'Corridor opening at the right edge'],
     group: 'Landing',
     note: `${MAPS.landing.text} This exact framing is the match cut in SH24 → SH25.`,
   },
@@ -305,7 +314,7 @@ export const ASSETS: Asset[] = [
     title: 'Central landing, night (edit)',
     ref: 'the night photo of the upper landing with the lamp on and the open two-screen monitor case on the small table beside the service door',
     editOf: 'LOC_LANDING_DAY.png',
-    prompt: 'Edit the uploaded photo of the landing: identical framing and geometry, nothing moved. Night: the landing window is black-blue; the brass table lamp is ON, making a warm pool on the table and the panelled wall; the rest falls into deep but readable shadow. On the table, beside the lamp, the small black hard-case field monitor from the product photo stands open with both screens glowing flat grey (left screen and right screen). The service door stays closed. No people, no text.',
+    prompt: 'Edit the uploaded photo of the landing: identical framing and geometry, nothing moved. Night: the landing window is black-blue; the brass table lamp is ON, making a warm pool on the table and the panelled wall; the rest falls into deep but readable shadow. The dust sheet is gone from the chair at the left end of the table. On the table, beside the lamp, the small black hard-case field monitor from the product photo stands open, angled toward that chair so both screens are also partly visible to the camera, both glowing flat grey. The service door stays closed. No people, no text.',
     uploads: [
       { file: 'LOC_LANDING_DAY.png', job: 'exact framing and room' },
       { file: 'PROP_MONITOR.png', job: 'what the open monitor case looks like' },
@@ -321,6 +330,7 @@ export const ASSETS: Asset[] = [
     title: 'Upper corridor from the landing end, day',
     ref: 'the daytime photo of the upper corridor seen from the landing end, with the white nursery door standing open on the left',
     prompt: `Photorealistic location plate, vertical 9:16, no people. Camera at the landing end of a long upper corridor of an old English manor, eye level, 35mm, looking straight down it to a tall window at the far end: faded patterned wallpaper, dark wood floor with a worn runner, a row of closed doors on the right; on the LEFT wall about four metres from camera a white panelled door stands wide open into its room (it opens inward), showing a sliver of a small child’s room. A small table under a dust sheet against the right wall. Warm daylight from the far window. ${LOOKS.dayInterior}`,
+    check: ['Nursery door open on the LEFT wall, about four metres in'],
     group: 'Corridor',
     note: MAPS.corridor.text,
   },
@@ -334,6 +344,7 @@ export const ASSETS: Asset[] = [
       { file: 'LOC_CORRIDOR_DAY.png', job: 'corridor materials, the nursery door' },
       { file: 'LOC_LANDING_DAY.png', job: 'what the landing at the end looks like' },
     ],
+    check: ['Nursery door open on the RIGHT wall', 'The landing with the table and service door visible at the far end'],
     group: 'Corridor',
   },
   {
@@ -367,6 +378,7 @@ export const ASSETS: Asset[] = [
     title: 'NURSERY FIXED, day (hero plate)',
     ref: 'the daytime view of the nursery from the small camera high in the corner, door in the lower left',
     prompt: `Photorealistic, vertical 9:16, no people. The view from a small fixed camera mounted about 2.6 m high in the corner where the window wall meets the right-hand wall of a child’s nursery in an old English manor; the window is behind the camera. The camera looks diagonally across and down the room at about 30 degrees, very wide lens without fisheye distortion. Exact layout: the single white panelled door with a brass handle is on the LEFT-hand wall close to the camera end, fully visible in the lower-left third of the frame, closed, with a clear strip of bare wooden floorboards in front of it. From there the room runs away from the camera up the frame: a worn faded rug in the middle of the floor; a low wooden chest on the rug at the centre of the frame with a grey archival document box on its lid; a small wooden side table against the right-hand wall at mid-depth with a small fabric-shaded practical lamp (switched off) and a few old books; a white iron child’s bed made up tightly with faded old linen against the far wall; an armchair under a white dust sheet in the far-left corner; the far-right corner is empty bare floor. Sun-bleached wallpaper with a small repeating pattern, empty picture hooks, a pale rectangle where a picture hung. Pale daylight from the window behind the camera through thin curtains, dust in the light. ${LOOKS.fixed} No people, no dolls, no toys, no horror props.`,
+    check: ['Door fully visible in the lower-LEFT third with bare floor in front of it', 'Chest with the grey box at frame centre', 'Lamp table on the right wall, bed on the far wall, armchair far-LEFT, far-RIGHT corner empty', 'No people, no dolls, no text'],
     group: 'Nursery',
     note: MAPS.nursery.text,
   },
@@ -378,6 +390,7 @@ export const ASSETS: Asset[] = [
     editOf: 'LOC_NURSERY_FIXED_DAY.png',
     prompt: `Edit the uploaded photo of the nursery seen from the high corner: identical camera, lens, framing and geometry, nothing moved. Night: the daylight is gone; the small lamp on the side table against the right-hand wall is ON and throws a dim warm pool across the rug, the low chest and the grey box; only weak spill reaches the door in the lower-left; the far corners fall into deep but readable shadow, so a still figure standing in the far-right corner, on the rug, or just behind someone at the door would be only just visible. A faint cool moonlight edge on the iron bed from the window behind the camera. ${LOOKS.fixed} Empty room, no people.`,
     uploads: [{ file: 'LOC_NURSERY_FIXED_DAY.png', job: 'exact camera and room' }],
+    check: ['Overlays the day plate exactly at 50% opacity', 'Lamp on; the door and far corners dark but readable'],
     group: 'Nursery',
     note: 'Must overlay pixel-for-pixel on the day plate (check at 50% opacity). Every NURSERY FIXED frame is an edit of this image.',
   },
@@ -391,6 +404,7 @@ export const ASSETS: Asset[] = [
       { file: 'LOC_NURSERY_FIXED_DAY.png', job: 'the room: furniture, wallpaper, positions' },
       { file: 'LOC_CORRIDOR_DAY.png', job: 'the corridor floor, runner and door' },
     ],
+    check: ['Chest and box to the LEFT inside, lamp table straight ahead, window on the RIGHT', 'The high corner ahead-right is empty (no camera yet)'],
     group: 'Nursery',
     note: 'Used for SH09 (clean view), SH13 (handheld POV) and SH14–SH16 (corridor angle). From the corridor, the landing is to the LEFT.',
   },

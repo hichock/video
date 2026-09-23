@@ -8,6 +8,18 @@ import { MAPS, type Upload } from './assets';
 
 export type CamKind = 'cinematic' | 'handheld' | 'tripod' | 'fixed-nursery' | 'fixed-bellboard';
 
+/** How a person is seen in the frame. Controls what the prompt may describe. */
+export type View = 'front' | 'front34' | 'profileL' | 'profileR' | 'back34' | 'back' | 'small' | 'hands';
+
+export interface Person {
+  id: CharId;
+  view: View;
+  /** Position against landmarks in the frame. */
+  where: string;
+  /** Action and eyeline at the start frame. */
+  doing: string;
+}
+
 export interface VBeat {
   t: [number, number];
   text: string;
@@ -46,7 +58,9 @@ export interface Shot {
   time: 'day' | 'night';
   lens: string;
   blocking: string;
-  visible: CharId[];
+  people: Person[];
+  /** Extra things to verify before approving the keyframe. */
+  check?: string[];
   kf: Keyframe;
   woman?: WomanLayer;
   video: {
@@ -112,7 +126,10 @@ export const SHOTS: Shot[] = [
     lens: 'Tight crop of the NURSERY FIXED wide',
     blocking:
       'A tight crop out of the NURSERY FIXED frame, same high corner camera looking down, same warm lamp spill from frame-right. Only the copper-haired woman’s lower face, throat, right hand and part of her right shoulder, seen from above and behind her right shoulder. She faces the door (out of frame to the left). The top-right corner of the crop clips a dark slice of the veiled figure’s dress and veil. No door, no furniture, no room geography.',
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'back34', where: 'fills the frame from above and behind her right shoulder; the door is just out of frame to the left', doing: 'right hand hooked at her own throat, two fingers pressed into the faint mark; eyes locked forward on the door' },
+    ],
+    check: ['No door or furniture visible', 'The dark slice at the top-right has no face and no depth cue'],
     kf: {
       mode: 'edit',
       uploads: [
@@ -162,8 +179,13 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '24mm',
     blocking:
-      'Master view: camera on the gravel behind the SUV at eye level, looking at the facade. The dark green SUV is a few metres from the foot of the front steps, slightly left of centre, rear toward camera, tailgate open. At the tailgate: the huge bearded man on the left lifting out a heavy black case, the small woman in rust on the right taking out a compact black case. Between the SUV and the steps, walking away from camera toward the front door with his back to us: the tall lean man in olive, handheld camera at chest height. Low sun from frame-left, long shadows falling right. Everyone small in frame; the manor dominates.',
-    visible: ['owen', 'mara', 'elias'],
+      'Master view: the camera stands on the gravel a few metres BEHIND the SUV at eye level, looking at the facade, so the house is ahead of the camera and everyone in frame. The dark green SUV sits slightly left of centre, a few metres from the foot of the front steps, its REAR toward the camera, nose toward the house, tailgate lifted open toward us. The two unloading stand at the two corners of the open tailgate. The tall man has just left the SUV: he is a few steps ahead of it on the gravel, still several metres from the steps, walking away from the camera toward the front door — the camera sees only his back. Low sun from frame-left, long shadows falling right. The people are small in frame; the manor dominates the upper two thirds.',
+    people: [
+      { id: 'owen', view: 'profileR', where: 'standing at the LEFT corner of the open tailgate, full body in frame', doing: 'body turned in profile toward frame-right, both hands hauling a heavy black case out of the boot' },
+      { id: 'mara', view: 'profileL', where: 'standing at the RIGHT corner of the open tailgate, full body in frame', doing: 'in profile toward frame-left, lifting a compact black case out of the boot, eyes on the case' },
+      { id: 'elias', view: 'back', where: 'on the gravel a few steps ahead of the SUV, still several metres from the front steps, walking straight toward the front door', doing: 'mid-stride AWAY from the camera, handheld camera held at chest height in front of him (only his elbows show), head up toward the facade' },
+    ],
+    check: ['The SUV’s REAR faces the camera and the tailgate is open toward us (not parked side-on)', 'The tall man’s FACE IS NOT VISIBLE: only the back of his head and jacket', 'He is a few steps ahead of the SUV, heading for the door, not yet at the steps'],
     kf: {
       mode: 'generate',
       uploads: [
@@ -173,17 +195,17 @@ export const SHOTS: Shot[] = [
         sheet('elias'),
         up('CH_LINEUP.png', 'relative heights'),
       ],
-      frame: 'A documentary moment, nobody posing, nobody looking at the camera: the crew already at work. The manor is bright, elegant and inviting.',
-      keep: ['the manor, SUV and light exactly as in the uploaded photo'],
+      frame: 'A documentary moment caught mid-action, nobody posing: the crew already at work and already moving toward the house. The manor is bright, elegant and inviting.',
+      keep: ['the manor, the SUV (rear toward camera, tailgate open) and the light exactly as in the uploaded photo'],
       saveAs: 'KF_SH02.png',
     },
     video: {
       camera: 'Slow smooth crane-down push-in toward the manor.',
       setting: 'Bright late afternoon, gravel drive in front of a pale stone manor.',
       beats: [
-        { t: [0, 3], text: `At the open tailgate ${D('owen')} hauls a heavy black case out and sets it on the gravel; ${D('mara')} lifts out a compact black case. ${Cap('elias')} keeps walking away from camera toward the front steps. Nobody looks at the camera. No one speaks.` },
+        { t: [0, 3], text: `At the open tailgate ${D('owen')} hauls a heavy black case out and sets it on the gravel, and ${D('mara')} lifts out a compact black case. Ahead of them ${D('elias')} keeps walking away from the camera, straight toward the front steps; he is still a few metres short of them when the shot ends. He never turns round. No one speaks.` },
       ],
-      stays: ['The manor, the SUV and the light stay exactly as in the start frame.', STAY_PEOPLE],
+      stays: ['The manor, the SUV and the light stay exactly as in the start frame.', 'The tall man’s face is never seen in this shot.', STAY_PEOPLE],
     },
     order: 3,
     edit: 2,
@@ -202,7 +224,12 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Reverse view: the camera is on the gravel between the SUV and the house with its BACK TO THE HOUSE (the house is behind the camera, out of frame), moving backward ahead of him. He walks toward the camera — toward the house — in three-quarter front view, handheld camera at chest height, eyes lifted past the lens to the upstairs windows. Behind him, a few metres back and soft: the dark green SUV front-on, and beside it the huge bearded man and the small woman in rust unloading at the open tailgate. Low sun from frame-RIGHT, rim-lighting his right side.',
-    visible: ['elias', 'owen', 'mara'],
+    people: [
+      { id: 'elias', view: 'front', where: 'in the centre of the frame on the gravel, full body to mid-thigh, walking toward the camera (and toward the house behind the camera)', doing: 'mid-stride, handheld camera at chest height, eyes lifted ABOVE the lens to the upstairs windows' },
+      { id: 'owen', view: 'small', where: 'behind him in the soft background, at the far end of the SUV, half hidden by it', doing: 'unloading a case at the open tailgate' },
+      { id: 'mara', view: 'small', where: 'behind him in the soft background beside the bearded man at the far end of the SUV', doing: 'lifting a small case out of the boot' },
+    ],
+    check: ['The manor is NOT in frame; we look away from it', 'The SUV is seen from its FRONT', 'Sun on frame-right'],
     kf: {
       mode: 'generate',
       uploads: [
@@ -240,8 +267,12 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '50mm',
     blocking:
-      'Camera beside the rear corner of the SUV at chest height, looking across the open tailgate; the manor’s front steps are soft in the background on the RIGHT of frame. The small woman in rust stands at the tailgate lifting a compact black hard case out of the boot with both hands, thumb already on its latch. At the left edge, partly cut off, the huge bearded man drags out a larger case. The low sun is ahead of the camera, backlighting her hair.',
-    visible: ['mara', 'owen'],
+      'Camera on the gravel beside the rear of the SUV, chest height, looking ACROSS the car side-on: the SUV’s open rear is on frame-LEFT, its nose points frame-RIGHT toward the manor, whose front steps are soft in the background on the RIGHT of frame. The small woman in rust stands at the open boot at the left end of the car, facing into it (toward frame-right), in profile. The huge bearded man is partly cut off at the left edge, also at the boot. The low sun is ahead of the camera, backlighting her hair.',
+    people: [
+      { id: 'mara', view: 'profileR', where: 'standing at the open boot at the LEFT end of the car (the SUV’s rear), facing into it toward frame-right', doing: 'both hands lifting a compact black hard case out, thumb on its latch, eyes on the latch' },
+      { id: 'owen', view: 'profileR', where: 'at the left edge of frame, partly cut off by the edge, beside her at the boot', doing: 'dragging a larger black case out, eyes on the case' },
+    ],
+    check: ['The manor is soft in the background on frame-RIGHT', 'Backlight: the sun is ahead of the camera'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_EXT_DAY.png', 'the SUV, gravel, manor and light'), sheet('mara'), bg('owen')],
@@ -253,7 +284,7 @@ export const SHOTS: Shot[] = [
       setting: 'Late afternoon at the open tailgate of the SUV, the manor behind.',
       beats: [
         { t: [0, 2], text: `${Cap('mara')} lifts the compact black case out of the boot.` },
-        { t: [2, 5], text: 'She turns toward the house and starts walking toward the front steps, thumbing the latch open and shut once to check it, eyes on the latch.' },
+        { t: [2, 5], text: 'She steps back from the boot and walks along the side of the SUV toward frame-right, toward the house and its steps, thumbing the latch open and shut once to check it, eyes on the latch, her profile to the camera.' },
       ],
       vo: vo('B8'),
       stays: [STAY_PEOPLE],
@@ -275,7 +306,11 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Reverse view, back to the house: camera moving backward ahead of two women walking toward it — toward the house, which is behind the camera. On the left, the very tall woman with locs in the camel coat; on the right, half a step ahead, the copper-haired woman in the ice-blue blouse, her right arm raised pointing up past the camera at an upstairs window. The SUV small and soft far behind them. Low sun from frame-right.',
-    visible: ['naomi', 'clara'],
+    people: [
+      { id: 'naomi', view: 'front', where: 'on the LEFT, walking toward the camera, clearly taller', doing: 'listening, eyes following her companion’s raised arm up past the camera' },
+      { id: 'clara', view: 'front', where: 'on the RIGHT, half a step ahead, walking toward the camera', doing: 'right arm raised, pointing up past the camera at an upstairs window, lips parted mid-sentence, eyes on the window above the lens' },
+    ],
+    check: ['The manor is NOT in frame; they walk toward the camera', 'She points ABOVE the camera'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_EXT_REV_DAY.png', 'location and light'), sheet('naomi'), sheet('clara'), up('CH_LINEUP.png', 'relative heights')],
@@ -307,7 +342,10 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Camera just inside the open front door, low and slightly left, looking into the hall (plate direction): the stair ahead, the plain service door on the RIGHT-hand wall. The huge bearded man has just come in past the camera, walking away into the hall, the heavy black case in his LEFT hand, his RIGHT hand reaching for the service-door knob as he passes it, head turned toward the door so his profile shows. A bar of low sun across the floor from the window on the left.',
-    visible: ['owen'],
+    people: [
+      { id: 'owen', view: 'back34', where: 'a few steps into the hall, just past the camera on the right side of frame, walking away from the camera toward the stair', doing: 'heavy black case in his LEFT hand; RIGHT hand reaching to the knob of the service door on the right-hand wall; head turned right toward the door so his right profile shows' },
+    ],
+    check: ['The service door is on the RIGHT-hand wall', 'The bright open front door is behind the camera'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_HALL_DAY.png', 'the hall, stair, service door and light — keep'), sheet('owen')],
@@ -342,8 +380,15 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '24mm',
     blocking:
-      'Camera in the hall at shoulder height, a step behind and to the right of the tall man in olive (over his right shoulder). He stands in the right foreground, back three-quarter to camera, holding his handheld camera up; its flip-out side monitor shows the staircase. Ahead, halfway up the central stair and climbing away from camera side by side: the copper-haired woman on the left, the very tall woman with locs on the right. At the lower-left edge, just coming in from the front door behind the camera: the huge bearded man with the heavy case and the small woman in rust with her compact case. Sun bar across the floor from the left.',
-    visible: ['elias', 'clara', 'naomi', 'owen', 'mara'],
+      'Camera in the hall at shoulder height, a step behind and to the right of the tall man in olive (over his right shoulder). He stands in the right foreground, back three-quarter to camera, holding his handheld camera up; its flip-out side monitor shows the staircase. Ahead, halfway up the central stair and climbing away from camera side by side: the copper-haired woman on the left, the very tall woman with locs on the right. At the foot of the stair, starting up behind the two women with his back to us: the huge bearded man with the heavy case. At the lower-left edge, just coming in from the front door behind the camera: the small woman in rust with her compact case. Sun bar across the floor from the left.',
+    people: [
+      { id: 'elias', view: 'back34', where: 'in the right foreground, from the waist up, a step ahead of the camera', doing: 'holding his handheld camera up at eye height, framing the staircase; its flip-out side monitor shows the stair' },
+      { id: 'clara', view: 'back', where: 'halfway up the central staircase, on the LEFT of the pair', doing: 'climbing away from the camera, one hand on the banister' },
+      { id: 'naomi', view: 'back', where: 'halfway up the central staircase, on the RIGHT of the pair, taller', doing: 'climbing away from the camera beside her' },
+      { id: 'owen', view: 'back', where: 'at the foot of the central staircase, one step up, behind the two women', doing: 'starting up the stair with the heavy black case, back to camera' },
+      { id: 'mara', view: 'small', where: 'at the lower-left edge, just coming in from the front door behind the camera', doing: 'carrying her compact case toward the stair, back to camera' },
+    ],
+    check: ['Both women are seen from behind, climbing', 'The front door is behind the camera'],
     kf: {
       mode: 'generate',
       uploads: [
@@ -360,7 +405,7 @@ export const SHOTS: Shot[] = [
       camera: 'Gimbal starts over his shoulder, then rises and tilts up to follow the two women up the stair in one continuous movement.',
       setting: 'Bright entrance hall with a central staircase.',
       beats: [
-        { t: [0, 1.5], text: `${Cap('elias')} frames the stair with his handheld camera; ${D('owen')} and ${D('mara')} come in at the lower edge with their cases, heading for the foot of the stair.` },
+        { t: [0, 1.5], text: `${Cap('elias')} crosses the hall a few steps and raises his handheld camera to frame the stair; ${D('owen')} starts up the stair behind the two women with the heavy case, and ${D('mara')} comes in at the lower-left edge with her compact case, heading for the stair.` },
         { t: [1.5, 5], text: `The camera rises past his shoulder and follows ${D('clara')} and ${D('naomi')} up the staircase as they reach the top and turn into the upper corridor.` },
       ],
       stays: [STAY_PEOPLE],
@@ -383,7 +428,11 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Reverse corridor view from the far-window end looking back toward the landing. The two women walk side by side toward camera, the landing behind them. The copper-haired woman is on frame-RIGHT, nearest the wall with the open white nursery door; the very tall woman with locs on frame-left. They are one step before the open doorway, which is on the right wall right beside the copper-haired woman. Daylight from behind the camera, soft on their faces.',
-    visible: ['clara', 'naomi'],
+    people: [
+      { id: 'clara', view: 'front', where: 'on frame-RIGHT, nearest the wall with the open nursery door, walking toward the camera', doing: 'eyes ahead down the corridor, composed and guarded' },
+      { id: 'naomi', view: 'front', where: 'on frame-LEFT beside her, walking toward the camera, clearly taller', doing: 'eyes on her companion, not on the camera' },
+    ],
+    check: ['The open nursery door is on the RIGHT wall right beside the copper-haired woman', 'The landing is visible behind them at the far end'],
     kf: {
       mode: 'generate',
       uploads: [
@@ -419,7 +468,7 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking: 'Plate framing: from the corridor straight through the open white door into the nursery. Chest and grey box on the rug to the left, bed beyond, window on the right, empty high corner ahead-right.',
-    visible: [],
+    people: [],
     kf: {
       mode: 'plate',
       uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'start frame as is')],
@@ -451,7 +500,10 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Same reverse corridor view: the two women are level with the open nursery doorway on the right wall. The copper-haired woman on frame-right, still looking through the doorway to her left; the woman with locs on frame-left, walking, eyes on her.',
-    visible: ['clara', 'naomi'],
+    people: [
+      { id: 'clara', view: 'front34', where: 'on frame-RIGHT, level with the open nursery doorway, walking toward the camera', doing: 'head turned to her left (frame-right), looking through the open doorway into the room' },
+      { id: 'naomi', view: 'front34', where: 'on frame-LEFT, walking toward the camera', doing: 'eyes on her companion' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi')],
@@ -484,7 +536,10 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Same reverse corridor view, further on: the open nursery doorway is now several metres behind them on the right wall. Both women walk toward camera; the copper-haired woman on frame-right, the woman with locs on frame-left.',
-    visible: ['clara', 'naomi'],
+    people: [
+      { id: 'clara', view: 'front', where: 'on frame-RIGHT, walking toward the camera; the open doorway is several metres behind her on the right wall', doing: 'eyes forward, just about to glance back over her left shoulder' },
+      { id: 'naomi', view: 'front', where: 'on frame-LEFT, walking toward the camera', doing: 'eyes on her companion' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi')],
@@ -516,8 +571,14 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'Same reverse corridor view, locked. The two women are at the very front of frame, about to pass the camera on the left. Down the corridor, coming from the landing: the small woman in rust carrying a compact black camera and a small metal bracket toward the open nursery door on the right wall, the tall man in olive right behind her with his handheld camera. At the far end, on the landing, the huge bearded man setting down a case.',
-    visible: ['clara', 'naomi', 'mara', 'elias', 'owen'],
+      'Same reverse corridor view, locked. The two women are at the very front of frame on the right, about to pass the camera on the right. In the left foreground, against the left wall, the huge bearded man kneels at an open black case, unpacking. Down the corridor, coming from the landing: the small woman in rust carrying a compact black camera and a small metal bracket toward the open nursery door on the right wall, the tall man in olive right behind her with his handheld camera.',
+    people: [
+      { id: 'clara', view: 'front', where: 'at the very front of frame on the right, nearest the right wall, about to pass the camera on the right', doing: 'walking, eyes ahead' },
+      { id: 'naomi', view: 'front', where: 'at the very front of frame, just left of her companion, about to pass the camera on the right', doing: 'walking beside her' },
+      { id: 'mara', view: 'small', where: 'halfway down the corridor, coming toward the camera from the landing, near the open nursery door on the right wall', doing: 'carrying a compact black camera and a small metal bracket' },
+      { id: 'elias', view: 'small', where: 'one step behind the small woman', doing: 'holding his handheld camera' },
+      { id: 'owen', view: 'profileR', where: 'in the left foreground against the left wall, partly cut off by the frame edge', doing: 'kneeling at an open black case, unpacking a compact black camera and a small canvas tool pouch, eyes on the case' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [
@@ -534,9 +595,9 @@ export const SHOTS: Shot[] = [
       camera: 'Locked tripod.',
       setting: 'Bright upper corridor, daytime.',
       beats: [
-        { t: [0, 1.5], text: `${Cap('clara')} and ${D('naomi')} walk out of frame past the camera on the left.` },
+        { t: [0, 1.5], text: `${Cap('clara')} and ${D('naomi')} walk out of frame past the camera on the right.` },
         { t: [1.5, 4], text: `Down the corridor, ${D('mara')} carries the compact camera to the open nursery door and turns in through it; ${D('elias')} follows her in, raising his handheld camera.` },
-        { t: [4, 5], text: `At the far end ${D('owen')} keeps working on the landing.` },
+        { t: [4, 5], text: `In the left foreground ${D('owen')} keeps unpacking his case and does not look up.` },
       ],
       stays: [STAY_PEOPLE],
     },
@@ -544,7 +605,7 @@ export const SHOTS: Shot[] = [
     edit: 3,
     sound: 'off',
     audio: 'House ambience, distant cases.',
-    note: 'Naomi exits with Clara here and is back working in the corridor in SH14 (“Owen and Naomi continue working nearby”).',
+    note: 'Owen works in the foreground; Naomi exits with Clara and is back in the corridor in SH14 (“Owen and Naomi continue working nearby”). In SH14 Owen walks from here (the window end) toward the landing.',
     trim: 'Candidate.',
   },
 
@@ -561,7 +622,10 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Handheld view from the doorway, looking in: ahead-right, high in the corner where the window wall meets the wall ahead, the small woman in rust stands on a small step stool, arms up, tightening a compact black camera onto one small metal wall bracket. The camera’s tiny flip-out preview screen faces us. Below her the window with thin curtains; to the left the low chest with the grey box on the rug and the white iron bed beyond. Daylight from the window.',
-    visible: ['mara'],
+    people: [
+      { id: 'mara', view: 'back34', where: 'ahead-right, high in the corner above the window, standing on a small step stool', doing: 'arms raised, tightening a compact black camera onto a wall bracket, face turned up to the mount in partial profile' },
+    ],
+    check: ['No person other than her; the doorway operator is never seen', 'The bracket is in the corner above the window, ahead-right'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket')],
@@ -595,7 +659,13 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Camera in the corridor with its back to the wall opposite the nursery door, eye level. In the open doorway, back three-quarter to camera, the tall man in olive stands filming into the room, handheld raised toward the far corner. Through the doorway, high in the corner ahead-right above the window, the small woman in rust on a step stool tightening the compact camera onto its bracket. In the corridor foreground, entering from frame-RIGHT and walking LEFT (toward the landing): the huge bearded man carrying a second compact black camera and a small canvas tool pouch; a few steps behind him, the very tall woman with locs holding her silver cassette recorder.',
-    visible: ['elias', 'mara', 'owen', 'naomi'],
+    people: [
+      { id: 'elias', view: 'back34', where: 'standing in the open nursery doorway in the midground, facing into the room', doing: 'handheld camera raised, pointed at the far corner ahead-right' },
+      { id: 'mara', view: 'small', where: 'seen through the doorway, high in the corner ahead-right above the window, on a step stool', doing: 'tightening the compact camera on its bracket, face in partial profile' },
+      { id: 'owen', view: 'profileL', where: 'in the corridor foreground, entering from frame-RIGHT, full body', doing: 'walking slowly toward frame-LEFT carrying a compact black camera and a small canvas tool pouch, eyes ahead down the corridor' },
+      { id: 'naomi', view: 'profileL', where: 'in the corridor foreground a few steps behind him, on the right', doing: 'walking toward frame-LEFT, looking down at the cassette recorder in her hands' },
+    ],
+    check: ['The bearded man walks toward frame-LEFT (the landing side)', 'The doorway is in the corridor wall; the room is seen through it'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('mara'), sheet('owen'), sheet('naomi')],
@@ -628,7 +698,12 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Same locked corridor angle, a moment later: the huge bearded man at the centre of the foreground, passing behind the tall man in the doorway, walking LEFT; the woman with locs a few steps behind him on the right; the small woman in rust still working in the corner beyond the doorway.',
-    visible: ['owen', 'elias', 'naomi', 'mara'],
+    people: [
+      { id: 'owen', view: 'profileL', where: 'in the centre of the corridor foreground, passing between the camera and the doorway', doing: 'walking toward frame-LEFT, eyes ahead, not turning his head' },
+      { id: 'naomi', view: 'profileL', where: 'on the right of the foreground, a few steps behind him', doing: 'walking toward frame-LEFT, head turning toward the man in the doorway with a small knowing smile, her profile to the camera' },
+      { id: 'elias', view: 'back34', where: 'in the open doorway, facing into the room', doing: 'handheld raised, starting to turn his head back toward the corridor (toward the camera side)' },
+      { id: 'mara', view: 'small', where: 'through the doorway, high in the far corner on the stool', doing: 'still working on the mount' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH14.png', 'exact framing, light and everyone’s look — continue from it'), sheet('owen'), sheet('elias'), sheet('naomi')],
@@ -640,8 +715,8 @@ export const SHOTS: Shot[] = [
       setting: 'Sunlit upper corridor, looking into the nursery doorway.',
       beats: [
         { t: [0, 2.5], text: `${Cap('owen')} keeps walking left past the doorway without turning around and says, low and deadpan, in ${V('owen')}: ${q('D7')}` },
-        { t: [2.5, 3.5], text: `Passing behind the man in the doorway, ${D('naomi')} gives him one knowing smile and keeps going with her recorder.` },
-        { t: [3.5, 5], text: `${Cap('elias')} grins once, lowers his camera and immediately follows the bearded man out of frame to the left.` },
+        { t: [2.5, 3.5], text: `Passing behind the man in the doorway, ${D('naomi')} turns her head to him with one knowing smile, her profile to the camera, and keeps going with her recorder.` },
+        { t: [3.5, 5], text: `${Cap('elias')} turns his head toward the corridor, grins once, lowers his camera and immediately follows the bearded man out of frame to the left.` },
       ],
       stays: [STAY_PEOPLE, 'The woman in the corner keeps working throughout.'],
     },
@@ -661,7 +736,9 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Same locked corridor angle, doorway now empty: through it, the small woman in rust on the step stool in the high corner gives the mounted camera a final twist; a small black hard-case monitor stands on the floor below her.',
-    visible: ['mara'],
+    people: [
+      { id: 'mara', view: 'small', where: 'through the empty doorway, high in the corner ahead-right on the step stool', doing: 'giving the mounted camera a final twist; the small black monitor case on the floor below her' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH14.png', 'exact framing and light'), sheet('mara'), up('PROP_MONITOR.png', 'the monitor case on the floor'), up('PROP_FIXED_CAM.png', 'the mounted camera')],
@@ -696,7 +773,13 @@ export const SHOTS: Shot[] = [
     lens: '24mm',
     blocking:
       'Entrance hall from near the front door (plate direction): the central staircase ahead, the plain service door on the RIGHT-hand wall. Coming down the stair toward camera in single file: the huge bearded man in front with the tool pouch and compact camera, then the tall man in olive with his handheld raised on him, then the small woman in rust with the monitor case, then the very tall woman with locs.',
-    visible: ['owen', 'elias', 'mara', 'naomi'],
+    people: [
+      { id: 'owen', view: 'front', where: 'first in line, on the last steps of the central staircase, coming down toward the camera', doing: 'tool pouch and compact camera in hand, eyes on the service door on the right-hand wall (to HIS left, frame-right)' },
+      { id: 'elias', view: 'front', where: 'second in line, a few steps above him', doing: 'handheld camera raised on the bearded man' },
+      { id: 'mara', view: 'front', where: 'third in line', doing: 'carrying the small black monitor case' },
+      { id: 'naomi', view: 'front', where: 'last, near the top of the visible stair', doing: 'coming down behind them' },
+    ],
+    check: ['The service door is on the RIGHT-hand wall', 'They come DOWN the stair toward the camera'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_HALL_DAY.png', 'the hall, stair and service door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
@@ -708,7 +791,7 @@ export const SHOTS: Shot[] = [
       setting: 'Bright entrance hall with a central staircase.',
       beats: [
         { t: [0, 2], text: 'The four come down the last steps of the stair in single file.' },
-        { t: [2, 4], text: `At the bottom ${D('owen')} turns right to the service door on the right-hand wall, opens it and goes through without breaking stride.` },
+        { t: [2, 4], text: `At the bottom ${D('owen')} turns toward frame-right to the service door on the right-hand wall, opens it and goes through without breaking stride.` },
         { t: [4, 5], text: 'The others follow him through it in the same order.' },
       ],
       stays: [STAY_PEOPLE],
@@ -730,7 +813,12 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Service hall from the passage entrance (plate direction): the bell board on the back wall, the lower wooden panel below it, the narrow lower service door immediately to its right. The huge bearded man crouches at the board, setting his tool pouch and the compact camera on the floor. The tall man in olive stands just behind his left shoulder, handheld raised on him. The small woman in rust sets the monitor case down by the left wall; the very tall woman with locs stands behind her. Cold shaft of light from the small high window on the left.',
-    visible: ['owen', 'elias', 'mara', 'naomi'],
+    people: [
+      { id: 'owen', view: 'back34', where: 'crouching at the foot of the bell board on the back wall', doing: 'setting the tool pouch and compact camera on the floor, reaching for the lower wooden panel' },
+      { id: 'elias', view: 'back34', where: 'standing just behind the bearded man’s left shoulder', doing: 'handheld camera aimed at the panel' },
+      { id: 'mara', view: 'profileL', where: 'by the left wall', doing: 'setting the monitor case down on the floor' },
+      { id: 'naomi', view: 'back34', where: 'behind the small woman, nearer the camera', doing: 'watching the board' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_BELLBOARD_DAY.png', 'the service hall, board, panel and door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
@@ -764,7 +852,9 @@ export const SHOTS: Shot[] = [
     lens: '50mm',
     blocking:
       'Close handheld insert from the host’s camera looking down into the open lower panel under the bell board: bundles of old cloth-covered bell wires hanging inside, clearly cut straight through, frayed copper ends; the bearded man’s large tattooed hand and indigo cuff hold the panel open on the right.',
-    visible: [],
+    people: [
+      { id: 'owen', view: 'hands', where: 'only his large tattooed hand and indigo cuff, on the right of frame', doing: 'holding the open lower panel' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_BELLBOARD_DAY.png', 'wood, board and light'), sheet('owen', 'his hand, forearm tattoos and indigo sleeve only')],
@@ -797,8 +887,12 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'Handheld from the host, a step back from the board: the huge bearded man in profile at the board, facing it, right index finger on the small brass flag under the readable NURSERY label; beside him on the left, the small woman in rust tightens a compact camera onto a simple spring clamp on a pipe to the left of the board, aimed at the board. The narrow lower service door on the right.',
-    visible: ['owen', 'mara'],
+      'Handheld from the host, just behind the huge bearded man’s right shoulder: he stands square in front of the board, facing it, so we see the back of his right shoulder and his right profile, his right index finger on the small brass flag under the readable NURSERY label. Beside the board on the left, the small woman in rust faces the board at an angle, tightening a compact camera onto a simple spring clamp on a pipe, aimed at the board. The narrow lower service door is to the right of the board.',
+    people: [
+      { id: 'owen', view: 'back34', where: 'standing square in front of the board; the camera is just behind his right shoulder so his right profile shows', doing: 'right index finger on the brass flag under the NURSERY label, eyes on the mechanism' },
+      { id: 'mara', view: 'front34', where: 'on the left of the board, beside it', doing: 'tightening a compact camera onto a spring clamp on a pipe, eyes on the clamp' },
+    ],
+    check: ['NURSERY label readable', 'The lower service door is to the RIGHT of the board'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_BELLBOARD_DAY.png', 'board, labels, door — keep; NURSERY must stay readable'), sheet('owen'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its spring clamp')],
@@ -833,7 +927,12 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Service hall from the passage entrance, slightly left: the bearded man at the board picking up his tool pouch; the narrow lower service door immediately to the RIGHT of the board; the tall man in olive at his shoulder with the handheld raised; the small woman in rust by the left wall with the monitor case; the very tall woman with locs behind her.',
-    visible: ['owen', 'elias', 'mara', 'naomi'],
+    people: [
+      { id: 'owen', view: 'profileR', where: 'at the board, beside the narrow lower door on its right', doing: 'picking up the tool pouch, free hand on the lower door’s handle' },
+      { id: 'elias', view: 'back34', where: 'just behind the bearded man', doing: 'handheld camera raised on him' },
+      { id: 'mara', view: 'profileR', where: 'by the left wall', doing: 'bending to lift the monitor case' },
+      { id: 'naomi', view: 'back34', where: 'behind the small woman, nearer the camera', doing: 'waiting to follow' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_BELLBOARD_DAY.png', 'service hall, board, lower door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
@@ -866,7 +965,13 @@ export const SHOTS: Shot[] = [
     lens: '24mm',
     blocking:
       'Camera on the middle-turn landing at chest height looking DOWN the lower flight (handrail on frame-left; the upper flight begins just off frame-right). Climbing toward camera at a quick walking pace: the huge bearded man two steps from the top, tool pouch in hand; behind him the tall man in olive with the handheld up on him; behind him the small woman in rust with the monitor case; at the bottom, the very tall woman with locs just stepping in through the open lower service door.',
-    visible: ['owen', 'elias', 'mara', 'naomi'],
+    people: [
+      { id: 'owen', view: 'front', where: 'two steps below the camera, climbing toward it, first in line', doing: 'tool pouch in hand, eyes on the turn above him' },
+      { id: 'elias', view: 'front', where: 'behind the bearded man', doing: 'handheld camera held up on him' },
+      { id: 'mara', view: 'front', where: 'behind the tall man', doing: 'carrying the monitor case' },
+      { id: 'naomi', view: 'small', where: 'at the bottom of the flight', doing: 'just stepping in through the open lower service door' },
+    ],
+    check: ['Handrail on frame-LEFT', 'The open lower door is visible at the bottom'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_STAIR_LOWER_DAY.png', 'the stair, rail side and lower door — keep, never flip'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
@@ -899,7 +1004,11 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Landing plate framing (tripod, eye level, facing the panelled wall): the narrow upper service door now open away from camera into the dark stairwell; the huge bearded man half out of it, stepping onto the landing; the small wooden table immediately to the LEFT of the door, lamp off, nothing on it; in the stairwell behind him, the tall man in olive with his handheld.',
-    visible: ['owen', 'elias'],
+    people: [
+      { id: 'owen', view: 'front34', where: 'half out of the open service door, stepping onto the landing, the table immediately to the left of the door', doing: 'mid-step, eyes on the landing, tool pouch in hand' },
+      { id: 'elias', view: 'small', where: 'in the dark stairwell behind him, framed by the door', doing: 'handheld camera up' },
+    ],
+    check: ['The table is immediately LEFT of the door; nothing on it but the lamp (lamp off)'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_DAY.png', 'exact framing: door, table to its left, window — keep'), sheet('owen'), sheet('elias')],
@@ -931,8 +1040,12 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'EXACT landing plate framing, locked (this is the match-cut frame). The small woman in rust stands at the table immediately left of the (now closed) service door, hands on the latches of the small black hard-case monitor she has just set down beside the lamp. The huge bearded man stands to the right of the table, next to the monitor, between the table and the door.',
-    visible: ['mara', 'owen'],
+      'EXACT landing plate framing, locked (this is the match-cut frame): camera facing the panelled wall, the closed service door on the right, the small table immediately to its left, the dust-sheeted chair at the table’s left end, the window further left. The small black hard-case monitor stands on the table beside the lamp, angled toward the chair on the left so both screens are also partly visible to the camera. The small woman in rust stands at the left end of the table by the chair, in profile facing frame-right, hands on the case latches. The huge bearded man stands to the right of the table, between the table and the door, in profile facing frame-left, looking at the monitor.',
+    people: [
+      { id: 'mara', view: 'profileR', where: 'standing at the LEFT end of the table beside the dust-sheeted chair', doing: 'hands on the latches of the small black hard-case monitor she has just set on the table, angled toward her' },
+      { id: 'owen', view: 'profileL', where: 'standing to the RIGHT of the table, between the table and the closed service door', doing: 'looking down at the monitor' },
+    ],
+    check: ['Framing identical to the landing plate (match cut)', 'The monitor is angled toward the chair on the left, both screens partly visible to the camera'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_DAY.png', 'EXACT framing for the match cut — do not move the camera'), sheet('mara'), sheet('owen'), up('PROP_MONITOR.png', 'the monitor case')],
@@ -970,8 +1083,13 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking:
-      'Exact same locked framing as SH24, now night: window black-blue, brass lamp ON. The small woman in rust sits at the table facing the open monitor; the huge bearded man stands to the right of the table, arms folded, looking at the screens; service door closed. At the right edge of frame, just stepping in from the corridor opening, the tall man in olive with his handheld lowered at his side.',
-    visible: ['mara', 'owen', 'elias'],
+      'Exact same locked framing as SH24, now night: window black-blue, brass lamp ON, the service door on the right closed. The small woman in rust now sits on the uncovered chair at the LEFT end of the table, in profile facing frame-right toward the open monitor (angled toward her). The huge bearded man stands just behind her left shoulder on the window side, arms folded, eyes on the screens. At the RIGHT edge of frame, just stepping in from the corridor opening, the tall man in olive with his handheld lowered at his side.',
+    people: [
+      { id: 'mara', view: 'profileR', where: 'seated on the chair at the LEFT end of the table', doing: 'facing the open monitor, which is angled toward her' },
+      { id: 'owen', view: 'profileR', where: 'standing just behind her left shoulder, on the window side', doing: 'arms folded, eyes on the screens' },
+      { id: 'elias', view: 'front34', where: 'at the RIGHT edge of frame, just stepping in from the corridor opening', doing: 'handheld camera lowered at his side, looking toward the table' },
+    ],
+    check: ['Framing identical to the day shot', 'Window black, lamp on'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_NIGHT.png', 'EXACT framing and night light — match cut'), sheet('mara'), sheet('owen'), sheet('elias')],
@@ -985,7 +1103,7 @@ export const SHOTS: Shot[] = [
       beats: [
         { t: [0, 2], text: `${Cap('elias')} crosses into frame from the right, handheld camera lowered, and stops by the table.` },
         { t: [2, 4.5], text: `Quietly, marking the start of the night, in ${V('elias')}: ${q('E5')}` },
-        { t: [4.5, 5], text: 'Before anyone answers, one sharp metallic servant-bell ring sounds from somewhere below; all three go still and turn their heads toward the sound.' },
+        { t: [4.5, 5], text: 'Before anyone answers, one sharp metallic servant-bell ring sounds from somewhere below; all three go still and turn their heads toward the closed service door, the way down to the board.' },
       ],
       stays: [STAY_PEOPLE, 'Screens stay plain glowing grey.'],
     },
@@ -1007,7 +1125,8 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: 'Fixed clamp camera',
     blocking: 'BELL BOARD FIXED locked view of the whole board at night, one bare bulb above. No person anywhere.',
-    visible: [],
+    people: [],
+    check: ['Only the NURSERY flag changes between start and end frame'],
     kf: {
       mode: 'startEnd',
       uploads: [up('LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL.png', 'start frame'), up('LOC_BELLBOARD_FIXED_NIGHT_DOWN.png', 'end frame')],
@@ -1041,8 +1160,11 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '50mm',
     blocking:
-      'Camera at the left end of the monitor table near the dark window, looking across the open monitor at their faces in three-quarter: the small woman in rust seated nearest camera, the huge bearded man standing close beside her on the right; the open monitor case soft in the lower-left foreground, its screens facing them. Warm lamp and cold screen glow on their faces.',
-    visible: ['mara', 'owen'],
+      'Reverse angle on the monitor station: camera beside the service door at the right end of the table, looking back along the table toward the dark window. The open monitor stands in the soft lower-right foreground with its screens facing AWAY from camera, toward them. Beyond it, the small woman in rust sits on the chair at the far end of the table, face to camera in three-quarter; the huge bearded man stands just behind her left shoulder. Cold screen glow and warm lamp light on their faces. Their LEFT-hand screen is the nursery feed, their RIGHT-hand screen is the bell-board feed.',
+    people: [
+      { id: 'mara', view: 'front34', where: 'seated at the far end of the table, facing the monitor and, beyond it, the camera', doing: 'leaning toward her right-hand screen, eyes on it' },
+      { id: 'owen', view: 'front34', where: 'standing just behind her left shoulder', doing: 'leaning in toward the same screen' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_NIGHT.png', 'the landing at night, lamp and monitor'), sheet('mara'), sheet('owen'), up('PROP_MONITOR.png', 'the monitor case')],
@@ -1053,7 +1175,7 @@ export const SHOTS: Shot[] = [
       camera: 'Static tripod.',
       setting: 'The monitor station on the landing at night.',
       beats: [
-        { t: [0, 1], text: 'Both lean in toward the right-hand screen.' },
+        { t: [0, 1], text: 'Both lean in toward their right-hand screen (the bell-board feed), eyes narrowing.' },
         { t: [1, 3], text: `${Cap('mara')} says low and factual in ${V('mara')}: ${q('F5')}` },
       ],
       stays: [STAY_PEOPLE],
@@ -1074,7 +1196,12 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Night corridor from the landing end. The open nursery door is on the LEFT wall in the left foreground, dim lamp spill coming out of it. About two metres beyond the door, on the far-window side, the copper-haired woman stands already turned toward the doorway — facing camera-left, face in three-quarter — shoulders tight, hands still at her sides; the very tall woman with locs a step behind her. In the right foreground, walking away from camera toward her, back three-quarter: the tall man in olive with his handheld lowered. Warm sconce on the right wall near camera.',
-    visible: ['clara', 'naomi', 'elias'],
+    people: [
+      { id: 'clara', view: 'front34', where: 'about two metres beyond the open nursery door, on the far-window side, standing still', doing: 'turned toward the open doorway (camera-left), shoulders tight, hands still at her sides, eyes on the doorway' },
+      { id: 'naomi', view: 'front34', where: 'a step behind her', doing: 'eyes on her' },
+      { id: 'elias', view: 'back', where: 'in the right foreground, walking away from the camera toward her', doing: 'handheld camera lowered at his side' },
+    ],
+    check: ['The open nursery door is on the LEFT wall in the foreground', 'Her face is toward the doorway, not toward the lens'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_CORRIDOR_NIGHT.png', 'the night corridor and nursery door position — keep'), sheet('clara'), sheet('naomi'), sheet('elias')],
@@ -1107,8 +1234,12 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking:
-      'Same night corridor from the landing end, camera lower and closer. The copper-haired woman in the centre facing the open nursery door, which is just ahead of her on the left wall; the tall man in olive on her right, camera lowered; the very tall woman with locs one pace behind. The small woman in rust and the huge bearded man stay at the monitor on the landing behind the camera, out of frame.',
-    visible: ['clara', 'elias', 'naomi'],
+      'Same night corridor from the landing end, camera lower and closer. The copper-haired woman in the centre, facing the open nursery door, which is just ahead of her in the left foreground; the tall man in olive at her shoulder on the frame-right side (the side he arrived on, nearest the landing), camera lowered; the very tall woman with locs one pace behind her on the far-window side. The small woman in rust and the huge bearded man stay at the monitor on the landing behind the camera, out of frame.',
+    people: [
+      { id: 'clara', view: 'front', where: 'in the centre, the open nursery door just ahead of her on the left wall', doing: 'facing the doorway, jaw set, eyes shining' },
+      { id: 'elias', view: 'profileL', where: 'at her shoulder on the frame-right side, nearest the landing', doing: 'camera lowered, eyes on her' },
+      { id: 'naomi', view: 'front34', where: 'one pace behind her, on the far-window side', doing: 'eyes on her' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_CORRIDOR_NIGHT.png', 'the night corridor — keep'), sheet('clara'), sheet('elias'), sheet('naomi')],
@@ -1145,7 +1276,12 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Night, camera in the corridor at shoulder height behind the tall man in olive (left) and the very tall woman with locs (right), both seen from behind. Between them, a step ahead, the copper-haired woman walking into the open nursery doorway, back to camera. Through the doorway: the lamp pool over the rug, the chest and grey box to the left; high in the far corner ahead-right above the dark window, the compact camera with its small red REC light.',
-    visible: ['clara', 'elias', 'naomi'],
+    people: [
+      { id: 'elias', view: 'back', where: 'in the left foreground, from the shoulders up', doing: 'facing the doorway' },
+      { id: 'naomi', view: 'back', where: 'in the right foreground, from the shoulders up, taller', doing: 'facing the doorway' },
+      { id: 'clara', view: 'back', where: 'between them, a step ahead, in the open doorway', doing: 'walking into the room' },
+    ],
+    check: ['The small red REC light is high in the far corner ahead-right, above the window', 'The chest and box are to the LEFT inside the room'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_NURSERY_DOORWAY_NIGHT.png', 'doorway, room, lamp and red REC light — keep'), sheet('clara'), sheet('elias'), sheet('naomi')],
@@ -1178,7 +1314,11 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Same angle as SH30: the tall man in olive and the woman with locs at the threshold, from behind; the copper-haired woman just inside the room, back to camera, heading for the low chest.',
-    visible: ['elias', 'naomi', 'clara'],
+    people: [
+      { id: 'elias', view: 'back', where: 'at the threshold, left', doing: 'facing the room' },
+      { id: 'naomi', view: 'back', where: 'at the threshold, right', doing: 'facing the room' },
+      { id: 'clara', view: 'back', where: 'just inside the room beyond them', doing: 'walking toward the low chest on the left inside the room' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH30.png', 'exact framing and everyone’s look — continue'), sheet('clara'), sheet('elias'), sheet('naomi')],
@@ -1211,7 +1351,10 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Inside the nursery at night, camera at eye level beside the window wall near the door corner, looking along the left-hand wall: the closed white door in three-quarter view on the LEFT. The copper-haired woman stands a step from the door in profile, facing it (facing frame-left), her right hand reaching for the brass handle. Behind her to the right the room: rug, chest with the box in the lamp pool, bed, dark corners — empty.',
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'profileL', where: 'a step from the closed door, in profile facing frame-LEFT; the empty room behind her on the right', doing: 'right hand reaching for the brass handle, eyes on the door' },
+    ],
+    check: ['The room behind her is EMPTY', 'The door is on the LEFT in three-quarter view'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_NURSERY_DOOR_NIGHT.png', 'the room, door and lamp light — keep'), sheet('clara')],
@@ -1246,8 +1389,11 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '85mm',
     blocking:
-      'Close on the huge bearded man at the monitor table, camera at the left end of the table near the window looking across the monitor at his face in three-quarter, lit by the cold glow of the screens and the warm lamp; the small woman in rust seated beside him in soft focus. His eyes on the LEFT screen (NURSERY FIXED).',
-    visible: ['owen', 'mara'],
+      'Same reverse angle on the monitor station, tighter (camera beside the service door looking back along the table): close on the huge bearded man standing behind the seated woman, face to camera in three-quarter, lit by the cold glow of the screens and the warm lamp; she is soft in the foreground. The back of the monitor is out of focus at the lower edge. His eyes are on his LEFT-hand screen (the nursery feed).',
+    people: [
+      { id: 'owen', view: 'front34', where: 'close, filling the right half of frame, standing behind the seated woman', doing: 'eyes on his LEFT-hand screen (the nursery feed), face still relaxed' },
+      { id: 'mara', view: 'front34', where: 'seated in front of him, soft focus', doing: 'eyes on the screens' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_NIGHT.png', 'the landing at night'), sheet('owen'), sheet('mara')],
@@ -1258,7 +1404,7 @@ export const SHOTS: Shot[] = [
       camera: 'Static tripod.',
       setting: 'The monitor station at night.',
       beats: [
-        { t: [0, 2], text: `${Cap('owen')}’s easy expression dies: his mouth closes, his eyes lock on the screen, his shoulders go dead still.` },
+        { t: [0, 2], text: `${Cap('owen')}’s easy expression dies: his mouth closes, his eyes lock on his left-hand screen, his shoulders go dead still.` },
         { t: [2, 3], text: `${Cap('mara')} notices his face and turns to the same screen.` },
         { t: [3, 5], text: `Without blinking, quiet, dread under the low voice, in ${V('owen')}: ${q('G18')}` },
       ],
@@ -1281,7 +1427,10 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: 'NURSERY FIXED locked wide',
     blocking: `${MAPS.nursery.text} The copper-haired woman stands on the bare floor half a step from the closed door in the lower-left, facing it, back to the room, hands low at her sides. The Woman is added as a still layer at P1 (far-right corner).`,
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'back34', where: 'half a step from the closed door in the lower-left, facing it', doing: 'hands low at her sides; three-quarter rear from above: her right cheek, jaw and the right side of her throat face the camera' },
+    ],
+    check: ['Frame matches the empty night plate at 50% opacity', 'No mark on her throat', 'No figure in the room (the Woman is a separate layer)'],
     kf: {
       mode: 'edit',
       uploads: [NURSERY_NIGHT_REF, sheet('clara')],
@@ -1324,7 +1473,12 @@ export const SHOTS: Shot[] = [
     lens: '50mm',
     blocking:
       'Night corridor from the far-window side looking back toward the landing. The closed white nursery door on the RIGHT wall in the midground. At the door: the tall man in olive on the landing side, hand still near the handle, and the very tall woman with locs on the camera side, facing the door. At the far end, the lamp-lit landing with the small monitor table where the huge bearded man and the small woman in rust watch the glowing screens.',
-    visible: ['elias', 'naomi', 'owen', 'mara'],
+    people: [
+      { id: 'elias', view: 'profileR', where: 'at the closed nursery door on the right wall, on the landing side of it', doing: 'hand near the handle, about to look down the corridor toward the landing' },
+      { id: 'naomi', view: 'profileR', where: 'at the door on the camera side, nearest the camera', doing: 'facing the door, stepping close to it' },
+      { id: 'owen', view: 'small', where: 'at the far end on the lit landing, at the monitor table', doing: 'watching the screens' },
+      { id: 'mara', view: 'small', where: 'seated at the monitor table on the landing', doing: 'watching the screens' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_CORRIDOR_REV_NIGHT.png', 'corridor, closed door, lit landing — keep'), sheet('elias'), sheet('naomi'), LINEUP_BG],
@@ -1357,7 +1511,9 @@ export const SHOTS: Shot[] = [
     lens: '50mm',
     blocking:
       'Same inside angle as SH32, a little tighter: the copper-haired woman close to the closed door in profile, facing it, hands low. The empty lamp-lit room behind her to the right.',
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'profileL', where: 'right at the closed door, in profile facing frame-LEFT, close to the wood', doing: 'hands low, eyes fixed on the door' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH32.png', 'exact angle, light and her look — tighter'), sheet('clara')],
@@ -1388,7 +1544,10 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '50mm',
     blocking: 'Night corridor, closer on the very tall woman with locs at the closed nursery door (right wall), palm flat on the wood, face close to it; the tall man in olive beside her, soft.',
-    visible: ['naomi', 'elias'],
+    people: [
+      { id: 'naomi', view: 'profileR', where: 'close, at the closed door, face near the wood', doing: 'palm flat on the door' },
+      { id: 'elias', view: 'profileR', where: 'soft, just beyond her at the door', doing: 'listening' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH35.png', 'the corridor, door and light — closer'), sheet('naomi'), sheet('elias')],
@@ -1419,7 +1578,9 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '50mm',
     blocking: 'Same inside angle as SH36.',
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'profileL', where: 'right at the closed door, in profile facing frame-LEFT', doing: 'hands low, eyes on the door' },
+    ],
     kf: {
       mode: 'plate',
       uploads: [up('KF_SH36.png', 'start frame as is')],
@@ -1448,8 +1609,11 @@ export const SHOTS: Shot[] = [
     location: 'LOC_LANDING_NIGHT.png',
     time: 'night',
     lens: '50mm',
-    blocking: 'Same monitor-station angle as SH27: the small woman in rust seated, the huge bearded man standing beside her, both staring at the LEFT screen.',
-    visible: ['mara', 'owen'],
+    blocking: 'Same reverse angle as SH27: the small woman in rust seated, the huge bearded man standing behind her left shoulder, both staring at their LEFT-hand screen (the nursery feed).',
+    people: [
+      { id: 'mara', view: 'front34', where: 'seated at the far end of the table behind the monitor', doing: 'eyes on her LEFT-hand screen' },
+      { id: 'owen', view: 'front34', where: 'standing behind her left shoulder', doing: 'eyes on the same screen' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH27.png', 'exact angle and light'), sheet('mara'), sheet('owen')],
@@ -1459,7 +1623,7 @@ export const SHOTS: Shot[] = [
     video: {
       camera: 'Static tripod.',
       setting: 'The monitor station at night.',
-      beats: [{ t: [0, 3], text: 'Both watch the left screen without moving; her eyes narrow slightly; his jaw tightens.' }],
+      beats: [{ t: [0, 3], text: 'Both watch their left-hand screen without moving; her eyes narrow slightly; his jaw tightens.' }],
       stays: [STAY_PEOPLE],
     },
     order: 3,
@@ -1479,7 +1643,10 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: 'NURSERY FIXED locked wide',
     blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was in SH34. The Woman is a still layer at P2 (on the rug, right of the chest).`,
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'back34', where: 'exactly where she was: half a step from the closed door in the lower-left, facing it', doing: 'hands low, head tipped very slightly down; three-quarter rear from above: her right cheek, jaw and the right side of her throat face the camera' },
+    ],
+    check: ['Frame matches SH34 exactly except the faint mark and head angle', 'No figure in the room'],
     kf: {
       mode: 'edit',
       uploads: [up('KF_SH34.png', 'the exact frame — change only what is listed'), up('MARK_STAGES.png', 'use the LEFT panel (faint thin red line)')],
@@ -1521,7 +1688,9 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '85mm',
     blocking: 'Close on the very tall woman with locs at the closed nursery door, palm flat on the wood, her face close to it, profile toward camera.',
-    visible: ['naomi'],
+    people: [
+      { id: 'naomi', view: 'profileR', where: 'close, at the closed nursery door, profile toward the door', doing: 'palm flat on the wood, listening' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH37.png', 'corridor, door and light — closer'), sheet('naomi')],
@@ -1551,8 +1720,10 @@ export const SHOTS: Shot[] = [
     location: 'LOC_LANDING_NIGHT.png',
     time: 'night',
     lens: '85mm',
-    blocking: 'Close on the small woman in rust seated at the monitor, camera at the left end of the table looking across the monitor at her face in three-quarter, screen glow on her face.',
-    visible: ['mara'],
+    blocking: 'Same reverse angle as SH27, close on the small woman in rust seated at the far end of the table, face to camera in three-quarter, screen glow on her face.',
+    people: [
+      { id: 'mara', view: 'front34', where: 'close, seated behind the monitor', doing: 'eyes on her LEFT-hand screen' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH27.png', 'exact angle and light — closer'), sheet('mara')],
@@ -1562,7 +1733,7 @@ export const SHOTS: Shot[] = [
     video: {
       camera: 'Static tripod.',
       setting: 'The monitor station at night.',
-      beats: [{ t: [0, 3], text: `${Cap('mara')}’s eyes move from the left screen to the right screen and stop.` }],
+      beats: [{ t: [0, 3], text: `${Cap('mara')}’s eyes move from her left-hand screen (the nursery feed) to her right-hand screen (the bell-board feed) and stop.` }],
       stays: [STAY_PEOPLE],
     },
     order: 3,
@@ -1580,7 +1751,7 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '50mm',
     blocking: 'Close insert on the open two-screen monitor case on the table, screens filling most of the frame, the lamp glow at the edge.',
-    visible: [],
+    people: [],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_NIGHT.png', 'the table, lamp and monitor at night'), up('PROP_MONITOR.png', 'the monitor case')],
@@ -1609,8 +1780,11 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking:
-      'Monitor station from the left end of the table, wider than SH42: the small woman in rust seated at the monitor, a black flashlight and a radio on the table by her right hand; the huge bearded man standing beside her on the right, staring at the left screen; the narrow service door just behind the table on the right.',
-    visible: ['mara', 'owen'],
+      'Same reverse angle as SH27, a little wider: the small woman in rust seated at the far end of the table, a black flashlight and a radio on the table by her right hand; the huge bearded man standing behind her left shoulder, staring at his LEFT-hand screen. The service door is just behind the camera on the right.',
+    people: [
+      { id: 'mara', view: 'front34', where: 'seated at the far end of the table behind the monitor', doing: 'eyes on the screens; a black flashlight and a radio on the table by her right hand' },
+      { id: 'owen', view: 'front34', where: 'standing behind her left shoulder', doing: 'eyes on the LEFT-hand screen' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH27.png', 'the angle and light — a little wider'), sheet('mara'), sheet('owen')],
@@ -1621,11 +1795,11 @@ export const SHOTS: Shot[] = [
       camera: 'Static tripod, slight push-in.',
       setting: 'The monitor station at night.',
       beats: [
-        { t: [0, 1], text: `${Cap('mara')}’s eyes go back to the left screen,` },
-        { t: [1, 1.5], text: 'and immediately back to the right.' },
+        { t: [0, 1], text: `${Cap('mara')}’s eyes go back to her left-hand screen,` },
+        { t: [1, 1.5], text: 'and immediately back to her right-hand screen.' },
         { t: [1.5, 2.5], text: `Recognition, fast and practical — her eyes snap wide; low and immediate, in ${V('mara')}: ${q('I16')}` },
-        { t: [2.5, 4], text: 'She grabs the flashlight and the radio from beside the monitor and is already up.' },
-        { t: [4, 5], text: `She moves toward the service door behind the table while ${D('owen')} is still staring at the left screen.` },
+        { t: [2.5, 4], text: 'She grabs the flashlight and the radio from beside the monitor.' },
+        { t: [4, 5], text: `She rises and moves toward the camera, heading for the service door just out of frame on the right, while ${D('owen')} is still staring at the left-hand screen.` },
       ],
       stays: [STAY_PEOPLE],
     },
@@ -1644,8 +1818,11 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking:
-      'Landing plate framing at night (as SH25): the small woman in rust at the narrow service door, one hand pushing it open into the black stairwell, flashlight in the other hand, radio in her fist; the huge bearded man at the table, hands going to the glowing monitor; the corridor opening at the right edge.',
-    visible: ['mara', 'owen'],
+      'Landing plate framing at night (as SH25): the small woman in rust at the narrow service door on the right, back three-quarter to camera, one hand pushing it open into the black stairwell, flashlight and radio in the other hand; the huge bearded man beside the empty chair at the table, hands going to the glowing monitor; the corridor opening at the right edge.',
+    people: [
+      { id: 'mara', view: 'back34', where: 'at the narrow service door to the RIGHT of the table', doing: 'one hand pushing the door open into the dark stairwell, flashlight and radio in the other' },
+      { id: 'owen', view: 'profileR', where: 'at the table beside the empty chair', doing: 'both hands going to the glowing monitor' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_LANDING_NIGHT.png', 'exact framing and night light'), sheet('mara'), sheet('owen')],
@@ -1680,7 +1857,10 @@ export const SHOTS: Shot[] = [
     lens: '24mm',
     blocking:
       'Upper flight at night from the top (handrail on frame-LEFT, the turn at the bottom goes RIGHT). Camera behind the small woman in rust and slightly above her shoulder: she is on the top steps, left hand free near the rail, flashlight held low in her right hand, beam on the steps below, radio clipped on her vest.',
-    visible: ['mara'],
+    people: [
+      { id: 'mara', view: 'back', where: 'on the top steps, just below and ahead of the camera', doing: 'running down, left hand free near the rail, flashlight low in her right hand, radio clipped on her vest' },
+    ],
+    check: ['Handrail on frame-LEFT; the stair turns RIGHT at the bottom'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_STAIR_UPPER_NIGHT.png', 'the stair at night — keep, never flip'), sheet('mara')],
@@ -1714,7 +1894,10 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: 'NURSERY FIXED locked wide',
     blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was. The Woman is a still layer at P3 (one body length behind her).`,
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'back34', where: 'exactly where she was, at the closed door in the lower-left, facing it', doing: 'right hand resting at her throat, shoulders slightly raised; three-quarter rear from above: her right cheek, jaw and the right side of her throat face the camera' },
+    ],
+    check: ['Frame matches SH40 exactly except the darker mark and hand', 'No figure in the room'],
     kf: {
       mode: 'edit',
       uploads: [up('KF_SH40.png', 'the exact frame — change only what is listed'), up('MARK_STAGES.png', 'use the MIDDLE panel (darker red line)')],
@@ -1759,7 +1942,11 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     blocking:
       'Night corridor from the far-window side looking toward the landing; the closed nursery door on the RIGHT wall. The tall man in olive at the door, one hand braced on the doorframe, the other on the handle; the very tall woman with locs beside him, palm flat on the door; several steps further toward the landing, the huge bearded man holding the small glowing monitor angled toward himself and the others.',
-    visible: ['elias', 'naomi', 'owen'],
+    people: [
+      { id: 'elias', view: 'profileR', where: 'at the closed nursery door on the right wall', doing: 'one hand braced on the doorframe, the other on the handle' },
+      { id: 'naomi', view: 'profileR', where: 'beside him at the door, nearest the camera', doing: 'palm flat on the door' },
+      { id: 'owen', view: 'front34', where: 'several steps further toward the landing, beyond the other two, facing them and the camera side', doing: 'holding the small glowing monitor angled toward himself, eyes on its screen' },
+    ],
     kf: {
       mode: 'generate',
       uploads: [up('KF_SH35.png', 'the corridor angle and night light'), sheet('elias'), sheet('naomi'), sheet('owen'), up('PROP_MONITOR.png', 'the monitor he holds')],
@@ -1794,7 +1981,10 @@ export const SHOTS: Shot[] = [
     lens: '24mm',
     blocking:
       'On the middle-turn landing at night, camera at shoulder height looking DOWN the lower flight (handrail on frame-LEFT; the upper flight comes in from frame-RIGHT). The small woman in rust is entering frame from the right mid-stride, coming off the upper flight, flashlight beam sweeping down the lower steps. The bottom of the flight is black; no door visible.',
-    visible: ['mara'],
+    people: [
+      { id: 'mara', view: 'back34', where: 'entering the turn landing from frame-RIGHT, coming off the upper flight', doing: 'mid-stride, turning to run down the lower flight, flashlight beam sweeping down the steps' },
+    ],
+    check: ['Handrail on frame-LEFT; the bottom of the stair is black — no door visible'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_STAIR_LOWER_NIGHT.png', 'the turn and lower flight at night — keep, never flip'), sheet('mara')],
@@ -1828,7 +2018,11 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking: 'Same corridor angle as SH48, same positions: the tall man and the woman with locs at the closed door; the huge bearded man with the monitor several steps behind them toward the landing, the upper service door visible at the far end.',
-    visible: ['elias', 'naomi', 'owen'],
+    people: [
+      { id: 'elias', view: 'profileR', where: 'at the closed nursery door, ear near the wood', doing: 'listening' },
+      { id: 'naomi', view: 'profileR', where: 'beside him, nearest the camera', doing: 'palm flat on the door, eyes on the wood' },
+      { id: 'owen', view: 'front34', where: 'several steps further toward the landing', doing: 'holding the glowing monitor' },
+    ],
     kf: {
       mode: 'plate',
       uploads: [up('KF_SH48.png', 'start frame as is')],
@@ -1862,7 +2056,10 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: 'NURSERY FIXED locked wide',
     blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was. The Woman is the SAME still P3 layer as SH47, untouched.`,
-    visible: ['clara'],
+    people: [
+      { id: 'clara', view: 'back34', where: 'exactly where she was, at the closed door in the lower-left, facing it', doing: 'right hand hooked at her throat, chin dragged up and back, left hand splayed on the door beside the handle, knees starting to bend; three-quarter rear from above: her right cheek, jaw and the right side of her throat face the camera' },
+    ],
+    check: ['Frame matches SH47 exactly except pose and dark mark', 'No figure in the room'],
     kf: {
       mode: 'edit',
       uploads: [up('KF_SH47.png', 'the exact frame — change only what is listed'), up('MARK_STAGES.png', 'use the RIGHT panel (dark bruised band)')],
@@ -1893,5 +2090,7 @@ export const SHOTS: Shot[] = [
     post: 'Same P3 layer as SH47, untouched (the Woman has not moved during the crosscuts).',
   },
 ];
+
+export const visibleOf = (s: Shot): CharId[] => s.people.map((p) => p.id);
 
 export const SHOT_BY_ID: Record<string, Shot> = Object.fromEntries(SHOTS.map((s) => [s.id, s]));

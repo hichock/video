@@ -3,8 +3,8 @@ import { MAPS } from '../data/assets';
 import type { Shot } from '../data/shots';
 import type { Finding } from '../lib/qa';
 import { fmtTime } from '../lib/qa';
-import { fmt, keyframePrompt, klingSettings, refFor, videoPrompt, womanPrompt } from '../lib/prompts';
-import { PromptBlock } from './common';
+import { approvalChecklist, fmt, keyframePrompt, klingSettings, refFor, videoPrompt, womanPrompt } from '../lib/prompts';
+import { Checklist, PromptBlock } from './common';
 
 const CAM_LABEL: Record<Shot['cam'], string> = {
   cinematic: 'cinematic',
@@ -97,6 +97,7 @@ export function ShotCard({
         </dl>
 
         <PromptBlock title={`Keyframe · Nano Banana 2 → ${shot.kf.mode === 'plate' || shot.kf.mode === 'startEnd' ? 'no new image' : shot.kf.saveAs}`} text={keyframePrompt(shot)} />
+        {(shot.kf.mode === 'generate' || shot.kf.mode === 'edit') && <Checklist id={shot.id} items={approvalChecklist(shot)} />}
         {w && <PromptBlock title={`Veiled Woman layer → ${shot.woman!.file}`} text={w} footer="Mask the figure out of this still and composite it over the clip. She never moves." />}
         {shot.woman?.cleanPrompt && <PromptBlock title={`Clean start frame → ${shot.woman.cleanSaveAs}`} text={shot.woman.cleanPrompt} />}
         <PromptBlock title="Video · Kling 3.0" text={videoPrompt(shot)} footer={klingSettings(shot)} />

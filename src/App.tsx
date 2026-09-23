@@ -7,7 +7,7 @@ import { DECISIONS, OLD_PACK_PROBLEMS, PROCESS_NOTE } from './data/notes';
 import { runQA, fmtTime, type Finding } from './lib/qa';
 import { buildOrder, exportMarkdown, linesLost, timeline } from './lib/build';
 import { fmt, keyframePrompt, videoPrompt } from './lib/prompts';
-import { CopyButton, PromptBlock, download, useStored } from './components/common';
+import { Checklist, CopyButton, PromptBlock, download, useStored } from './components/common';
 import { ShotCard } from './components/ShotCard';
 import { NurseryMap, UpperFloorMap } from './components/Diagrams';
 
@@ -394,6 +394,7 @@ function Build({ done, toggle }: { done: Record<string, boolean>; toggle: (k: st
                 </ul>
               )}
               {b.prompt ? <PromptBlock title="Prompt" text={b.prompt} /> : null}
+              {b.check?.length ? <Checklist id={`asset-${b.file}`} items={b.check} /> : null}
               {(b.note || asset?.note) && <p className="lead" style={{ fontSize: 14 }}>{b.note ?? asset?.note}</p>}
             </div>
           </div>

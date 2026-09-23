@@ -231,3 +231,12 @@ tr.cut td { color: var(--muted); text-decoration: line-through; }
   .finding > :last-child { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* --- approval checklist --------------------------------------------------- */
+.checklist { border: 1px solid var(--warn); background: var(--warn-soft); border-radius: 5px; padding: 10px 12px; display: grid; gap: 6px; }
+.checklist.ok { border-color: var(--ok); background: var(--ok-soft); }
+.checklist-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; font: 600 13px/1.2 var(--display); text-transform: uppercase; letter-spacing: 0.07em; }
+.checklist ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.checklist label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.checklist input { margin-top: 2px; flex-shrink: 0; }
+.checklist-foot { font-size: 12.5px; color: var(--muted); }

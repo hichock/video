@@ -4,7 +4,7 @@
 
 import { ASSETS, HYGIENE, LOOKS, type Asset, type Upload } from '../data/assets';
 import { CHARACTERS, CAST, type CharId } from '../data/characters';
-import { SHOTS, type Shot } from '../data/shots';
+import { SHOTS, visibleOf, type Person, type Shot, type View } from '../data/shots';
 
 /** How reused shot stills are described when uploaded (never by file name). */
 export const KF_REFS: Record<string, string> = {
@@ -68,13 +68,43 @@ export function heightsLine(ids: CharId[]): string | null {
   return `Relative heights, keep them: ${sorted.map((c) => `${CHARACTERS[c].short} (${CHARACTERS[c].heightCm} cm)`).join(' > ')}.`;
 }
 
-function peopleBlock(ids: CharId[]): string {
-  if (!ids.length) return '';
-  const lines = ids.map((c) => {
-    const ch = CHARACTERS[c];
-    return `• ${ch.short}: ${ch.look}. Wearing: ${ch.wardrobe}.`;
-  });
-  return `PEOPLE — each must match their reference exactly (face, hair, build and the FULL outfit including trousers and shoes):\n${lines.join('\n')}`;
+const VIEW_TEXT: Record<View, string> = {
+  front: 'facing the camera — face visible, but the eyes are NOT on the lens',
+  front34: 'three-quarter front view — face visible, eyes NOT on the lens',
+  profileL: 'in profile, facing frame-LEFT',
+  profileR: 'in profile, facing frame-RIGHT',
+  back34: 'three-quarter view from BEHIND — back of the head and shoulder, only the edge of the cheek visible',
+  back: 'seen from directly BEHIND — back of the head and back of the clothes only; the FACE IS NOT VISIBLE',
+  small: 'small in the background',
+  hands: 'only the hand and forearm are in frame',
+};
+
+const VIEW_SHORT: Record<View, string> = {
+  front: 'facing the camera',
+  front34: 'three-quarter front',
+  profileL: 'in profile facing frame-left',
+  profileR: 'in profile facing frame-right',
+  back34: 'three-quarter from behind',
+  back: 'seen from behind, face not visible',
+  small: 'small in the background',
+  hands: 'hand only',
+};
+
+const FACE_VISIBLE: View[] = ['front', 'front34', 'profileL', 'profileR'];
+
+function personLine(p: Person): string {
+  const ch = CHARACTERS[p.id];
+  const body = FACE_VISIBLE.includes(p.view) ? ch.look : p.view === 'hands' ? 'large tattooed hand and forearm' : `${ch.fromBehind} (face not shown)`;
+  return `• ${ch.short} — ${VIEW_TEXT[p.view]}.\n  Where: ${p.where}.\n  Doing: ${p.doing}.\n  Looks: ${body}.\n  Wearing: ${ch.wardrobe}.`;
+}
+
+function peopleBlock(people: Person[]): string {
+  if (!people.length) return '';
+  return [
+    'STAGING — place and turn every person exactly as listed. The character sheets show each person standing and facing the camera: use them ONLY for identity (face, hair, build, clothes). Do NOT copy their pose or their direction.',
+    ...people.map(personLine),
+    'Nobody looks into the lens.',
+  ].join('\n');
 }
 
 export function lookFor(s: Shot): string {
@@ -94,9 +124,9 @@ export function keyframePrompt(s: Shot): string {
   parts.push(`REFERENCES (uploaded images; their order is not guaranteed):\n${k.uploads.map(refLine).join('\n')}`);
   parts.push(`BLOCKING (fixed — do not change): ${s.blocking}`);
   if (k.mode === 'generate') parts.push(`THE MOMENT: ${k.frame}`);
-  const people = peopleBlock(s.visible);
+  const people = peopleBlock(s.people);
   if (people) parts.push(people);
-  const h = heightsLine(s.visible);
+  const h = heightsLine(visibleOf(s));
   if (h) parts.push(h);
   parts.push(`CAMERA: ${s.lens}.`);
   parts.push(`LOOK: ${lookFor(s)}`);
@@ -125,10 +155,14 @@ export function videoPrompt(s: Shot): string {
   const v = s.video;
   const lines: string[] = [];
   lines.push(`${v.camera} ${v.setting}`);
-  if (s.visible.length) lines.push(`In frame: ${s.visible.map((c) => CHARACTERS[c].short).join('; ')}.`);
+  if (s.people.length) {
+    lines.push(`Start frame: ${s.people.map((p) => `${CHARACTERS[p.id].short} — ${VIEW_SHORT[p.view]}, ${p.where}`).join('; ')}.`);
+  }
   for (const b of v.beats) lines.push(`${fmt(b.t[0])}–${fmt(b.t[1])}s: ${b.text}`);
   if (v.vo) lines.push(`Voice-over across the clip, added in the edit — nobody on screen speaks and no one on screen moves their mouth. ${v.vo}`);
-  lines.push(v.stays.join(' '));
+  const stays = [...v.stays];
+  if (s.people.some((p) => p.view !== 'hands')) stays.push('Nobody looks into the lens.');
+  lines.push(stays.join(' '));
   return lines.join('\n');
 }
 
@@ -141,4 +175,24 @@ export function klingSettings(s: Shot): string {
 
 export function startFrame(s: Shot): string {
   return s.woman?.cleanSaveAs ?? (s.kf.mode === 'plate' ? s.kf.uploads[0].file : s.kf.saveAs);
+}
+
+/** What must be true before a keyframe is approved and sent to Kling. */
+export function approvalChecklist(s: Shot): string[] {
+  const out: string[] = [];
+  for (const p of s.people) {
+    const ch = CHARACTERS[p.id];
+    const who = ch.short;
+    if (p.view === 'back') out.push(`${who}: seen from BEHIND — face NOT visible`);
+    else if (p.view === 'back34') out.push(`${who}: three-quarter from behind — face turned away`);
+    else if (p.view === 'profileL' || p.view === 'profileR') out.push(`${who}: in profile facing frame-${p.view === 'profileL' ? 'left' : 'right'}`);
+    else if (p.view === 'front' || p.view === 'front34') out.push(`${who}: face visible, eyes NOT on the lens`);
+    else if (p.view === 'small') out.push(`${who}: small in the background`);
+    out.push(`${who}: ${p.where}`);
+    if (p.view !== 'hands' && p.view !== 'small') out.push(`${who} wears: ${ch.mustSee}`);
+  }
+  out.push(...(s.check ?? []));
+  if (s.people.length) out.push('Nobody looks into the lens; nobody poses');
+  out.push('No text, captions, logos or overlays; vertical 9:16');
+  return out;
 }

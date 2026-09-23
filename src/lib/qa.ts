@@ -4,7 +4,7 @@
 import { ALL_BEATS, BEAT_BY_ID, BEAT_INDEX, SCRIPT } from '../data/script';
 import { ASSETS } from '../data/assets';
 import { CHARACTERS, NAMES } from '../data/characters';
-import { SHOTS, type Shot } from '../data/shots';
+import { SHOTS, visibleOf, type Shot } from '../data/shots';
 import { keyframePrompt, producedFiles, refFor, videoPrompt, womanPrompt } from './prompts';
 
 export type Severity = 'error' | 'warn' | 'info';
@@ -119,14 +119,25 @@ export function runQA(): Finding[] {
     if (needsUploads) {
       const files = new Set(s.kf.uploads.map((u) => u.file));
       const continuing = s.kf.uploads.some((u) => u.file.startsWith('KF_'));
-      for (const c of s.visible) {
+      for (const c of visibleOf(s)) {
         if (!files.has(CHARACTERS[c].sheetFile) && !files.has('CH_LINEUP.png') && !continuing)
           add('error', 'Identity', `${CHARACTERS[c].name} is visible but no sheet, lineup or approved frame is uploaded`, s.id);
       }
     }
 
+    // 9b. Staging: everyone placed and turned; the video prompt restates the start frame
+    const ids = visibleOf(s);
+    if (new Set(ids).size !== ids.length) add('error', 'Staging', 'A person is staged twice', s.id);
+    for (const p of s.people) {
+      if (!p.where || !p.doing) add('error', 'Staging', `${CHARACTERS[p.id].name} has no position or action`, s.id);
+      if ((p.view === 'back' || p.view === 'back34') && /\b(looks?|looking|eyes) (at|into) the (camera|lens)\b/i.test(p.doing)) add('error', 'Staging', `${CHARACTERS[p.id].name} is seen from behind but told to look at the camera`, s.id);
+    }
+    if (s.people.length && !vp.includes('Start frame:')) add('error', 'Staging', 'Video prompt does not describe the start frame', s.id);
+    if (s.people.some((p) => p.view !== 'hands') && !vp.includes('Nobody looks into the lens')) add('error', 'Staging', 'Video prompt must keep eyes off the lens', s.id);
+    if (s.cam === 'handheld' && s.operator && ids.includes(s.operator)) add('error', 'Camera grammar', 'The handheld operator cannot be in his own shot', s.id);
+
     // 10. Veiled Woman only on NURSERY FIXED, never generated in motion
-    const usesVeiled = s.visible.includes('veiled') || allUploads.some((u) => u.file === CHARACTERS.veiled.sheetFile);
+    const usesVeiled = visibleOf(s).includes('veiled') || allUploads.some((u) => u.file === CHARACTERS.veiled.sheetFile);
     if ((usesVeiled || s.woman) && s.cam !== 'fixed-nursery') add('error', 'Veiled Woman', 'The Woman may only appear on NURSERY FIXED', s.id);
     if (s.kf.uploads.some((u) => u.file === CHARACTERS.veiled.sheetFile)) add('error', 'Veiled Woman', 'The Woman must not be in the animated start frame; composite her as a still', s.id);
     if (/veil/i.test(vp)) add('error', 'Veiled Woman', 'Video prompt mentions the figure; she is composited, never animated', s.id);
@@ -137,10 +148,10 @@ export function runQA(): Finding[] {
       else {
         const i = SHOTS.indexOf(s);
         const prev = SHOTS[i - 1];
-        const established = prev && (prev.visible.includes(s.operator) || (prev.cam === 'handheld' && prev.operator === s.operator));
+        const established = prev && (visibleOf(prev).includes(s.operator) || (prev.cam === 'handheld' && prev.operator === s.operator));
         if (!established) add('error', 'Camera grammar', 'Handheld operator is not established by the previous shot', s.id);
       }
-      if (s.visible.length === 1 && s.visible[0] === 'clara') add('error', 'Camera grammar', 'Clara alone is never handheld', s.id);
+      if (visibleOf(s).length === 1 && visibleOf(s)[0] === 'clara') add('error', 'Camera grammar', 'Clara alone is never handheld', s.id);
     }
     if (s.cam.startsWith('fixed') && !vp.includes('perfectly locked')) add('error', 'Camera grammar', 'Fixed camera prompt must lock the camera', s.id);
     if (s.cam === 'fixed-nursery' && !s.woman && s.id !== 'SH01') add('warn', 'Veiled Woman', 'NURSERY FIXED shot without a Woman layer', s.id);
