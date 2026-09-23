@@ -96,6 +96,17 @@ export function ShotCard({
           )}
         </dl>
 
+        {shot.map && (
+          <figure className="shotmap">
+            <a href={shot.map} target="_blank" rel="noreferrer">
+              <img src={shot.map} alt={`Top-down shot map for ${shot.id}`} loading="lazy" />
+            </a>
+            <figcaption>
+              Shot map — upload it with the keyframe as <code>MAP_{shot.id}.png</code>.{' '}
+              <a href={shot.map} download={`MAP_${shot.id}.png`}>Download PNG</a>
+            </figcaption>
+          </figure>
+        )}
         <PromptBlock title={`Keyframe · Nano Banana 2 → ${shot.kf.mode === 'plate' || shot.kf.mode === 'startEnd' ? 'no new image' : shot.kf.saveAs}`} text={keyframePrompt(shot)} />
         {(shot.kf.mode === 'generate' || shot.kf.mode === 'edit') && <Checklist id={shot.id} items={approvalChecklist(shot)} />}
         {w && <PromptBlock title={`Veiled Woman layer → ${shot.woman!.file}`} text={w} footer="Mask the figure out of this still and composite it over the clip. She never moves." />}

@@ -63,6 +63,8 @@ export interface Shot {
   people: Person[];
   /** Extra things to verify before approving the keyframe. */
   check?: string[];
+  /** Top-down shot map image (public/maps). */
+  map?: string;
   kf: Keyframe;
   woman?: WomanLayer;
   video: {
@@ -188,6 +190,7 @@ export const SHOTS: Shot[] = [
       { id: 'elias', view: 'back', where: 'RIGHT third of the frame, midground, on open gravel past the SUV’s rear, about halfway to the front steps', doing: 'mid-stride AWAY from the camera toward the front door, head up toward the facade', hands: 'his RIGHT hand holds the black handheld camera by its top handle at chest height, held out to his right side so the camera body and its handle clearly show beyond his right arm from behind; left arm swinging free' },
     ],
     check: ['The SUV’s REAR faces the camera and the tailgate is open toward us (not parked side-on)', 'The tall man’s FACE IS NOT VISIBLE: only the back of his head and jacket', 'The SUV fills the LEFT half; the tall man is in the RIGHT third on open gravel past the car, nothing between him and the steps', 'The bearded man’s case is already OUT of the car; the small woman’s case is still INSIDE the boot', 'The tall man’s camera is clearly visible in his right hand from behind'],
+    map: '/maps/SH02_map.png',
     kf: {
       mode: 'generate',
       uploads: [
@@ -195,7 +198,7 @@ export const SHOTS: Shot[] = [
         sheet('owen'),
         sheet('mara'),
         sheet('elias'),
-        up('CH_LINEUP.png', 'relative heights'),
+        up('MAP_SH02.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image'),
       ],
       frame: 'A documentary moment caught mid-action, nobody posing: the crew already at work and already moving toward the house. The manor is bright, elegant and inviting.',
       keep: ['the manor, the SUV (rear toward camera, tailgate open) and the light exactly as in the uploaded photo'],
@@ -225,19 +228,20 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'Reverse view: the camera is on the gravel between the SUV and the house with its BACK TO THE HOUSE (the house is behind the camera, out of frame), moving backward ahead of him. He walks toward the camera — toward the house — in three-quarter front view, handheld camera at chest height, eyes lifted past the lens to the upstairs windows. Behind him, a few metres back and soft: the dark green SUV front-on, and beside it the huge bearded man and the small woman in rust unloading at the open tailgate. Low sun from frame-RIGHT, rim-lighting his right side.',
+      'Reverse view: the camera is on the gravel between the SUV and the house with its BACK TO THE HOUSE (the house is behind the camera, out of frame), moving backward ahead of him. He walks toward the camera — toward the house — in three-quarter front view, handheld camera at chest height, eyes lifted past the lens to the upstairs windows. Behind him, a few metres back and soft, on the RIGHT half of the frame: the dark green SUV seen from its front, and at its far end the huge bearded man and the small woman in rust unloading at the open tailgate. Low sun from frame-RIGHT, rim-lighting his right side.',
     people: [
       { id: 'elias', view: 'front', where: 'in the centre of the frame on the gravel, full body to mid-thigh, walking toward the camera (and toward the house behind the camera)', doing: 'mid-stride, handheld camera at chest height, eyes lifted ABOVE the lens to the upstairs windows', hands: 'right hand holds the black handheld camera at chest height in front of him, lens forward, clearly visible' },
       { id: 'owen', view: 'small', where: 'behind him in the soft background, at the far end of the SUV, half hidden by it', doing: 'unloading a case at the open tailgate', hands: 'both hands on a black case at the tailgate' },
       { id: 'mara', view: 'small', where: 'behind him in the soft background beside the bearded man at the far end of the SUV', doing: 'lifting a small case out of the boot', hands: 'both hands on a small black case' },
     ],
-    check: ['The manor is NOT in frame; we look away from it', 'The SUV is seen from its FRONT', 'Sun on frame-right'],
+    check: ['The manor is NOT in frame; we look away from it', 'The SUV is seen from its FRONT, on the RIGHT half of the frame', 'Sun on frame-right'],
+    map: '/maps/SH03_map.png',
     kf: {
       mode: 'generate',
       uploads: [
         up('LOC_EXT_REV_DAY.png', 'location and light: the view away from the house, SUV front-on'),
         sheet('elias'),
-        up('PROP_HANDHELD_CAM.png', 'his camera'),
+        up('MAP_SH03.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image'),
         bg('owen'),
         bg('mara'),
       ],
@@ -275,9 +279,10 @@ export const SHOTS: Shot[] = [
       { id: 'owen', view: 'profileR', where: 'at the left edge of frame, partly cut off by the edge, beside her at the boot', doing: 'dragging a larger black case out, eyes on the case', hands: 'both hands on the handle of a larger black case still half inside the boot' },
     ],
     check: ['The manor is soft in the background on frame-RIGHT', 'Backlight: the sun is ahead of the camera'],
+    map: '/maps/SH04_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_EXT_DAY.png', 'the SUV, gravel, manor and light'), sheet('mara'), bg('owen')],
+      uploads: [up('LOC_EXT_DAY.png', 'the SUV, gravel, manor and light'), sheet('mara'), bg('owen'), up('MAP_SH04.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Focused, practical, a faint unimpressed half-frown. Nobody looks at the camera.',
       saveAs: 'KF_SH04.png',
     },
@@ -307,15 +312,16 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'Reverse view, back to the house: camera moving backward ahead of two women walking toward it — toward the house, which is behind the camera. On the left, the very tall woman with locs in the camel coat; on the right, half a step ahead, the copper-haired woman in the ice-blue blouse, her right arm raised pointing up past the camera at an upstairs window. The SUV small and soft far behind them. Low sun from frame-right.',
+      'Reverse view, back to the house: camera moving backward ahead of two women walking toward it — toward the house, which is behind the camera. On the left, the very tall woman with locs in the camel coat; on the right, half a step ahead, the copper-haired woman in the ice-blue blouse, her right arm raised pointing up past the camera at an upstairs window. The SUV soft, a few metres behind them on the RIGHT of frame. Low sun from frame-right.',
     people: [
       { id: 'naomi', view: 'front', where: 'on the LEFT, walking toward the camera, clearly taller', doing: 'listening, eyes following her companion’s raised arm up past the camera' },
       { id: 'clara', view: 'front', where: 'on the RIGHT, half a step ahead, walking toward the camera', doing: 'right arm raised, pointing up past the camera at an upstairs window, lips parted mid-sentence, eyes on the window above the lens' },
     ],
     check: ['The manor is NOT in frame; they walk toward the camera', 'She points ABOVE the camera'],
+    map: '/maps/SH05_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_EXT_REV_DAY.png', 'location and light'), sheet('naomi'), sheet('clara'), up('CH_LINEUP.png', 'relative heights')],
+      uploads: [up('LOC_EXT_REV_DAY.png', 'location and light'), sheet('naomi'), sheet('clara'), up('CH_LINEUP.png', 'relative heights'), up('MAP_SH05.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'The woman with locs is clearly taller and listens with warm attention; the copper-haired woman is composed and guarded, explaining.',
       saveAs: 'KF_SH05.png',
     },

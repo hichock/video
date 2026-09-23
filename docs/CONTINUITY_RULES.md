@@ -31,6 +31,14 @@ frame-left of the door; the corridor opening is frame-right."*
 
 Every plate and keyframe for that space repeats the relevant part of the map, word for word.
 
+**Per-shot map image.** For shots with movement or several people, draw a top-down plan of
+that shot: camera position, field of view and movement; each person as a dot with a facing
+arrow and a dashed path to an end mark; the sun or key light; plus a small 9:16 frame
+preview showing which third each thing lands in. Check the frame preview against the plan
+before using it: in a reverse view, left and right swap. Upload the map with the keyframe
+and tell the model it is a diagram for positions only, not something to draw
+(`scripts/shot_maps.py`, `public/maps/`).
+
 ## 2. The 180° rule (line of action)
 
 - Draw an imaginary line through the two main people who face each other (or along a person's path of travel).

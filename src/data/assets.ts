@@ -4,7 +4,7 @@
 
 import { CHARACTERS, LINEUP_PROMPT, type CharId } from './characters';
 
-export type AssetKind = 'character' | 'lineup' | 'location' | 'prop' | 'overlay' | 'keyframe' | 'comp';
+export type AssetKind = 'character' | 'lineup' | 'location' | 'prop' | 'overlay' | 'keyframe' | 'comp' | 'map';
 
 export interface Upload {
   file: string;
@@ -430,5 +430,39 @@ export const ASSETS: Asset[] = [
     uploads: [{ file: 'LOC_NURSERY_FIXED_NIGHT.png', job: 'the room, furniture and lamp light' }],
     group: 'Nursery',
     note: 'Cinematic angle: the Veiled Woman NEVER appears here. The room behind Clara is always empty.',
+  },
+
+  // --- Shot maps (top-down plans, uploaded as blocking references) -------
+  {
+    file: 'MAP_SH02.png',
+    kind: 'map',
+    title: 'SH02 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH02_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH03.png',
+    kind: 'map',
+    title: 'SH03 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH03_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH04.png',
+    kind: 'map',
+    title: 'SH04 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH04_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH05.png',
+    kind: 'map',
+    title: 'SH05 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH05_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
   },
 ];
