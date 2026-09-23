@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'The corridor did not match the generated nursery',
+    body: 'The corridor plates were text-only: they never uploaded the nursery or hall images, so the door, wallpaper and the view through the doorway were invented. The nursery map also no longer matched the approved plate (bed along the right wall, lamp in the far-right corner, window beside the camera).',
+    fix: 'The approved nursery plate is now the source of truth. One room description taken from it (NURSERY_LAYOUT) is used by every nursery prompt; the corridor plates upload the nursery (door, surround, wallpaper) and the hall (woodwork, floors). The floor plan was re-drawn so the corridor runs on past the nursery door to the far window, and the Veiled Woman positions moved off the lamp table.',
+  },
+  {
     title: 'Props vanished and actions ran backwards (second SH02 test)',
     body: 'The prompt told the image model the camera was held in front of his chest with “only his elbows show”, so the camera was invisible from behind and the video gave him empty hands. The keyframe showed the case already out of the car while the video prompt said “hauls a case out”, so the video put it back to perform the action again. The tall man was placed “beyond the car”, which the model read as walking toward the car.',
     fix: 'Every person now has a Hands line saying what each hand holds and how it stays visible from this camera. Every Doing line states how far the action has got in the start frame (ALREADY OUT / STILL INSIDE / CLOSED / not yet pressing), the video continues forward from it, and every video prompt says nothing already done is undone. Positions use frame thirds plus landmarks. QA flags hidden props, unstaged hands and repeated actions.',

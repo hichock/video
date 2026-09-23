@@ -54,15 +54,15 @@ export const MAPS = {
   },
   corridor: {
     title: 'Upper corridor',
-    text: 'Runs straight from the central landing to a tall window at the far end. Walking from the landing toward the far window, the NURSERY DOOR is on the LEFT wall about four metres from the landing; it is a white panelled door that opens INTO the nursery. At night one warm wall sconce is lit between the landing and the nursery door. From the nursery door you can see the landing, the monitor table and the upper service door down the corridor.',
+    text: 'Plan (north up): the corridor runs straight from the central landing (south end) to a tall window at the far north end. The nursery lies along its LEFT (west) side when you walk from the landing toward the far window. The nursery door is in the corridor’s left wall near the NORTH end of the nursery: about six metres from the landing and about three metres before the far window. It is the same white four-panel door with a brass knob and moulded surround seen inside the nursery; it opens INTO the room and is hinged on its left as seen from the corridor. Standing in the corridor facing the open door: straight ahead the white iron bed along the room’s far wall, its foot to the right, the window with thin curtains at its right end; ahead-left the dark chest with the grey box on the rug, the bedside table and lamp at the bed head, the dust-sheeted armchair in the deep left corner; high in the corner ahead-RIGHT, above the window, is where NURSERY FIXED hangs. From the nursery door you can see down the corridor to the landing, the monitor table and the upper service door. At night one warm sconce is lit between the landing and the nursery door.',
   },
   nursery: {
     title: 'Nursery (NURSERY FIXED geometry)',
-    text: 'NURSERY FIXED is mounted about 2.6 m high in the corner where the WINDOW WALL meets the RIGHT-HAND WALL; the window is behind the camera; it looks diagonally across and down the room at about 30°, very wide lens without fisheye. In its frame: the single white panelled door with a brass handle is on the LEFT-HAND wall near the camera end, fully visible in the LOWER-LEFT third, with a strip of bare floorboards in front of it. The room runs away up the frame: worn faded rug in the middle; low wooden chest on the rug at frame centre with the grey archival box on its lid; small side table with the practical lamp against the right-hand wall at mid-depth; white iron child’s bed against the far wall; dust-sheeted armchair in the far-LEFT corner; the far-RIGHT corner is empty bare floor. From the corridor looking in through the doorway, the camera and its red REC light are high in the far corner across the room, ahead-right, above the window. When the copper-haired woman stands at the door facing it, the camera sees her from behind her right shoulder in three-quarter rear view: her right cheek, jaw and the right side of her throat face the camera.',
+    text: 'NURSERY FIXED is mounted about 2.6 m high in the corner right beside the window (north-west corner in plan) and looks diagonally across and down the room at about 30°, very wide lens without fisheye. In its frame: the white four-panel door with a brass knob is on the LEFT-hand wall close to the camera, fully visible in the lower-left third, with bare floorboards in front of it; a large faded rug in the middle; the dark wooden chest with the grey archival box at frame centre; the white iron bed along the RIGHT-hand wall, foot toward the camera, head at the far wall; the bedside table with the lamp in the far-RIGHT corner; the dust-sheeted armchair in the far-LEFT corner; open floor at the far end between them; the window curtain edge at the right edge of the frame. From the corridor looking in through the doorway, the camera and its red REC light are high in the corner ahead-right, above the window. When the copper-haired woman stands at the door facing it, the camera sees her from behind her right shoulder in three-quarter rear view: her right cheek, jaw and the right side of her throat face the camera.',
   },
   veiled: {
     title: 'Veiled Woman positions (NURSERY FIXED only)',
-    text: 'P1 FAR: standing in the empty far-right corner at the top of the frame, half swallowed by shadow but readable as a woman. P2 HALFWAY: standing on the rug to the right of the low chest, halfway between the far-right corner and the woman at the door. P3 ONE BODY LENGTH: standing one body length directly behind the woman’s back, just off the rug, same size as the woman in frame. Always the same still pose: facing the woman’s back, arms straight at her sides, veil over the face. The move between positions is never shown.',
+    text: 'P1 FAR: standing at the far end of the room on the open floor between the dust-sheeted armchair and the bedside table, back near the far wall, half swallowed by shadow but readable as a woman. P2 HALFWAY: standing on the rug just LEFT of the chest (the door side), halfway between the far end and the woman at the door. P3 ONE BODY LENGTH: standing one body length directly behind the woman’s back, on the bare boards between her and the rug, same size as the woman in frame. Always the same still pose: facing the woman’s back, arms straight at her sides, veil over the face. The move between positions is never shown.',
   },
 } as const;
 
@@ -97,6 +97,10 @@ const charAssets: Asset[] = (Object.keys(CHARACTERS) as CharId[]).map((id) => ({
   group: 'Characters',
   note: 'Text only, no uploads. Reroll until the face is right; then never regenerate.',
 }));
+
+/** The nursery as seen by NURSERY FIXED — matches the approved LOC_NURSERY_FIXED_DAY plate. */
+export const NURSERY_LAYOUT =
+  'the white four-panel door with a brass knob, in a moulded white surround, is on the LEFT-hand wall close to the camera, fully visible in the lower-left third, hinged on its far side, with bare floorboards in front of it. The room runs away from the camera up the frame: a large faded rug in the middle of the floor; a dark wooden chest on the rug at the centre of the frame with a grey archival box on its lid; a white iron single bed along the RIGHT-hand wall, its foot toward the camera and its head at the far wall, made up with faded floral linen; a small wooden bedside table with a fabric-shaded lamp and a few old books in the far-RIGHT corner beside the bed head; an armchair under a white dust sheet in the far-LEFT corner; open bare floor at the far end between the armchair and the bedside table. Pale sprigged wallpaper, small framed pictures and empty picture hooks. The window, with thin white curtains, is on the right-hand wall right beside the camera: only the curtain edge shows at the right edge of the frame.';
 
 const STAIR_WALLS = 'close scuffed whitewashed walls with old handprints near the rail, a simple dark wooden handrail, worn dips in the treads';
 
@@ -329,9 +333,13 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Upper corridor from the landing end, day',
     ref: 'the daytime photo of the upper corridor seen from the landing end, with the white nursery door standing open on the left',
-    prompt: `Photorealistic location plate, vertical 9:16, no people. Camera at the landing end of a long upper corridor of an old English manor, eye level, 35mm, looking straight down it to a tall window at the far end: faded patterned wallpaper, dark wood floor with a worn runner, a row of closed doors on the right; on the LEFT wall about four metres from camera a white panelled door stands wide open into its room (it opens inward), showing a sliver of a small child’s room. A small table under a dust sheet against the right wall. Warm daylight from the far window. ${LOOKS.dayInterior}`,
-    check: ['Nursery door open on the LEFT wall, about four metres in'],
+    prompt: `Using the uploaded high-corner nursery photo for the nursery door (white four-panel door, brass knob, moulded white surround) and its wallpaper, and the uploaded entrance-hall photo for the house’s woodwork, floors and light: photorealistic location plate, vertical 9:16, no people. Camera at the landing end of a long straight upper corridor of the same old English manor, eye level, 35mm, looking straight down it to a tall window at the far end. Dark wood floor with a worn runner, faded patterned wallpaper, white skirting and door surrounds, a small table under a dust sheet against the right wall, a row of closed doors on the right. On the LEFT wall, about six metres ahead and about three metres before the far window, the nursery door stands wide open into its room (it opens inward, hinged on its left), showing a sliver of the room: pale sprigged wallpaper, bare floorboards and the brass-railed foot of a white iron bed in daylight. Warm daylight from the far window. ${LOOKS.dayInterior}`,
+    check: ['Nursery door open on the LEFT wall, about two thirds of the way to the far window', 'Same white four-panel door and brass knob as the nursery photo', 'A sliver of the nursery (sprigged wallpaper, iron bed foot) through the door', 'Same floors and woodwork as the entrance hall'],
     group: 'Corridor',
+    uploads: [
+      { file: 'LOC_NURSERY_FIXED_DAY.png', job: 'the nursery door, its surround and the nursery wallpaper' },
+      { file: 'LOC_HALL_DAY.png', job: 'the same house: woodwork, floors, light' },
+    ],
     note: MAPS.corridor.text,
   },
   {
@@ -339,12 +347,13 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Upper corridor looking back to the landing, day',
     ref: 'the daytime photo of the upper corridor seen from the far window end looking back to the landing, with the white nursery door open on the right',
-    prompt: 'Using the uploaded corridor photo for wallpaper, floor, runner, doors and light, and the uploaded landing photo for what is at the end: the reverse view. Camera near the far window end at eye level, 35mm, looking back up the corridor toward the central landing: at the end, the top of the main staircase banister, the narrow panelled service door with the small wooden table and brass lamp immediately to its left. The same white nursery door now stands open on the RIGHT wall, about four metres before the landing. Daylight from behind the camera. No people, no text.',
+    prompt: 'Using the uploaded corridor photo for wallpaper, floor, runner, doors and light, the uploaded landing photo for what is at the end, and the uploaded high-corner nursery photo for the nursery door: the reverse view. Camera near the far window end at eye level, 35mm, looking back down the corridor toward the central landing. The same white four-panel nursery door now stands open on the RIGHT wall, about three metres from the camera, opening into its room (hinged on its right as seen from here), a slice of the daylit nursery visible through it. At the far end, about nine metres away: the top of the main staircase banister and, on the landing, the narrow panelled service door with the small wooden table and brass lamp immediately to its left. Daylight from the window behind the camera. No people, no text.',
     uploads: [
       { file: 'LOC_CORRIDOR_DAY.png', job: 'corridor materials, the nursery door' },
       { file: 'LOC_LANDING_DAY.png', job: 'what the landing at the end looks like' },
+      { file: 'LOC_NURSERY_FIXED_DAY.png', job: 'the nursery door style' },
     ],
-    check: ['Nursery door open on the RIGHT wall', 'The landing with the table and service door visible at the far end'],
+    check: ['Nursery door open on the RIGHT wall, about three metres from camera', 'Same door as the nursery photo', 'The landing with the table and service door visible at the far end'],
     group: 'Corridor',
   },
   {
@@ -375,12 +384,12 @@ export const ASSETS: Asset[] = [
   {
     file: 'LOC_NURSERY_FIXED_DAY.png',
     kind: 'location',
-    title: 'NURSERY FIXED, day (hero plate)',
+    title: 'NURSERY FIXED, day (hero plate) — APPROVED, do not regenerate',
     ref: 'the daytime view of the nursery from the small camera high in the corner, door in the lower left',
-    prompt: `Photorealistic, vertical 9:16, no people. The view from a small fixed camera mounted about 2.6 m high in the corner where the window wall meets the right-hand wall of a child’s nursery in an old English manor; the window is behind the camera. The camera looks diagonally across and down the room at about 30 degrees, very wide lens without fisheye distortion. Exact layout: the single white panelled door with a brass handle is on the LEFT-hand wall close to the camera end, fully visible in the lower-left third of the frame, closed, with a clear strip of bare wooden floorboards in front of it. From there the room runs away from the camera up the frame: a worn faded rug in the middle of the floor; a low wooden chest on the rug at the centre of the frame with a grey archival document box on its lid; a small wooden side table against the right-hand wall at mid-depth with a small fabric-shaded practical lamp (switched off) and a few old books; a white iron child’s bed made up tightly with faded old linen against the far wall; an armchair under a white dust sheet in the far-left corner; the far-right corner is empty bare floor. Sun-bleached wallpaper with a small repeating pattern, empty picture hooks, a pale rectangle where a picture hung. Pale daylight from the window behind the camera through thin curtains, dust in the light. ${LOOKS.fixed} No people, no dolls, no toys, no horror props.`,
-    check: ['Door fully visible in the lower-LEFT third with bare floor in front of it', 'Chest with the grey box at frame centre', 'Lamp table on the right wall, bed on the far wall, armchair far-LEFT, far-RIGHT corner empty', 'No people, no dolls, no text'],
+    prompt: `Photorealistic, vertical 9:16, no people. The view from a small fixed camera mounted about 2.6 m high in the corner of a child’s nursery in an old English manor, right beside the window, looking diagonally across and down the room at about 30 degrees, very wide lens without fisheye distortion. Exact layout: ${NURSERY_LAYOUT} Soft daylight from the window beside the camera, dust in the light. ${LOOKS.fixed} No people, no dolls, no toys, no horror props.`,
+    check: ['Door fully visible in the lower-LEFT third, bare floor in front of it', 'Chest with the grey box at frame centre on the rug', 'Bed along the RIGHT wall (foot toward camera), lamp table in the far-RIGHT corner, dust-sheeted armchair far-LEFT, open floor between them', 'Curtain edge at the right edge of frame', 'No people, no dolls, no text'],
     group: 'Nursery',
-    note: MAPS.nursery.text,
+    note: 'APPROVED plate (already generated). Every other nursery and corridor prompt is written from this image. ' + MAPS.nursery.text,
   },
   {
     file: 'LOC_NURSERY_FIXED_NIGHT.png',
@@ -388,7 +397,7 @@ export const ASSETS: Asset[] = [
     title: 'NURSERY FIXED, night, empty (edit)',
     ref: 'the night view of the nursery from the small camera high in the corner, door in the lower left, lamp on',
     editOf: 'LOC_NURSERY_FIXED_DAY.png',
-    prompt: `Edit the uploaded photo of the nursery seen from the high corner: identical camera, lens, framing and geometry, nothing moved. Night: the daylight is gone; the small lamp on the side table against the right-hand wall is ON and throws a dim warm pool across the rug, the low chest and the grey box; only weak spill reaches the door in the lower-left; the far corners fall into deep but readable shadow, so a still figure standing in the far-right corner, on the rug, or just behind someone at the door would be only just visible. A faint cool moonlight edge on the iron bed from the window behind the camera. ${LOOKS.fixed} Empty room, no people.`,
+    prompt: `Edit the uploaded photo of the nursery seen from the high corner: identical camera, lens, framing and geometry, nothing moved. Night: the daylight is gone; the small lamp on the bedside table in the far-RIGHT corner beside the bed head is ON and throws a dim warm pool over the bed head, the far end of the rug and the chest with the grey box; only weak spill reaches the door in the lower-left; the far-left corner with the armchair and the open floor at the far end fall into deep but readable shadow, so a still figure standing at the far end, on the rug, or just behind someone at the door would be only just visible. A faint cool moonlight edge on the curtain at the right edge and on the iron bed. ${LOOKS.fixed} Empty room, no people.`,
     uploads: [{ file: 'LOC_NURSERY_FIXED_DAY.png', job: 'exact camera and room' }],
     check: ['Overlays the day plate exactly at 50% opacity', 'Lamp on; the door and far corners dark but readable'],
     group: 'Nursery',
@@ -399,12 +408,12 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Nursery seen from the corridor through the doorway, day',
     ref: 'the daytime photo taken from the corridor looking through the open white nursery door into the room',
-    prompt: `Using the uploaded high-corner nursery photo for the room, furniture and wallpaper, and the uploaded corridor photo for the corridor: camera in the upper corridor with its back against the corridor wall opposite the nursery door, eye level, 35mm, looking straight through the wide-open white panelled door into the nursery. In the foreground a strip of corridor floor with the worn runner. Through the doorway: straight ahead against the far wall of the view, the small side table with its lamp switched off; to the LEFT, deeper in the room, the low wooden chest on the worn rug with the grey archival box on its lid and the white iron child’s bed beyond it; to the RIGHT, the window wall with thin curtains letting in pale daylight, and above it, high up, the empty corner where the window wall meets the wall ahead. No camera mounted anywhere yet. No people. ${LOOKS.dayInterior}`,
+    prompt: `Using the uploaded high-corner nursery photo for the room, furniture and wallpaper, and the uploaded corridor photo for the corridor and the door: camera in the upper corridor with its back against the corridor wall opposite the nursery door, eye level, 35mm, looking straight through the wide-open white four-panel door (brass knob, moulded white surround, the door leaf swung open INTO the room against the inner wall on the LEFT). In the foreground a strip of corridor floor with the worn runner. Through the doorway, the same room seen from its side: straight ahead the white iron bed runs along the far wall of this view, its foot to the RIGHT and its head to the LEFT; on the right, beside the foot of the bed, the window with thin white curtains letting in daylight, and high up in the corner above it, empty wall where a camera will be mounted; ahead-left, on the faded rug in the middle of the room, the dark wooden chest with the grey archival box on its lid; at the left end of the bed, the bedside table with its lamp (switched off); deep on the left, the armchair under a white dust sheet in the corner. No camera mounted anywhere yet. No people. ${LOOKS.dayInterior}`,
     uploads: [
       { file: 'LOC_NURSERY_FIXED_DAY.png', job: 'the room: furniture, wallpaper, positions' },
       { file: 'LOC_CORRIDOR_DAY.png', job: 'the corridor floor, runner and door' },
     ],
-    check: ['Chest and box to the LEFT inside, lamp table straight ahead, window on the RIGHT', 'The high corner ahead-right is empty (no camera yet)'],
+    check: ['Door leaf open inward on the LEFT', 'Bed straight ahead, foot to the right; window and curtains ahead-right', 'Chest with the grey box ahead-left on the rug; bedside table and lamp at the bed head; armchair deep left', 'The high corner ahead-right above the window is empty (no camera yet)', 'Same door, wallpaper, bed and chest as the high-corner photo'],
     group: 'Nursery',
     note: 'Used for SH09 (clean view), SH13 (handheld POV) and SH14–SH16 (corridor angle). From the corridor, the landing is to the LEFT.',
   },
@@ -414,7 +423,7 @@ export const ASSETS: Asset[] = [
     title: 'Nursery seen from the corridor through the doorway, night (edit)',
     ref: 'the night photo taken from the corridor looking through the open white nursery door, with the lamp on inside and a small red camera light high in the far corner',
     editOf: 'LOC_NURSERY_DOORWAY_DAY.png',
-    prompt: 'Edit the uploaded photo looking from the corridor through the open nursery door: identical camera and geometry, nothing moved. Night: inside, the small lamp on the side table straight ahead is ON, making a dim warm pool over the rug, the low chest and the grey box; the window on the right is dark with a faint cool edge; high in the corner ahead-right above the window there is now a compact black camera on a small wall bracket with a small glowing red REC light. The corridor foreground is in dim warm sconce light. Deep readable shadow. No people, no text.',
+    prompt: 'Edit the uploaded photo looking from the corridor through the open nursery door: identical camera and geometry, nothing moved. Night: inside, the small lamp on the bedside table at the head of the bed (ahead-left) is ON, making a dim warm pool over the bed head, the rug and the chest with the grey box; the window ahead-right is dark with a faint cool edge on the curtains; high in the corner ahead-right above the window there is now a compact black camera on a small wall bracket with a small glowing red REC light. The corridor foreground is in dim warm sconce light. Deep readable shadow. No people, no text.',
     uploads: [
       { file: 'LOC_NURSERY_DOORWAY_DAY.png', job: 'exact geometry' },
       { file: 'PROP_FIXED_CAM.png', job: 'the camera on its wall bracket' },
@@ -426,7 +435,7 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Inside the nursery beside the door, night (cinematic)',
     ref: 'the night photo inside the nursery at eye level beside the closed white door, with the lamp-lit room opening to the right',
-    prompt: `Using the uploaded high-corner night photo of the nursery for the room, furniture, wallpaper and lamp light: a new cinematic angle inside the same room at night. Camera at eye level, 35mm, standing close to the window wall about a metre from the corner by the door, looking along the left-hand wall: the closed white panelled door with its brass handle in three-quarter view on the LEFT of frame, a strip of bare floorboards in front of it; to the RIGHT and behind, the room opens up — the worn rug, the low chest with the grey box inside the warm pool of the practical lamp on the side table against the right-hand wall, the white iron bed against the far wall, the far corners in deep shadow. No people. ${LOOKS.night}`,
+    prompt: `Using the uploaded high-corner night photo of the nursery for the room, furniture, wallpaper and lamp light: a new cinematic angle inside the same room at night. Camera at eye level, 35mm, standing about a metre from the closed door, near the wall with the camera corner, looking along the door wall toward the far end: the closed white four-panel door with its brass knob in three-quarter view on the LEFT of frame, bare floorboards in front of it; to the RIGHT the room opens up — the faded rug, the dark chest with the grey box, the white iron bed along the right-hand wall, and at the far end the lamp glowing on the bedside table in the far-right corner and the dust-sheeted armchair in the far-left corner, both far corners in deep shadow. No people. ${LOOKS.night}`,
     uploads: [{ file: 'LOC_NURSERY_FIXED_NIGHT.png', job: 'the room, furniture and lamp light' }],
     group: 'Nursery',
     note: 'Cinematic angle: the Veiled Woman NEVER appears here. The room behind Clara is always empty.',
@@ -464,5 +473,85 @@ export const ASSETS: Asset[] = [
     ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
     group: 'Shot maps',
     note: 'Download from /maps/SH05_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH06.png',
+    kind: 'map',
+    title: 'SH06 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH06_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH07.png',
+    kind: 'map',
+    title: 'SH07 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH07_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH08.png',
+    kind: 'map',
+    title: 'SH08 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH08_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH09.png',
+    kind: 'map',
+    title: 'SH09 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH09_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH10.png',
+    kind: 'map',
+    title: 'SH10 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH10_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH11.png',
+    kind: 'map',
+    title: 'SH11 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH11_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH12.png',
+    kind: 'map',
+    title: 'SH12 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH12_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH13.png',
+    kind: 'map',
+    title: 'SH13 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH13_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH14.png',
+    kind: 'map',
+    title: 'SH14 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH14_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
+  },
+  {
+    file: 'MAP_SH15.png',
+    kind: 'map',
+    title: 'SH15 top-down shot map',
+    ref: 'the top-down plan diagram of this shot, with a 9:16 frame preview (a drawing, not a photo)',
+    group: 'Shot maps',
+    note: 'Download from /maps/SH15_map.png. Upload it as a blocking reference; the prompt tells the model to use it only for positions and directions.',
   },
 ];

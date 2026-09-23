@@ -351,12 +351,13 @@ export const SHOTS: Shot[] = [
     blocking:
       'Camera just inside the open front door, low and slightly left, looking into the hall (plate direction): the stair ahead, the plain service door on the RIGHT-hand wall. The huge bearded man has just come in past the camera, walking away into the hall, the heavy black case in his LEFT hand, his RIGHT hand reaching for the service-door knob as he passes it, head turned toward the door so his profile shows. A bar of low sun across the floor from the window on the left.',
     people: [
-      { id: 'owen', view: 'back34', where: 'a few steps into the hall, just past the camera on the right side of frame, walking away from the camera toward the stair', doing: 'head turned right toward the service door so his right profile shows; his hand has not reached the knob yet', hands: 'heavy black case in his LEFT hand; RIGHT hand reaching out toward the knob of the service door on the right-hand wall, a hand’s width from it' },
+      { id: 'owen', view: 'back34', where: 'a few metres into the hall on the right side of frame, right beside the service door on the right-hand wall, walking away from the camera toward the stair', doing: 'head turned right toward the service door so his right profile shows; his hand has not reached the knob yet', hands: 'heavy black case in his LEFT hand; RIGHT hand reaching out toward the knob of the service door on the right-hand wall, a hand’s width from it' },
     ],
     check: ['The service door is on the RIGHT-hand wall', 'The bright open front door is behind the camera'],
+    map: '/maps/SH06_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_HALL_DAY.png', 'the hall, stair, service door and light — keep'), sheet('owen')],
+      uploads: [up('LOC_HALL_DAY.png', 'the hall, stair, service door and light — keep'), sheet('owen'), up('MAP_SH06.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Mid-stride, not slowing, deadpan and practical.',
       saveAs: 'KF_SH06.png',
     },
@@ -397,14 +398,14 @@ export const SHOTS: Shot[] = [
       { id: 'mara', view: 'small', where: 'at the lower-left edge, just coming in from the front door behind the camera', doing: 'carrying her compact case toward the stair, back to camera', hands: 'compact black case in her right hand' },
     ],
     check: ['Both women are seen from behind, climbing', 'The front door is behind the camera'],
+    map: '/maps/SH07_map.png',
     kf: {
       mode: 'generate',
       uploads: [
         up('LOC_HALL_DAY.png', 'the hall and staircase — keep'),
         sheet('elias'),
-        sheet('clara'),
-        sheet('naomi'),
         LINEUP_BG,
+        up('MAP_SH07.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image'),
       ],
       frame: 'Everyone busy and moving; nobody looks at the camera.',
       saveAs: 'KF_SH07.png',
@@ -441,6 +442,7 @@ export const SHOTS: Shot[] = [
       { id: 'naomi', view: 'front', where: 'on frame-LEFT beside her, walking toward the camera, clearly taller', doing: 'eyes on her companion, not on the camera' },
     ],
     check: ['The open nursery door is on the RIGHT wall right beside the copper-haired woman', 'The landing is visible behind them at the far end'],
+    map: '/maps/SH08_map.png',
     kf: {
       mode: 'generate',
       uploads: [
@@ -448,6 +450,7 @@ export const SHOTS: Shot[] = [
         sheet('clara'),
         sheet('naomi'),
         up('LOC_NURSERY_DOORWAY_DAY.png', 'what is visible through the nursery doorway'),
+        up('MAP_SH08.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image'),
       ],
       frame: 'Walking, not posing, not an interview. The woman with locs is clearly taller, eyes on her companion.',
       saveAs: 'KF_SH08.png',
@@ -475,8 +478,9 @@ export const SHOTS: Shot[] = [
     location: 'LOC_NURSERY_DOORWAY_DAY.png',
     time: 'day',
     lens: '35mm',
-    blocking: 'Plate framing: from the corridor straight through the open white door into the nursery. Chest and grey box on the rug to the left, bed beyond, window on the right, empty high corner ahead-right.',
+    blocking: 'Plate framing: from the corridor straight through the open white door into the nursery. The iron bed straight ahead along the far wall (foot to the right), the window and curtains ahead-right, the chest with the grey box ahead-left on the rug, the bedside table and lamp at the bed head, the dust-sheeted armchair deep left; the high corner ahead-right above the window is still empty.',
     people: [],
+    map: '/maps/SH09_map.png',
     kf: {
       mode: 'plate',
       uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'start frame as is')],
@@ -512,9 +516,10 @@ export const SHOTS: Shot[] = [
       { id: 'clara', view: 'front34', where: 'on frame-RIGHT, level with the open nursery doorway, walking toward the camera', doing: 'head turned to her left (frame-right), looking through the open doorway into the room' },
       { id: 'naomi', view: 'front34', where: 'on frame-LEFT, walking toward the camera', doing: 'eyes on her companion' },
     ],
+    map: '/maps/SH10_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi')],
+      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi'), up('MAP_SH10.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Controlled and direct on the outside; grief held underneath.',
       saveAs: 'KF_SH10.png',
     },
@@ -548,9 +553,10 @@ export const SHOTS: Shot[] = [
       { id: 'clara', view: 'front', where: 'on frame-RIGHT, walking toward the camera; the open doorway is several metres behind her on the right wall', doing: 'eyes forward, just about to glance back over her left shoulder' },
       { id: 'naomi', view: 'front', where: 'on frame-LEFT, walking toward the camera', doing: 'eyes on her companion' },
     ],
+    map: '/maps/SH11_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi')],
+      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi'), up('MAP_SH11.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Quieter now, the guard slipping.',
       saveAs: 'KF_SH11.png',
     },
@@ -587,6 +593,7 @@ export const SHOTS: Shot[] = [
       { id: 'elias', view: 'small', where: 'one step behind the small woman', doing: 'holding his handheld camera', hands: 'handheld camera in his right hand' },
       { id: 'owen', view: 'profileR', where: 'in the left foreground against the left wall, partly cut off by the frame edge', doing: 'kneeling at an open black case, unpacking a compact black camera and a small canvas tool pouch, eyes on the case', hands: 'both hands in the open case' },
     ],
+    map: '/maps/SH12_map.png',
     kf: {
       mode: 'generate',
       uploads: [
@@ -594,7 +601,7 @@ export const SHOTS: Shot[] = [
         sheet('clara'),
         sheet('naomi'),
         LINEUP_BG,
-        up('PROP_FIXED_CAM.png', 'the camera and bracket she carries'),
+        up('MAP_SH12.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image'),
       ],
       frame: 'One connected flow of work, nobody posing.',
       saveAs: 'KF_SH12.png',
@@ -629,14 +636,15 @@ export const SHOTS: Shot[] = [
     time: 'day',
     lens: '35mm',
     blocking:
-      'Handheld view from the doorway, looking in: ahead-right, high in the corner where the window wall meets the wall ahead, the small woman in rust stands on a small step stool, arms up, tightening a compact black camera onto one small metal wall bracket. The camera’s tiny flip-out preview screen faces us. Below her the window with thin curtains; to the left the low chest with the grey box on the rug and the white iron bed beyond. Daylight from the window.',
+      'Handheld view from the doorway, looking in: ahead-right, high in the corner above the window, the small woman in rust stands on a small step stool beside the foot of the iron bed, arms up, tightening a compact black camera onto one small metal wall bracket. The camera’s tiny flip-out preview screen faces us. Below her the window with thin white curtains; straight ahead the white iron bed along the far wall; ahead-left the dark chest with the grey box on the rug. Daylight from the window.',
     people: [
       { id: 'mara', view: 'back34', where: 'ahead-right, high in the corner above the window, standing on a small step stool', doing: 'arms raised, tightening a compact black camera onto a wall bracket, face turned up to the mount in partial profile', hands: 'both arms raised, both hands on the compact camera and its bracket, the camera clearly visible above her hands' },
     ],
     check: ['No person other than her; the doorway operator is never seen', 'The bracket is in the corner above the window, ahead-right'],
+    map: '/maps/SH13_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket')],
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket'), up('MAP_SH13.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Concentrated, quick, precise hands.',
       saveAs: 'KF_SH13.png',
     },
@@ -674,9 +682,10 @@ export const SHOTS: Shot[] = [
       { id: 'naomi', view: 'profileL', where: 'in the corridor foreground a few steps behind him, on the right', doing: 'walking toward frame-LEFT, looking down at the cassette recorder in her hands', hands: 'silver cassette recorder held in both hands in front of her' },
     ],
     check: ['The bearded man walks toward frame-LEFT (the landing side)', 'The doorway is in the corridor wall; the room is seen through it'],
+    map: '/maps/SH14_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('mara'), sheet('owen'), sheet('naomi')],
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('owen'), up('CH_LINEUP.png', 'identities of the woman in the corner and the woman with locs, and everyone’s heights'), up('MAP_SH14.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Relaxed crew banter while everyone keeps working.',
       saveAs: 'KF_SH14.png',
     },
@@ -712,9 +721,10 @@ export const SHOTS: Shot[] = [
       { id: 'elias', view: 'back34', where: 'in the open doorway, facing into the room', doing: 'handheld raised, starting to turn his head back toward the corridor (toward the camera side)', hands: 'handheld camera still raised in both hands, visible beyond his right shoulder' },
       { id: 'mara', view: 'small', where: 'through the doorway, high in the far corner on the stool', doing: 'still working on the mount' },
     ],
+    map: '/maps/SH15_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('KF_SH14.png', 'exact framing, light and everyone’s look — continue from it'), sheet('owen'), sheet('elias'), sheet('naomi')],
+      uploads: [up('KF_SH14.png', 'exact framing, light and everyone’s look — continue from it'), sheet('owen'), sheet('elias'), sheet('naomi'), up('MAP_SH15.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
       frame: 'Continue the uploaded frame a moment later with the new positions.',
       saveAs: 'KF_SH15.png',
     },
@@ -1283,13 +1293,13 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking:
-      'Night, camera in the corridor at shoulder height behind the tall man in olive (left) and the very tall woman with locs (right), both seen from behind. Between them, a step ahead, the copper-haired woman walking into the open nursery doorway, back to camera. Through the doorway: the lamp pool over the rug, the chest and grey box to the left; high in the far corner ahead-right above the dark window, the compact camera with its small red REC light.',
+      'Night, camera in the corridor at shoulder height behind the tall man in olive (left) and the very tall woman with locs (right), both seen from behind. Between them, a step ahead, the copper-haired woman walking into the open nursery doorway, back to camera. Through the doorway: the lamp glowing on the bedside table at the bed head (ahead-left), its pool over the rug and the chest with the grey box; the iron bed straight ahead; high in the corner ahead-right above the dark window, the compact camera with its small red REC light.',
     people: [
       { id: 'elias', view: 'back', where: 'in the left foreground, from the shoulders up', doing: 'facing the doorway', hands: 'handheld camera lowered in his right hand, its top just visible at the bottom edge' },
       { id: 'naomi', view: 'back', where: 'in the right foreground, from the shoulders up, taller', doing: 'facing the doorway' },
       { id: 'clara', view: 'back', where: 'between them, a step ahead, in the open doorway', doing: 'walking into the room' },
     ],
-    check: ['The small red REC light is high in the far corner ahead-right, above the window', 'The chest and box are to the LEFT inside the room'],
+    check: ['The small red REC light is high in the far corner ahead-right, above the window', 'The chest and box are ahead-LEFT inside the room; the bed straight ahead'],
     kf: {
       mode: 'generate',
       uploads: [up('LOC_NURSERY_DOORWAY_NIGHT.png', 'doorway, room, lamp and red REC light — keep'), sheet('clara'), sheet('elias'), sheet('naomi')],
@@ -1358,7 +1368,7 @@ export const SHOTS: Shot[] = [
     time: 'night',
     lens: '35mm',
     blocking:
-      'Inside the nursery at night, camera at eye level beside the window wall near the door corner, looking along the left-hand wall: the closed white door in three-quarter view on the LEFT. The copper-haired woman stands a step from the door in profile, facing it (facing frame-left), her right hand reaching for the brass handle. Behind her to the right the room: rug, chest with the box in the lamp pool, bed, dark corners — empty.',
+      'Inside the nursery at night, camera at eye level about a metre from the door, looking along the door wall toward the far end: the closed white four-panel door in three-quarter view on the LEFT. The copper-haired woman stands a step from the door in profile, facing it (facing frame-left), her right hand reaching for the brass knob. Behind her to the right the room: rug, chest with the grey box, the iron bed along the right wall, the lamp on the bedside table far right, the dust-sheeted armchair far left — empty.',
     people: [
       { id: 'clara', view: 'profileL', where: 'a step from the closed door, in profile facing frame-LEFT; the empty room behind her on the right', doing: 'right hand reaching for the brass handle, eyes on the door' },
     ],
@@ -1434,7 +1444,7 @@ export const SHOTS: Shot[] = [
     location: 'LOC_NURSERY_FIXED_NIGHT.png',
     time: 'night',
     lens: 'NURSERY FIXED locked wide',
-    blocking: `${MAPS.nursery.text} The copper-haired woman stands on the bare floor half a step from the closed door in the lower-left, facing it, back to the room, hands low at her sides. The Woman is added as a still layer at P1 (far-right corner).`,
+    blocking: `${MAPS.nursery.text} The copper-haired woman stands on the bare floor half a step from the closed door in the lower-left, facing it, back to the room, hands low at her sides. The Woman is added as a still layer at P1 (far end, between the armchair and the bedside table).`,
     people: [
       { id: 'clara', view: 'back34', where: 'half a step from the closed door in the lower-left, facing it', doing: 'hands low at her sides; three-quarter rear from above: her right cheek, jaw and the right side of her throat face the camera' },
     ],
@@ -1452,7 +1462,7 @@ export const SHOTS: Shot[] = [
       position: 'P1',
       uploads: [up('KF_SH34.png', 'the exact frame — change nothing but adding the figure'), WOMAN_REF],
       prompt:
-        'Edit the uploaded high-corner night frame of the woman at the door; keep everything exactly unchanged. Add ONE figure: the veiled woman from the veiled-figure reference, standing perfectly still in the empty FAR-RIGHT corner at the top of the frame, facing toward the woman at the door, arms straight at her sides, black mourning dress to the floor, smoke-grey veil over her whole face. Half swallowed by shadow but readable as a woman; scaled correctly for the distance. No glow, no transparency.',
+        'Edit the uploaded high-corner night frame of the woman at the door; keep everything exactly unchanged. Add ONE figure: the veiled woman from the veiled-figure reference, standing perfectly still at the far end of the room, on the open floor between the dust-sheeted armchair (far-left corner) and the bedside table (far-right corner), back near the far wall, facing toward the woman at the door, arms straight at her sides, black mourning dress to the floor, smoke-grey veil over her whole face. Half swallowed by shadow but readable as a woman; scaled correctly for the distance. No glow, no transparency.',
     },
     video: {
       camera: 'Fixed high-corner security camera, completely static.',
@@ -1650,7 +1660,7 @@ export const SHOTS: Shot[] = [
     location: 'LOC_NURSERY_FIXED_NIGHT.png',
     time: 'night',
     lens: 'NURSERY FIXED locked wide',
-    blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was in SH34. The Woman is a still layer at P2 (on the rug, right of the chest).`,
+    blocking: `${MAPS.nursery.text} The copper-haired woman exactly where she was in SH34. The Woman is a still layer at P2 (on the rug, just left of the chest).`,
     people: [
       { id: 'clara', view: 'back34', where: 'exactly where she was: half a step from the closed door in the lower-left, facing it', doing: 'hands low, head tipped very slightly down; three-quarter rear from above: her right cheek, jaw and the right side of her throat face the camera' },
     ],
@@ -1668,7 +1678,7 @@ export const SHOTS: Shot[] = [
       position: 'P2',
       uploads: [up('KF_SH40.png', 'the exact frame'), up('KF_SH34_W.png', 'the identical veiled figure — same look, only moved')],
       prompt:
-        'Edit the first uploaded frame; keep everything exactly unchanged. Add the SAME veiled figure as in the second uploaded frame — identical dress, veil, height and pose — now standing on the rug to the right of the low chest, halfway between the far-right corner and the woman at the door, facing her back, arms at her sides. Scaled correctly for the distance: clearly closer and larger than before. Still, readable, face fully covered.',
+        'Edit the first uploaded frame; keep everything exactly unchanged. Add the SAME veiled figure as in the second uploaded frame — identical dress, veil, height and pose — now standing on the rug just LEFT of the dark chest (the door side), halfway between the far end of the room and the woman at the door, facing her back, arms at her sides. Scaled correctly for the distance: clearly closer and larger than before. Still, readable, face fully covered.',
     },
     video: {
       camera: 'Fixed high-corner security camera, completely static.',
