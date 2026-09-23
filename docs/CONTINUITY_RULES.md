@@ -222,13 +222,64 @@ time … muted, slightly desaturated, deep soft shadows, a heavy stillness*. If 
 plate is approved, its prompt text is locked: change it only to fix a real error, and say
 in the Changes tab what changed.
 
+## 7d. Location maps and the 2×2 location sheet
+
+Every main location has a **location map** (`public/maps/LOC_*.png`, drawn by
+`scripts/shot_maps.py`) and a **2×2 location sheet** (one image, one prompt):
+
+|            | view A          | view B (camera turned 180°) |
+|------------|-----------------|-----------------------------|
+| **day**    | = approved plate | the reverse                 |
+| **night**  | same framing as above, only the light changes | same framing as above |
+
+- Generate the sheet from the approved master plate (top-left) plus the location map.
+- Any plate or keyframe that looks in the view-B direction, or is at night, uploads the
+  sheet and names the panel it needs ("the TOP-RIGHT panel is this view"). A reverse
+  angle is never invented from text alone.
+- At 4K each panel is ~1080×1920 and can be cropped as a plate directly.
+- The map marks every shot setup that uses the location, so reverse angles, light sides
+  and the 180° line can be checked for the whole scene at once.
+
+## 7e. Classical rules — the full checklist
+
+What a script supervisor and DP check on a real set, and where each one lives here.
+**QA** = enforced by `npm test`; **map** = visible on the shot/location maps;
+**prompt** = written into every generated prompt; **manual** = check by eye.
+
+| Rule | What it means for us | Where |
+|---|---|---|
+| 180° line | Keep the camera on one side of the action; cross only on screen or via a neutral (head-on) shot | map, manual |
+| Screen direction | A journey keeps its direction across cuts (toward the landing = frame-left in SH14) | map, §3 |
+| 30° / size change | New angle ≥30° or a new size at every cut | QA |
+| Establish geography | A new location gets a WS/MWS in its first two shots | QA |
+| Reverse angles | The other half of a set comes from the location sheet, not from text | sheet, §7d |
+| Light direction | Sun/practical sides are fixed per location and flip in reverses (window LEFT in A = RIGHT in B) | map, sheet |
+| Motivated light at night | One practical per space (lamp, sconce, bulb); nothing lit from nowhere | sheet, LOOKS |
+| Time of day | Late afternoon for the whole day block; the sun only gets lower | LOOKS |
+| Eyelines | Looks go to a place on the map, never the lens | prompt, §4 |
+| Lead room / headroom | More space on the side a person looks or moves toward; eyes ~⅓ down in singles | prompt |
+| Matched singles | Shot/reverse-shot pairs use the same size, lens and camera height | manual |
+| Camera height | Eye level by default; low/high only with a reason (SH06 low = his bulk; SH07 high = geography) | shot `lens` field |
+| Lens family | Wide (24–28mm) for geography, 35–50mm for action, 85mm only for emotion | manual |
+| Cut on action / overlap | Each clip starts a beat before the cut and runs past it (order length > edit length) | shot `order` vs `edit` |
+| Clean entrances and exits | Let people clear the frame, or enter an empty one, when a cut changes place | manual |
+| Exit/entry sides | Exit frame-right → enter the next shot from frame-left | map, manual |
+| Eye trace | The next shot’s point of interest sits near where the eye was at the end of the last one | frame previews |
+| Reaction shots | Key lines get a listener (Naomi in SH10/SH11) | manual |
+| Props and wardrobe state | What is open, carried, set down or mounted carries over | staging cards, §8 |
+| Hitchcock’s size rule | The size of a thing in frame matches its importance now (the box, the NURSERY flag → inserts) | coverage table |
+| Rhythm | Hold wides longer, cut closes shorter; avoid three equal sizes in a row | QA (warning) |
+| Sound bridges | Room tone per location; J/L cuts carry VO and bells across cuts | Edit & audio tab |
+
 ## 11. Order of work for a new scene
 
 1. Read the scene in the script and list every beat.
-2. Draw the overhead map (§1) and the line of action (§2).
+2. Draw the location map, view A and view B, light sides (§7d) and the line of action (§2);
+   generate the 2×2 location sheet from the approved master plate.
 3. Plan the coverage (§7b): setup ID and size per shot, with which beats each covers; no
    consecutive pair shares both.
 4. Fill a staging card per shot (§6), including the start and end positions.
 5. Run the cut check (§5) on paper for every pair of consecutive shots.
-6. Only then write the plate, keyframe and video prompts.
-7. Approve keyframes (§9) and clips (§10), updating the continuity log (§8) as you go.
+6. Draw a shot map per shot (§1) and walk the §7e checklist.
+7. Only then write the plate, keyframe and video prompts.
+8. Approve keyframes (§9) and clips (§10), updating the continuity log (§8) as you go.

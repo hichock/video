@@ -228,6 +228,23 @@ export function runQA(): Finding[] {
     if (prev2 && prev2.size === prev.size && prev.size === s.size) add('warn', 'Coverage', `Third ${s.size} in a row (${prev2.id}, ${prev.id}, ${s.id})`, s.id);
   });
 
+  // 16c. Establish every new location: one of its first two shots must be wide enough to show
+  // the geography (continuity rules §7d). The cold open is exempt.
+  const seenLoc = new Map<string, Shot[]>();
+  for (const s of SHOTS.slice(1)) {
+    const loc = setupKey(s.setup).split('-')[0];
+    const list = seenLoc.get(loc) ?? [];
+    list.push(s);
+    seenLoc.set(loc, list);
+  }
+  for (const [loc, list] of seenLoc) {
+    const first = list.slice(0, 2);
+    if (!first.some((s) => ['EWS', 'WS', 'MWS'].includes(s.size))) {
+      const inScope = SHOTS.indexOf(first[0]) < 20;
+      add(inScope ? 'error' : 'warn', 'Coverage', `Location ${loc} is never established: its first shots (${first.map((s) => `${s.id} ${s.size}`).join(', ')}) are all close. Make one of them WS/MWS.`, first[0].id);
+    }
+  }
+
   // 17. Runtime vs script
   const total = SHOTS.reduce((a, s) => a + s.edit, 0);
   add('info', 'Runtime', `Full script cut: ${total.toFixed(1)}s (${fmtTime(total)}). Script expects ~2:38–2:45.`);

@@ -392,7 +392,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH06_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_HALL_DAY.png', 'the same hall: floor, walls, service door, light — shown from the opposite direction'), sheet('owen'), mapUp('SH06')],
+      uploads: [up('LOC_HALL_DAY.png', 'the same hall: floor, walls, service door, light'), up('LOCSHEET_HALL.png', 'the TOP-RIGHT panel (day, view B) is the hall looking back toward the front door — the direction of this shot'), sheet('owen'), mapUp('SH06')],
       frame: 'Mid-stride, not slowing, deadpan and practical; backlit by the doorway, face readable.',
       saveAs: 'KF_SH06.png',
     },
@@ -438,7 +438,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH07_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_HALL_DAY.png', 'the same hall, stair and light — seen from the top of the stair'), sheet('clara'), sheet('naomi'), LINEUP_BG, mapUp('SH07')],
+      uploads: [up('LOCSHEET_HALL.png', 'the TOP-RIGHT panel (day, view B) is the hall looking back toward the front door — seen here from high on the stair'), sheet('clara'), sheet('naomi'), LINEUP_BG, mapUp('SH07')],
       frame: 'Busy, moving, nobody posing.',
       saveAs: 'KF_SH07.png',
     },
@@ -803,7 +803,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH16_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_FIXED_DAY.png', 'the same room, furniture and wallpaper — seen from the far end'), sheet('mara'), up('PROP_MONITOR.png', 'the monitor case on the floor'), up('PROP_FIXED_CAM.png', 'the mounted camera'), mapUp('SH16')],
+      uploads: [up('LOCSHEET_NUR.png', 'the TOP-RIGHT panel (day, view B) is this room seen from the far end — the direction of this shot'), sheet('mara'), up('PROP_MONITOR.png', 'the monitor case on the floor'), up('PROP_FIXED_CAM.png', 'the mounted camera'), mapUp('SH16')],
       frame: 'Only she is in the room.',
       saveAs: 'KF_SH16.png',
     },
@@ -844,6 +844,7 @@ export const SHOTS: Shot[] = [
       { id: 'naomi', view: 'front', where: 'last, near the top of the visible stair', doing: 'coming down behind them' },
     ],
     check: ['The service door is on the RIGHT-hand wall', 'They come DOWN the stair toward the camera'],
+    map: '/maps/SH17_map.png',
     kf: {
       mode: 'generate',
       uploads: [up('LOC_HALL_DAY.png', 'the hall, stair and service door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
@@ -885,6 +886,7 @@ export const SHOTS: Shot[] = [
       { id: 'mara', view: 'profileL', where: 'by the left wall', doing: 'setting the monitor case down on the floor', hands: 'both hands on the monitor case handle as it touches the floor' },
       { id: 'naomi', view: 'back34', where: 'behind the small woman, nearer the camera', doing: 'watching the board' },
     ],
+    map: '/maps/SH18_map.png',
     kf: {
       mode: 'generate',
       uploads: [up('LOC_BELLBOARD_DAY.png', 'the service hall, board, panel and door — keep'), sheet('owen'), sheet('elias'), sheet('mara'), sheet('naomi')],
@@ -923,9 +925,10 @@ export const SHOTS: Shot[] = [
     people: [
       { id: 'owen', view: 'hands', where: 'only his large tattooed hand and indigo cuff, on the right of frame', doing: 'holding the open lower panel' },
     ],
+    map: '/maps/SH19_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_BELLBOARD_DAY.png', 'wood, board and light'), sheet('owen', 'his hand, forearm tattoos and indigo sleeve only')],
+      uploads: [up('LOC_BELLBOARD_DAY.png', 'wood, board and light'), sheet('owen', 'his hand, forearm tattoos and indigo sleeve only'), mapUp('SH19')],
       frame: 'The cut is unmistakable: clean severed ends, a gap between them.',
       saveAs: 'KF_SH19.png',
     },
@@ -963,9 +966,10 @@ export const SHOTS: Shot[] = [
       { id: 'mara', view: 'front34', where: 'on the left of the board, beside it', doing: 'tightening a compact camera onto a spring clamp on a pipe, eyes on the clamp', hands: 'both hands on the spring clamp and the compact camera' },
     ],
     check: ['NURSERY label readable', 'The lower service door is to the RIGHT of the board'],
+    map: '/maps/SH20_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_BELLBOARD_DAY.png', 'board, labels, door — keep; NURSERY must stay readable'), sheet('owen'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its spring clamp')],
+      uploads: [up('LOC_BELLBOARD_DAY.png', 'board, labels, door — keep; NURSERY must stay readable'), sheet('owen'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its spring clamp'), mapUp('SH20')],
       frame: 'He looks at the mechanism, never at the camera.',
       saveAs: 'KF_SH20.png',
     },

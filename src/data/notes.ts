@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'Reverse angles and night views were invented from text',
+    body: 'Only one direction of each location existed as an approved image. Every reverse (SH06/SH07 looking back at the front door, the corridor from the far window, SH16 from the far end of the nursery) and every night plate was generated from words, so the far wall, the light side and the furniture drifted between angles.',
+    fix: 'Each main location now has a location map (view A, view B at 180°, light by day and night, every shot setup) and ONE 2×2 location sheet prompt: day/night × view A/view B, generated from the approved master plate. Reverse and night plates and keyframes upload the sheet and name the panel they need. Classical rules that were missing (establishing shots, lead room, light direction, exit/entry sides, eye trace…) are in the continuity rules §7e; establishing and lead room are now automatic.',
+  },
+  {
     title: 'Flat coverage: every shot a full-body wide',
     body: 'Most shots were written as full-figure wides at 24–35mm, and SH06 and SH07 were the same hall angle at the same size with the people moved around. Nothing in the bible or script asks for this; it was a staging shortcut.',
     fix: 'Every shot now has a named camera setup and a shot size, and the size goes into the keyframe CAMERA line. SH06 is a low waist-up medium beside the service door looking back at the front door; SH07 is a high wide from the top of the stair; SH08 → SH10 → SH11 walks wide → medium → close-up; SH12 turns round to the landing end; SH15 is a frontal medium; SH16 is a reverse from the far end of the nursery. QA fails the build if two consecutive shots share both setup and size (unless marked as a match cut). New maps for SH06, SH07, SH11, SH12, SH15 and SH16, and a Shot maps tab to check them side by side.',

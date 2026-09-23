@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ALL_BEATS, SCRIPT, SCRIPT_META } from './data/script';
 import { CHARACTERS, CAST, type CharId } from './data/characters';
-import { ASSETS, MAPS } from './data/assets';
+import { ASSETS, LOCATION_SHEETS, MAPS } from './data/assets';
 import { SHOTS } from './data/shots';
 import { DECISIONS, OLD_PACK_PROBLEMS, PROCESS_NOTE } from './data/notes';
 import { runQA, fmtTime, type Finding } from './lib/qa';
@@ -14,7 +14,7 @@ import { NurseryMap, UpperFloorMap } from './components/Diagrams';
 const TABS = [
   ['overview', 'Overview'],
   ['shots', 'Shotlist'],
-  ['maps', 'Shot maps'],
+  ['maps', 'Maps'],
   ['script', 'Script check'],
   ['bible', 'Bible & maps'],
   ['build', 'Build order'],
@@ -100,55 +100,80 @@ export default function App() {
 
 // ---------------------------------------------------------------------------
 
-/** Quick visual check: every shot map of the test scope side by side, with size and setup. */
+/** Quick visual check: location maps and every shot map, one full-width row each, in cut order. */
 function ShotMaps({ findings }: { findings: Finding[] }) {
   const scope = SHOTS.slice(0, 20);
   const coverage = findings.filter((f) => f.rule === 'Coverage' && scope.some((s) => s.id === f.shot));
+  const [view, setView] = useStored<'shots' | 'locations'>('maps-view', 'shots');
   return (
     <section className="section">
-      <h2>Shot maps, SH01–SH20</h2>
-      <p className="lead">Top-down plan of every shot of the test scope, in cut order. Read them in sequence: the camera setup or the shot size should change at every cut, and people should leave one map where they start the next. Click a map to open it full size.</p>
-      <div className="sizestrip" aria-label="Shot sizes in cut order">
-        {scope.map((s) => (
-          <span key={s.id} className={`sizechip size-${s.size}`} title={`${s.id} · ${s.setup}`}>
-            <b>{s.id.slice(2)}</b>
-            {s.size}
-          </span>
-        ))}
+      <h2>Maps</h2>
+      <div className="seg" role="tablist" aria-label="Which maps">
+        <button role="tab" aria-selected={view === 'shots'} onClick={() => setView('shots')}>Shot maps SH01–SH20</button>
+        <button role="tab" aria-selected={view === 'locations'} onClick={() => setView('locations')}>Location maps + 2×2 sheets</button>
       </div>
-      {coverage.length > 0 && (
-        <div>
-          {coverage.map((f, i) => (
-            <div className="finding" key={i}>
-              <span className={`pill ${f.severity === 'error' ? 'rec' : 'warn'}`}>{f.severity}</span>
-              <span className="mono">{f.shot}</span>
-              <span>{f.msg}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="mapgrid">
-        {scope.map((s) => (
-          <figure key={s.id} className="mapcell">
-            {s.map ? (
-              <a href={s.map} target="_blank" rel="noreferrer">
-                <img src={s.map} alt={`Top-down map of ${s.id}`} loading="lazy" />
+      {view === 'locations' ? (
+        <>
+          <p className="lead">One map per main location: view A and its reverse view B (180°), where the light comes from by day and by night, and every shot setup that uses the place. Each has a one-prompt 2×2 location sheet (top row day, bottom row night; left column view A, right column view B). Generate the sheet from the approved master plate; every reverse or night plate and keyframe then uploads it.</p>
+          {LOCATION_SHEETS.map((l) => {
+            const a = ASSETS.find((x) => x.file === l.file)!;
+            return (
+              <article key={l.id} className="maprow">
+                <header>
+                  <span className="pill mono">{l.id}</span>
+                  <b>{l.title}</b>
+                  <span className="dim">A: {l.shotsA.join(', ') || '—'} · B: {l.shotsB.join(', ') || 'not used yet'}{l.shotsSide?.length ? ` · side: ${l.shotsSide.join(', ')}` : ''}</span>
+                </header>
+                <a href={l.map} target="_blank" rel="noreferrer"><img src={l.map} alt={`Location map: ${l.title}`} loading="lazy" /></a>
+                <details>
+                  <summary>2×2 sheet prompt — {l.file} · uploads: {a.uploads?.map((u) => u.file).join(', ')}</summary>
+                  <PromptBlock title={`${l.file} — one image, 2×2`} text={a.prompt ?? ''} footer={a.note} />
+                  {a.check && <Checklist id={`sheet-${l.id}`} items={a.check} />}
+                </details>
+              </article>
+            );
+          })}
+        </>
+      ) : (
+        <>
+          <p className="lead">Every shot of the test scope in cut order, one per row. Read down the page: the camera setup or the shot size must change at every cut, and people must leave one map where they start the next. Click a map to open it full size.</p>
+          <div className="sizestrip" aria-label="Shot sizes in cut order">
+            {scope.map((s) => (
+              <a key={s.id} href={`#map-${s.id}`} className={`sizechip size-${s.size}`} title={`${s.id} · ${s.setup}`}>
+                <b>{s.id.slice(2)}</b>
+                {s.size}
               </a>
-            ) : (
-              <div className="nomap">No map — {s.cam === 'fixed-nursery' ? 'locked NURSERY FIXED frame' : 'not drawn yet'}</div>
-            )}
-            <figcaption>
-              <div className="pills">
+            ))}
+          </div>
+          {coverage.length > 0 && (
+            <div>
+              {coverage.map((f, i) => (
+                <div className="finding" key={i}>
+                  <span className={`pill ${f.severity === 'error' ? 'rec' : 'warn'}`}>{f.severity}</span>
+                  <span className="mono">{f.shot}</span>
+                  <span>{f.msg}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {scope.map((s) => (
+            <article key={s.id} id={`map-${s.id}`} className="maprow">
+              <header>
                 <span className="pill mono">{s.id}</span>
                 <span className="pill brass">{s.size}</span>
                 <span className="pill">{s.lens}</span>
-              </div>
-              <div className="setup">{s.setup}</div>
-              <div className="dim">{s.title}</div>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
+                <b>{s.setup}</b>
+                <span className="dim">{s.title}</span>
+              </header>
+              {s.map ? (
+                <a href={s.map} target="_blank" rel="noreferrer"><img src={s.map} alt={`Top-down map of ${s.id}`} loading="lazy" /></a>
+              ) : (
+                <div className="nomap">No map — {s.cam === 'fixed-nursery' ? 'this is a crop of the locked NURSERY FIXED frame (view A of the nursery location map)' : 'not drawn yet'}</div>
+              )}
+            </article>
+          ))}
+        </>
+      )}
     </section>
   );
 }

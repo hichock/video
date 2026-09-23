@@ -130,6 +130,8 @@ export function keyframePrompt(s: Shot): string {
   const h = heightsLine(visibleOf(s));
   if (h) parts.push(h);
   parts.push(`CAMERA: ${SIZE_TEXT[s.size]}, ${s.lens}.`);
+  if (s.people.some((p) => p.view !== 'hands') && s.size !== 'INSERT' && s.size !== 'ECU')
+    parts.push('COMPOSITION: normal headroom; give every person lead room — more open space on the side they look or move toward than behind them. Eyes about one third down the frame in singles.');
   parts.push(`LOOK: ${lookFor(s)}`);
   if (k.keep?.length) parts.push(`KEEP UNCHANGED: ${k.keep.join('; ')}.`);
   parts.push(HYGIENE);

@@ -4,7 +4,7 @@
 
 import { CHARACTERS, LINEUP_PROMPT, type CharId } from './characters';
 
-export type AssetKind = 'character' | 'lineup' | 'location' | 'prop' | 'overlay' | 'keyframe' | 'comp' | 'map';
+export type AssetKind = 'character' | 'lineup' | 'location' | 'sheet' | 'prop' | 'overlay' | 'keyframe' | 'comp' | 'map';
 
 export interface Upload {
   file: string;
@@ -90,6 +90,185 @@ export const HYGIENE =
 // Assets.
 // ---------------------------------------------------------------------------
 
+/** The nursery as seen by NURSERY FIXED — matches the approved LOC_NURSERY_FIXED_DAY plate. */
+export const NURSERY_LAYOUT =
+  'the white four-panel door with a brass knob, in a moulded white surround, is on the LEFT-hand wall close to the camera, fully visible in the lower-left third, hinged on its far side, with bare floorboards in front of it. The room runs away from the camera up the frame: a large faded rug in the middle of the floor; a dark wooden chest on the rug at the centre of the frame with a grey archival box on its lid; a white iron single bed along the RIGHT-hand wall, its foot toward the camera and its head at the far wall, made up with faded floral linen; a small wooden bedside table with a fabric-shaded lamp and a few old books in the far-RIGHT corner beside the bed head; an armchair under a white dust sheet in the far-LEFT corner; open bare floor at the far end between the armchair and the bedside table. Pale sprigged wallpaper, small framed pictures and empty picture hooks. The window, with thin white curtains, is on the right-hand wall right beside the camera: only the curtain edge shows at the right edge of the frame.';
+
+// ---------------------------------------------------------------------------
+// Location sheets: ONE image per main location, a 2×2 grid. Columns are two
+// opposite views (A and B, 180° apart); rows are day and night. Generated from
+// the approved master plate (day A) so every other angle and the night light
+// come from the same picture. See the location maps in public/maps/LOC_*.png.
+// ---------------------------------------------------------------------------
+
+export interface LocationSheet {
+  id: string;
+  title: string;
+  file: string;
+  /** Location map image (public/maps). */
+  map: string;
+  place: string;
+  /** Approved master plate = the top-left panel. */
+  master: string;
+  extraUploads?: Upload[];
+  viewA: string;
+  viewB: string;
+  swap: string;
+  dayLight: string;
+  nightLight: string;
+  /** What may differ between the rows besides the light. */
+  rowChanges?: string;
+  layout: string;
+  look: string;
+  /** Shots per view, for the app and the map. */
+  shotsA: string[];
+  shotsB: string[];
+  shotsSide?: string[];
+}
+
+export const LOCATION_SHEETS: LocationSheet[] = [
+  {
+    id: 'EXT',
+    title: 'Exterior — arrival',
+    file: 'LOCSHEET_EXT.png',
+    map: '/maps/LOC_EXT.png',
+    place: 'the front drive of a large pale limestone three-storey English manor, with a dark green SUV parked on the gravel',
+    master: 'LOC_EXT_DAY.png',
+    viewA: 'camera on the gravel drive behind the SUV, eye level, 24mm, looking at the house: the facade with the front door at the top of five wide stone steps in the centre; the SUV in the foreground slightly left of centre, nose toward the house, its open tailgate toward the camera.',
+    viewB: 'the camera turned round 180°: on the gravel near the foot of the front steps with its back to the house (the house is not visible), eye level, 35mm, looking out along the drive: the same SUV a few metres ahead, now seen from its FRONT, its tailgate open on the far side; the drive curves away between lawns and mature trees.',
+    swap: 'The steps and front door are ahead in view A and behind the camera in view B.',
+    dayLight: 'late afternoon, low golden sun from the LEFT of view A, which is the RIGHT of view B, long soft shadows.',
+    nightLight: 'deep blue night, no sun. In view A the lantern beside the front door is lit and two ground-floor windows glow warm; the SUV is a dark shape. In view B a cool moon from the RIGHT edges the SUV and the trees, and warm light from the house behind the camera spills faintly onto the gravel.',
+    layout: MAPS.exterior.text,
+    look: 'Elegant and inviting, not a ruin, yet quietly frozen in time: most upper windows have their inside shutters closed. Natural, slightly muted palette, deep soft shadows, a heavy stillness. No fog, no storm, no cemetery, no broken windows.',
+    shotsA: ['SH02', 'SH04'],
+    shotsB: ['SH03', 'SH05'],
+  },
+  {
+    id: 'HALL',
+    title: 'Entrance hall',
+    file: 'LOCSHEET_HALL.png',
+    map: '/maps/LOC_HALL.png',
+    place: 'the entrance hall of an old English manor that is being cleared to sell',
+    master: 'LOC_HALL_DAY.png',
+    viewA: 'exactly the uploaded hall photo: from just inside the front door, eye level, 24mm, the wide central staircase straight ahead rising into shadow, the plain panelled service door on the RIGHT-hand wall, the tall window on the LEFT wall.',
+    viewB: 'the camera turned round 180°: at the foot of the central staircase, eye level, 24mm, looking back across the hall to the front door: the tall front door in the centre of the far wall, standing open onto bright daylight; the plain panelled service door now on the LEFT-hand wall; the tall window now on the RIGHT wall.',
+    swap: 'The service door is on the RIGHT wall in view A and on the LEFT wall in view B; the window and its bar of sun are on the LEFT in view A and on the RIGHT in view B.',
+    dayLight: 'low late-afternoon sun through the tall window laying one long bar of light across the black-and-white floor, the rest in soft shade, dust in the light.',
+    nightLight: 'the window is black-blue with a faint cool moon edge on the same side the sun came from; one warm table lamp near the foot of the stair is the only light; the rest in deep, readable shadow.',
+    rowChanges: 'The front door stands open in the day row and is closed in the night row.',
+    layout: MAPS.hall.text,
+    look: 'Worn black-and-white stone floor, dark wood banister, furniture under white dust sheets, stacked cardboard removal boxes against the wall, pale rectangles on the wallpaper where portraits hung, a tall long-case clock stopped. Elegant and real, not a ruin, but frozen in time. Muted, slightly desaturated palette, deep soft shadows in corners, a heavy stillness. No cobwebs, no candles, no horror props.',
+    shotsA: ['SH17'],
+    shotsB: ['SH06', 'SH07'],
+  },
+  {
+    id: 'COR',
+    title: 'Upper corridor',
+    file: 'LOCSHEET_COR.png',
+    map: '/maps/LOC_COR.png',
+    place: 'the long straight upper corridor of an old English manor, with the white nursery door on one side',
+    master: 'LOC_CORRIDOR_DAY.png',
+    extraUploads: [{ file: 'LOC_NURSERY_FIXED_DAY.png', job: 'the nursery door, its surround and the nursery wallpaper seen through it' }],
+    viewA: 'exactly the uploaded corridor photo: from the landing end, eye level, 35mm, looking straight down the corridor to the tall window at the far end; the white nursery door stands open on the LEFT wall about two thirds of the way along, showing a sliver of the room.',
+    viewB: 'the camera turned round 180°: near the far window, eye level, 35mm, looking back down the corridor to the central landing: the same white nursery door stands open on the RIGHT wall about three metres from the camera; at the far end, about nine metres away, the top of the main staircase banister and, on the landing, a narrow panelled service door with a small wooden table and brass lamp immediately to its left.',
+    swap: 'The nursery door is on the LEFT wall in view A and on the RIGHT wall in view B; the row of other doors is on the RIGHT in view A and on the LEFT in view B.',
+    dayLight: 'daylight from the tall far window: ahead of the camera in view A, behind the camera in view B, lighting the corridor toward the landing.',
+    nightLight: 'the far window is black-blue; one warm wall sconce is lit on the east wall between the landing and the nursery door (on the RIGHT wall in view A, on the LEFT wall in view B); dim warm lamp light spills out of the open nursery door onto the runner; in view B the landing lamp glows warm at the far end.',
+    layout: MAPS.corridor.text,
+    look: LOOKS.dayInterior,
+    shotsA: ['SH12', 'SH15'],
+    shotsB: ['SH08', 'SH10', 'SH11'],
+    shotsSide: ['SH09', 'SH14'],
+  },
+  {
+    id: 'NUR',
+    title: 'Nursery',
+    file: 'LOCSHEET_NUR.png',
+    map: '/maps/LOC_NUR.png',
+    place: 'a child’s nursery in an old English manor',
+    master: 'LOC_NURSERY_FIXED_DAY.png',
+    viewA: 'exactly the uploaded high-corner photo: the view from about 2.6 m up in the corner beside the window, looking diagonally down across the room, very wide lens without fisheye.',
+    viewB: 'the reverse: camera at eye level at the far end of the room, between the armchair and the bedside table, 28mm, looking back toward the corner where view A was taken: the window with thin curtains on the far LEFT and the empty high corner above it; the white iron bed along the LEFT wall, its foot toward the window end; the faded rug with the dark chest and the grey box in the middle; the white four-panel door with its brass knob on the RIGHT wall near the far end, standing open.',
+    swap: 'The bed is along the RIGHT wall in view A and along the LEFT wall in view B; the door is on the LEFT wall in view A and on the RIGHT wall in view B.',
+    dayLight: 'soft daylight from the window: beside the camera in view A, backlighting the room from the far left in view B.',
+    nightLight: 'the small lamp on the bedside table at the head of the bed is ON and throws a dim warm pool over the bed head, the rug and the chest; the corners fall into deep but readable shadow; a faint cool moonlight edge on the curtains. In view A the lamp is in the far-right corner; in view B it is just off frame on the LEFT near the camera.',
+    rowChanges: 'The door stands open in the day row and is closed in the night row. No camera is mounted in the corner in any panel.',
+    layout: NURSERY_LAYOUT,
+    look: 'Muted, slightly desaturated palette, deep soft shadows, a heavy stillness. No people, no dolls, no toys, no horror props.',
+    shotsA: ['SH01'],
+    shotsB: ['SH16'],
+    shotsSide: ['SH13'],
+  },
+  {
+    id: 'SVC',
+    title: 'Service hall and bell board',
+    file: 'LOCSHEET_SVC.png',
+    map: '/maps/LOC_SVC.png',
+    place: 'the ground-floor service hall of an old English manor, with an antique servant-bell board',
+    master: 'LOC_BELLBOARD_DAY.png',
+    viewA: 'exactly the uploaded bell-board photo: from the passage entrance, eye level, 35mm, facing the back wall: the mahogany bell board with NURSERY readable in the middle row, the hinged lower wooden panel below it, the narrow lower service door immediately to its RIGHT, the small high window on the LEFT wall.',
+    viewB: 'the camera turned round 180°: standing with its back to the bell board, eye level, 35mm, looking back along the short passage to the plain panelled door into the entrance hall at the far end, standing open with the brighter hall beyond; the small high window is now on the RIGHT wall.',
+    swap: 'The high window is on the LEFT in view A and on the RIGHT in view B.',
+    dayLight: 'one cold shaft of daylight from the small high window, the rest in cool shade.',
+    nightLight: 'one bare warm bulb above the bell board is lit and the walls fall into darkness; in view B the bulb is behind the camera, the passage lit only by its spill and a faint cool edge from the high window.',
+    rowChanges: 'The door to the entrance hall stands open in the day row and is closed in the night row.',
+    layout: MAPS.serviceHall.text,
+    look: 'Chipped whitewashed walls, worn stone floor, an old enamel sign. Muted, slightly desaturated palette, deep soft shadows, a heavy stillness.',
+    shotsA: ['SH18', 'SH19', 'SH20', 'SH21'],
+    shotsB: [],
+  },
+];
+
+export function sheetPrompt(l: LocationSheet): string {
+  return [
+    `ONE photorealistic image made of FOUR photographs arranged in a 2×2 grid, all four of the same real place: ${l.place}. Each panel is vertical 9:16 and all four are the same size, separated by thin white gutters; the whole image is vertical 9:16. No people. No text, labels, numbers, arrows or borders other than the gutters.`,
+    'Use the uploaded photo of this place as the TOP-LEFT panel: keep its layout, materials, furniture and light exactly. Use the uploaded top-down plan only for directions (where each view stands and looks); do not draw it.',
+    `TOP-LEFT — DAY, VIEW A: ${l.viewA}`,
+    `TOP-RIGHT — DAY, VIEW B: ${l.viewB}`,
+    'BOTTOM-LEFT — NIGHT, VIEW A: exactly the same camera, lens and framing as the top-left panel; only the light changes.',
+    'BOTTOM-RIGHT — NIGHT, VIEW B: exactly the same camera, lens and framing as the top-right panel; only the light changes.',
+    `CONTINUITY ACROSS THE FOUR PANELS: the left column and the right column look in opposite directions through the same space, so what is on the left side of view A is on the right side of view B. ${l.swap} Every wall, door, window, piece of furniture and object keeps its exact place, size, colour and condition in all four panels. ${l.rowChanges ?? ''} Between the top and bottom rows nothing else changes but the light.`,
+    `LAYOUT: ${l.layout}`,
+    `DAY ROW LIGHT: ${l.dayLight}`,
+    `NIGHT ROW LIGHT: ${l.nightLight} Dark by design but readable, fine grain.`,
+    `LOOK: ${l.look} Photorealistic, cinema camera.`,
+  ].join('\n\n');
+}
+
+const sheetAssets: Asset[] = LOCATION_SHEETS.flatMap((l): Asset[] => [
+  {
+    file: `MAP_LOC_${l.id}.png`,
+    kind: 'map',
+    title: `${l.title} — location map`,
+    ref: 'the top-down plan of this location with view A and view B marked (a drawing, not a photo)',
+    group: 'Location maps',
+    note: `Download from ${l.map}. Upload it with the location sheet prompt.`,
+  },
+  {
+    file: l.file,
+    kind: 'sheet',
+    title: `${l.title} — 2×2 location sheet (day/night × view A/B)`,
+    ref: `the 2×2 location sheet of ${l.place}: top row day, bottom row night; left column view A, right column the reverse view B`,
+    prompt: sheetPrompt(l),
+    uploads: [
+      { file: l.master, job: 'this is the TOP-LEFT panel (day, view A) — keep it exactly' },
+      ...(l.extraUploads ?? []),
+      { file: `MAP_LOC_${l.id}.png`, job: 'directions only: where view A and view B stand and look — do not draw it' },
+    ],
+    check: [
+      'Four panels in a 2×2 grid, equal size, thin white gutters, no text',
+      'Top-left matches the approved master plate',
+      'Right column is the true reverse: everything that was on the left of view A is on the right of view B',
+      'Within each column the night panel has exactly the same framing as the day panel',
+      'Nothing moves between panels except the light and the listed changes',
+      'Same materials, furniture and mood as the master plate — muted, frozen in time',
+    ],
+    group: 'Location sheets',
+    note: `Generate at the highest resolution your image model offers. At 4K each panel is about 1080×1920: crop a panel and use it directly as a plate. At lower resolution, upload the sheet as the reference for any plate or keyframe that looks in that direction or at night. View A: ${l.shotsA.join(', ') || '—'}. View B: ${l.shotsB.join(', ') || 'not used yet'}.${l.shotsSide?.length ? ` Side angles: ${l.shotsSide.join(', ')}.` : ''}`,
+  },
+]);
+
 const charAssets: Asset[] = (Object.keys(CHARACTERS) as CharId[]).map((id) => ({
   file: CHARACTERS[id].sheetFile,
   kind: 'character',
@@ -99,10 +278,6 @@ const charAssets: Asset[] = (Object.keys(CHARACTERS) as CharId[]).map((id) => ({
   group: 'Characters',
   note: 'Text only, no uploads. Reroll until the face is right; then never regenerate.',
 }));
-
-/** The nursery as seen by NURSERY FIXED — matches the approved LOC_NURSERY_FIXED_DAY plate. */
-export const NURSERY_LAYOUT =
-  'the white four-panel door with a brass knob, in a moulded white surround, is on the LEFT-hand wall close to the camera, fully visible in the lower-left third, hinged on its far side, with bare floorboards in front of it. The room runs away from the camera up the frame: a large faded rug in the middle of the floor; a dark wooden chest on the rug at the centre of the frame with a grey archival box on its lid; a white iron single bed along the RIGHT-hand wall, its foot toward the camera and its head at the far wall, made up with faded floral linen; a small wooden bedside table with a fabric-shaded lamp and a few old books in the far-RIGHT corner beside the bed head; an armchair under a white dust sheet in the far-LEFT corner; open bare floor at the far end between the armchair and the bedside table. Pale sprigged wallpaper, small framed pictures and empty picture hooks. The window, with thin white curtains, is on the right-hand wall right beside the camera: only the curtain edge shows at the right edge of the frame.';
 
 const STAIR_WALLS = 'close scuffed whitewashed walls with old handprints near the rail, a simple dark wooden handrail, worn dips in the treads';
 
@@ -197,8 +372,11 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Exterior reverse (back to the house)',
     ref: 'the daytime photo looking out along the gravel drive from the foot of the manor steps, with the front of the dark green SUV a few metres ahead',
-    prompt: 'Using the uploaded photo of the manor and the SUV for the gravel, lawns, trees, SUV and light: show the reverse view. Camera at chest height on the gravel near the foot of the front steps with its back to the house (the house is behind the camera and not visible), 35mm, looking out along the drive. The same dark green SUV is a few metres ahead with its FRONT toward the camera; its tailgate is open on the far side. The gravel drive curves away between green lawns and mature trees. Low warm sun now comes from the RIGHT of frame. No people, no text.',
-    uploads: [{ file: 'LOC_EXT_DAY.png', job: 'same place, SUV, materials and light — reverse the view' }],
+    prompt: 'The top-right panel of the uploaded 2×2 location sheet (day, view B) is this exact view: reproduce it at full size and full detail. Using the uploaded photo of the manor and the SUV for the gravel, lawns, trees, SUV and light: show the reverse view. Camera at chest height on the gravel near the foot of the front steps with its back to the house (the house is behind the camera and not visible), 35mm, looking out along the drive. The same dark green SUV is a few metres ahead with its FRONT toward the camera; its tailgate is open on the far side. The gravel drive curves away between green lawns and mature trees. Low warm sun now comes from the RIGHT of frame. No people, no text.',
+    uploads: [
+      { file: 'LOCSHEET_EXT.png', job: 'the TOP-RIGHT panel (day, view B) is this exact view — reproduce it at full size' },
+      { file: 'LOC_EXT_DAY.png', job: 'same place, SUV, materials and light' },
+    ],
     check: ['The house is NOT in frame', 'The SUV is seen from its FRONT', 'Sun from frame-RIGHT'],
     group: 'Exterior',
   },
@@ -349,8 +527,9 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Upper corridor looking back to the landing, day',
     ref: 'the daytime photo of the upper corridor seen from the far window end looking back to the landing, with the white nursery door open on the right',
-    prompt: 'Using the uploaded corridor photo for wallpaper, floor, runner, doors and light, the uploaded landing photo for what is at the end, and the uploaded high-corner nursery photo for the nursery door: the reverse view. Camera near the far window end at eye level, 35mm, looking back down the corridor toward the central landing. The same white four-panel nursery door now stands open on the RIGHT wall, about three metres from the camera, opening into its room (hinged on its right as seen from here), a slice of the daylit nursery visible through it. At the far end, about nine metres away: the top of the main staircase banister and, on the landing, the narrow panelled service door with the small wooden table and brass lamp immediately to its left. Daylight from the window behind the camera. No people, no text.',
+    prompt: 'The top-right panel of the uploaded 2×2 location sheet (day, view B) is this exact view: reproduce it at full size and full detail. Using the uploaded corridor photo for wallpaper, floor, runner, doors and light, the uploaded landing photo for what is at the end, and the uploaded high-corner nursery photo for the nursery door: the reverse view. Camera near the far window end at eye level, 35mm, looking back down the corridor toward the central landing. The same white four-panel nursery door now stands open on the RIGHT wall, about three metres from the camera, opening into its room (hinged on its right as seen from here), a slice of the daylit nursery visible through it. At the far end, about nine metres away: the top of the main staircase banister and, on the landing, the narrow panelled service door with the small wooden table and brass lamp immediately to its left. Daylight from the window behind the camera. No people, no text.',
     uploads: [
+      { file: 'LOCSHEET_COR.png', job: 'the TOP-RIGHT panel (day, view B) is this exact view — reproduce it at full size' },
       { file: 'LOC_CORRIDOR_DAY.png', job: 'corridor materials, the nursery door' },
       { file: 'LOC_LANDING_DAY.png', job: 'what the landing at the end looks like' },
       { file: 'LOC_NURSERY_FIXED_DAY.png', job: 'the nursery door style' },
@@ -364,8 +543,11 @@ export const ASSETS: Asset[] = [
     title: 'Upper corridor from the landing end, night (edit)',
     ref: 'the night photo of the upper corridor from the landing end, with the open nursery door on the left spilling dim lamp light',
     editOf: 'LOC_CORRIDOR_DAY.png',
-    prompt: 'Edit the uploaded photo of the manor corridor: same camera, same geometry, same doors, nothing moved. Night: the far window is black-blue; one warm wall sconce is lit on the right wall near the camera; the nursery door on the left still stands open and a dim warm lamp spill comes out of it onto the runner; the rest of the corridor is in soft deep shadow but readable. No people, no text.',
-    uploads: [{ file: 'LOC_CORRIDOR_DAY.png', job: 'exact geometry' }],
+    prompt: 'Edit the uploaded photo of the manor corridor: same camera, same geometry, same doors, nothing moved. Match the night light of the bottom-left panel of the uploaded 2×2 location sheet. Night: the far window is black-blue; one warm wall sconce is lit on the right wall near the camera; the nursery door on the left still stands open and a dim warm lamp spill comes out of it onto the runner; the rest of the corridor is in soft deep shadow but readable. No people, no text.',
+    uploads: [
+      { file: 'LOC_CORRIDOR_DAY.png', job: 'exact geometry' },
+      { file: 'LOCSHEET_COR.png', job: 'the BOTTOM-LEFT panel (night, view A): how the night light falls' },
+    ],
     group: 'Corridor',
   },
   {
@@ -374,9 +556,10 @@ export const ASSETS: Asset[] = [
     title: 'Upper corridor looking back to the landing, night, nursery door closed (edit)',
     ref: 'the night photo of the upper corridor looking back toward the lit landing, with the white nursery door closed on the right',
     editOf: 'LOC_CORRIDOR_REV_DAY.png',
-    prompt: 'Edit the uploaded reverse photo of the corridor: same camera, same geometry, nothing moved. Night: the window behind the camera is dark; one warm sconce lit on the wall between the landing and the nursery door; the white nursery door on the RIGHT wall is now CLOSED, its brass handle catching the light; at the far end the landing lamp glows warm on the small table beside the narrow service door, with the open black monitor case on it showing two glowing grey screens. Soft deep shadow, readable. No people, no text.',
+    prompt: 'Edit the uploaded reverse photo of the corridor: same camera, same geometry, nothing moved. Match the night light of the bottom-right panel of the uploaded 2×2 location sheet. Night: the window behind the camera is dark; one warm sconce lit on the wall between the landing and the nursery door; the white nursery door on the RIGHT wall is now CLOSED, its brass handle catching the light; at the far end the landing lamp glows warm on the small table beside the narrow service door, with the open black monitor case on it showing two glowing grey screens. Soft deep shadow, readable. No people, no text.',
     uploads: [
       { file: 'LOC_CORRIDOR_REV_DAY.png', job: 'exact geometry' },
+      { file: 'LOCSHEET_COR.png', job: 'the BOTTOM-RIGHT panel (night, view B): how the night light falls' },
       { file: 'LOC_LANDING_NIGHT.png', job: 'how the lit landing and monitor look at night' },
     ],
     group: 'Corridor',
@@ -437,14 +620,20 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Inside the nursery beside the door, night (cinematic)',
     ref: 'the night photo inside the nursery at eye level beside the closed white door, with the lamp-lit room opening to the right',
-    prompt: `Using the uploaded high-corner night photo of the nursery for the room, furniture, wallpaper and lamp light: a new cinematic angle inside the same room at night. Camera at eye level, 35mm, standing about a metre from the closed door, near the wall with the camera corner, looking along the door wall toward the far end: the closed white four-panel door with its brass knob in three-quarter view on the LEFT of frame, bare floorboards in front of it; to the RIGHT the room opens up — the faded rug, the dark chest with the grey box, the white iron bed along the right-hand wall, and at the far end the lamp glowing on the bedside table in the far-right corner and the dust-sheeted armchair in the far-left corner, both far corners in deep shadow. No people. ${LOOKS.night}`,
-    uploads: [{ file: 'LOC_NURSERY_FIXED_NIGHT.png', job: 'the room, furniture and lamp light' }],
+    prompt: `Using the uploaded high-corner night photo of the nursery for the room, furniture, wallpaper and lamp light, and the night row of the uploaded 2×2 location sheet for how that light falls from both ends of the room: a new cinematic angle inside the same room at night. Camera at eye level, 35mm, standing about a metre from the closed door, near the wall with the camera corner, looking along the door wall toward the far end: the closed white four-panel door with its brass knob in three-quarter view on the LEFT of frame, bare floorboards in front of it; to the RIGHT the room opens up — the faded rug, the dark chest with the grey box, the white iron bed along the right-hand wall, and at the far end the lamp glowing on the bedside table in the far-right corner and the dust-sheeted armchair in the far-left corner, both far corners in deep shadow. No people. ${LOOKS.night}`,
+    uploads: [
+      { file: 'LOC_NURSERY_FIXED_NIGHT.png', job: 'the room, furniture and lamp light' },
+      { file: 'LOCSHEET_NUR.png', job: 'the BOTTOM row (night): where the lamp light falls in this room from both ends' },
+    ],
     group: 'Nursery',
     note: 'Cinematic angle: the Veiled Woman NEVER appears here. The room behind Clara is always empty.',
   },
 
+  // --- Location sheets and their maps -----------------------------------
+  ...sheetAssets,
+
   // --- Shot maps (top-down plans, uploaded as blocking references) -------
-  ...['02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16'].map(
+  ...['02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'].map(
     (n): Asset => ({
       file: `MAP_SH${n}.png`,
       kind: 'map',

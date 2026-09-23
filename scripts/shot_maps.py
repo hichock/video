@@ -1,4 +1,4 @@
-"""Generate top-down shot maps (SVG) for SH02-SH16.
+"""Generate top-down shot maps (SVG) for SH02-SH20 and one location map per main location.
 
 Each map has two panels: an overhead plan of the drive (house, steps, SUV,
 sun, camera with field of view and movement, people with facing and path)
@@ -63,7 +63,12 @@ def base_plan(sun_note):
     return p
 
 
-def camera(cx, cy, heading_deg, fov_deg, reach, label, move_to=None, ldx=22, ldy=34):
+CAMS = []  # (shot or None, x, y, heading) — tagged by svg()
+
+
+def camera(cx, cy, heading_deg, fov_deg, reach, label, move_to=None, ldx=22, ldy=34, record=True):
+    if record:
+        CAMS.append([None, cx, cy, heading_deg])
     a = math.radians(heading_deg)
     l, r = a - math.radians(fov_deg / 2), a + math.radians(fov_deg / 2)
     p1 = (cx + reach * math.cos(l), cy + reach * math.sin(l))
@@ -131,6 +136,9 @@ def frame_panel(ox, oy, items, caption):
 
 
 def svg(shot, title, subtitle, plan, frame, notes):
+    for c in CAMS:
+        if c[0] is None:
+            c[0] = shot
     body = ''.join(plan + frame)
     notes_svg = ''.join(text(20, 848 + i * 18, n, 13, INK, 'start', 400) for i, n in enumerate(notes))
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="{866 + 18*len(notes)}" viewBox="0 0 1160 {866 + 18*len(notes)}">
@@ -498,8 +506,265 @@ maps['SH16'] = svg('SH16', 'Mara finishes the mount and takes the monitor case o
                    ['Reverse of the NURSERY FIXED view: the camera corner is now ahead-left, high.',
                     'She exits frame-RIGHT through the door into the corridor (toward the landing).'])
 
+
+# ---------------- SH17 ----------------
+plan = hall_plan()
+plan += camera(300, 640, -90, 60, 600, 'CAMERA 24mm, gimbal, pans right', None, ldx=-240, ldy=50)
+plan += person('owen', 330, 330, 90, end=(585, 408), via=[(345, 390)], note=['first, down the last steps,', 'turns to the service door', 'and goes through'], label_dx=26, label_dy=-50)
+plan += person('elias', 330, 270, 90, label_dx=26, label_dy=-30, note=['handheld raised on him'])
+plan += person('mara', 330, 210, 90, label_dx=26, label_dy=-20, note=['monitor case'])
+plan += person('naomi', 330, 150, 90, label_dx=26, label_dy=-10)
+frame = frame_panel(760, 60, [
+    ('box', 0.24, 0.04, 0.52, 0.56, 'STAIR', '#d9cfbf'),
+    ('box', 0.86, 0.3, 0.14, 0.34, 'SERVICE DOOR', '#8a6a45'),
+    ('box', 0.0, 0.26, 0.1, 0.3, 'WINDOW', '#6f8fb8'),
+    ('fig', 0.5, 0.08, 0.035, 0.08, '', COL['naomi']),
+    ('fig', 0.5, 0.2, 0.04, 0.09, '', COL['mara']),
+    ('fig', 0.5, 0.32, 0.05, 0.12, 'OLIVE', COL['elias']),
+    ('fig', 0.52, 0.46, 0.07, 0.2, 'BEARDED', COL['owen']),
+], ['WIDE from the front door (plate direction).', 'Single file down the stair toward camera;', 'the bearded man turns frame-RIGHT to the', 'service door; the others follow.'])
+maps['SH17'] = svg('SH17', 'Owen leads the crew down the stair and through the service door (WS, 24mm)',
+                   'Hall, VIEW A: from just inside the front door', plan, frame,
+                   ['Picks up SH15/SH16: everyone has come back along the corridor to the landing and down the main stair.',
+                    'Screen direction: the service door is frame-RIGHT, so they exit frame-right into SH18.'])
+
+
+# ===========================================================================
+# Service hall (SH18-SH21). North up. Entered from the hall service door (west);
+# the bell board is on the east (back) wall.
+# ===========================================================================
+
+def svc_plan():
+    return [
+        '<rect x="0" y="0" width="660" height="760" fill="#e6e1d8"/>',
+        text(330, 40, 'SERVICE HALL (north up)', 18, INK, 'middle', 700),
+        f'<rect x="200" y="180" width="400" height="420" fill="#efe8dc" stroke="{INK}" stroke-width="3"/>',
+        f'<rect x="60" y="330" width="140" height="90" fill="#efe8dc" stroke="{INK}" stroke-width="2"/>',
+        text(130, 316, 'short passage', 12, MUTED, 'middle', 400),
+        f'<rect x="52" y="345" width="16" height="60" fill="#ffffff" stroke="{INK}"/>',
+        text(60, 450, 'SERVICE DOOR', 12, INK, 'middle', 700),
+        text(60, 466, '← entrance hall', 11, MUTED, 'middle', 400),
+        # small high window on the north wall + cold shaft
+        '<line x1="300" y1="180" x2="380" y2="180" stroke="#6f8fb8" stroke-width="7"/>',
+        text(340, 170, 'SMALL HIGH WINDOW', 11, MUTED, 'middle', 700),
+        '<polygon points="300,184 380,184 470,330 390,330" fill="#bcd0e6" fill-opacity="0.45"/>',
+        text(392, 250, 'cold shaft of daylight', 11, '#4f6f95', 'start', 400),
+        # bell board on the east wall, lower panel under it
+        f'<rect x="586" y="320" width="14" height="100" fill="#5b3f2a" stroke="{INK}"/>',
+        text(578, 300, 'BELL BOARD', 13, INK, 'end', 700),
+        text(578, 314, 'NURSERY in the middle row', 11, MUTED, 'end', 400),
+        f'<rect x="572" y="350" width="12" height="40" fill="#8a6a45" stroke="{INK}"/>',
+        # lower service door right of the board (south of it when facing east)
+        f'<rect x="592" y="440" width="16" height="60" fill="#8a6a45" stroke="{INK}"/>',
+        text(582, 526, 'LOWER SERVICE DOOR', 12, INK, 'end', 700),
+        text(582, 542, '→ back stair', 11, MUTED, 'end', 400),
+        '<circle cx="566" cy="336" r="5" fill="#f2b632"/>',
+        text(330, 640, 'the lower wooden panel is under the board at knee height', 11, MUTED, 'middle', 400),
+        text(330, 656, 'night: one bare bulb above the board', 11, MUTED, 'middle', 400),
+    ]
+
+
+# ---------------- SH18 ----------------
+plan = svc_plan()
+plan += camera(230, 380, 0, 50, 400, 'CAMERA 35mm, passage entrance, drifts in', move_to=(262, 380), ldx=-200, ldy=130)
+plan += person('owen', 556, 382, 0, note=['at the board, about to crouch;', 'panel still CLOSED'], label_dx=-230, label_dy=180)
+plan += person('elias', 512, 350, 10, note=['behind his LEFT shoulder,', 'handheld on the panel'], label_dx=-170, label_dy=70)
+plan += person('mara', 430, 214, -90, note=['sets the monitor case down', 'by the left (north) wall'], label_dx=-230, label_dy=14)
+plan += person('naomi', 350, 262, 10, note=['behind her, nearer camera'], label_dx=-150, label_dy=60)
+frame = frame_panel(760, 60, [
+    ('box', 0.46, 0.2, 0.3, 0.3, 'BELL BOARD', '#5b3f2a'),
+    ('box', 0.52, 0.52, 0.18, 0.1, 'PANEL', '#8a6a45'),
+    ('box', 0.8, 0.22, 0.14, 0.5, 'LOWER DOOR', '#8a6a45'),
+    ('box', 0.06, 0.02, 0.26, 0.1, 'HIGH WINDOW', '#6f8fb8'),
+    ('fig', 0.6, 0.34, 0.08, 0.3, 'BEARDED (back)', COL['owen'], 16),
+    ('fig', 0.44, 0.33, 0.07, 0.3, 'OLIVE', COL['elias'], 12),
+    ('fig', 0.16, 0.36, 0.06, 0.24, 'RUST', COL['mara']),
+    ('fig', 0.3, 0.38, 0.11, 0.42, 'CAMEL (back)', COL['naomi']),
+], ['WIDE from the passage entrance.', 'Board centre, lower door frame-RIGHT,', 'high window frame-LEFT.'])
+maps['SH18'] = svg('SH18', 'At the bell board Owen sets the pouch down and opens the lower panel (WS, 35mm)',
+                   'Service hall, VIEW A: from the passage entrance facing the board', plan, frame,
+                   ['They entered from the hall service door BEHIND the camera, so they move away from camera toward the board.',
+                    'Same setup returns in SH21 (not consecutive, so it reads as the master of this scene).'])
+
+# ---------------- SH19 ----------------
+plan = svc_plan()
+plan += camera(540, 392, 12, 34, 70, 'HANDHELD, close, looking down', None, ldx=-280, ldy=80)
+plan += person('owen', 566, 416, -10, note=['only his hand and cuff', 'hold the panel open'], label_dx=-250, label_dy=130)
+frame = frame_panel(760, 60, [
+    ('box', 0.06, 0.12, 0.7, 0.64, 'OPEN PANEL: CUT BELL WIRES', '#5b3f2a'),
+    ('box', 0.74, 0.24, 0.26, 0.5, 'HIS HAND', COL['owen']),
+], ['INSERT, 50mm handheld.', 'Cut wires fill the frame; his hand holds', 'the panel open on the RIGHT, then shuts it.'])
+maps['SH19'] = svg('SH19', 'One clean view of the cut wiring (INSERT, 50mm handheld)',
+                   'Service hall, the host’s camera at knee height at the panel', plan, frame,
+                   ['Hand on frame-RIGHT = he is on the camera’s right, as in SH18.'])
+
+# ---------------- SH20 ----------------
+plan = svc_plan()
+plan += camera(520, 414, -12, 44, 84, 'HANDHELD 35mm, behind his RIGHT shoulder', None, ldx=-360, ldy=60)
+plan += person('owen', 560, 386, 0, note=['square to the board; finger on', 'the NURSERY flag, not yet pressing'], label_dx=-320, label_dy=110)
+plan += person('mara', 556, 312, 45, note=['left of the board, tightening', 'the camera on its clamp'], label_dx=-280, label_dy=-40)
+frame = frame_panel(760, 60, [
+    ('box', 0.3, 0.12, 0.46, 0.38, 'BELL BOARD · NURSERY', '#5b3f2a'),
+    ('box', 0.84, 0.2, 0.16, 0.6, 'LOWER DOOR', '#8a6a45'),
+    ('fig', 0.16, 0.26, 0.14, 0.5, 'RUST (3/4)', COL['mara']),
+    ('fig', 0.7, 0.34, 0.34, 0.6, 'BEARDED (back 3/4, right profile)', COL['owen'], -200),
+], ['MEDIUM, over his RIGHT shoulder.', 'NURSERY label readable above his finger.', 'Small woman frame-LEFT at her clamp.'])
+maps['SH20'] = svg('SH20', 'Owen lowers and resets the NURSERY flag: “The wiring’s dead…” (MS, 35mm)',
+                   'Service hall, closer: behind his right shoulder', plan, frame,
+                   ['Change of size (WS → INSERT → MS) around one board keeps the cuts from jumping.',
+                    'Her camera on its clamp is left of the board, facing it = BELL BOARD FIXED.'])
+
+
+# ===========================================================================
+# Location maps: one per main location. Two opposite views (A and B, 180°
+# apart) = the columns of the 2×2 location sheet; day and night = its rows.
+# Every shot setup that uses the location is marked with its number.
+# ===========================================================================
+
+def setup_marks(shots, color):
+    out = []
+    for shot, x, y, h in CAMS:
+        if shot not in shots:
+            continue
+        a = math.radians(h)
+        out.append(f'<line x1="{x}" y1="{y}" x2="{x + 26 * math.cos(a):.0f}" y2="{y + 26 * math.sin(a):.0f}" stroke="{color}" stroke-width="4"/>')
+        out.append(f'<circle cx="{x}" cy="{y}" r="12" fill="#ffffff" stroke="{color}" stroke-width="3"/>')
+        out.append(text(x, y + 4, shot[2:], 11, color, 'middle', 700))
+    return out
+
+
+def practical(x, y, label, anchor='start', dx=10, dy=4):
+    return ['<circle cx="%d" cy="%d" r="8" fill="#f2b632" stroke="#8a5a00" stroke-width="2"/>' % (x, y),
+            text(x + dx, y + dy, label, 11, '#8a5a00', anchor, 700)]
+
+
+def sheet_panel(ox, oy, cells, uses):
+    """The 2×2 location sheet as it should come out: columns = views, rows = day/night."""
+    w, h, g = 140, 249, 12
+    out = [text(ox, oy - 12, 'THE 2×2 LOCATION SHEET (one image)', 15, INK, 'start', 700)]
+    for i, (title, lines, fill, ink) in enumerate(cells):
+        x = ox + (i % 2) * (w + g)
+        y = oy + (i // 2) * (h + g)
+        out.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}" stroke="{INK}" stroke-width="2"/>')
+        out.append(text(x + 8, y + 20, title, 12, ink, 'start', 700))
+        for j, ln in enumerate(lines):
+            out.append(text(x + 8, y + 44 + j * 16, ln, 11, ink, 'start', 400))
+    y0 = oy + 2 * h + g + 30
+    for j, ln in enumerate(uses):
+        out.append(text(ox, y0 + j * 17, ln, 12, INK, 'start', 400))
+    return out
+
+
+def loc_svg(key, title, subtitle, plan, panel, notes):
+    body = ''.join(plan + panel)
+    notes_svg = ''.join(text(20, 848 + i * 18, n, 13, INK, 'start', 400) for i, n in enumerate(notes))
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="{866 + 18*len(notes)}" viewBox="0 0 1160 {866 + 18*len(notes)}">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(20,40)">{body}</g>
+{text(20, 26, f"{key} — LOCATION MAP: view A, view B (180°), light, and every shot setup", 16, INK, 'start', 700)}
+{text(20, 826, title, 14, INK, 'start', 700)}
+{text(760, 26, subtitle, 12, MUTED, 'start', 400)}
+{notes_svg}
+</svg>'''
+
+
+VIEW_A, VIEW_B, SIDE = '#1f5fa8', '#c0501f', '#667073'
+DAY, DAYB, NIGHT = '#f6efd9', '#f6efd9', '#27303a'
+locmaps = {}
+
+
+def view(x, y, h, fov, reach, label, color, ldx, ldy):
+    a = math.radians(h)
+    l, r = a - math.radians(fov / 2), a + math.radians(fov / 2)
+    return [f'<polygon points="{x},{y} {x + reach * math.cos(l):.0f},{y + reach * math.sin(l):.0f} {x + reach * math.cos(r):.0f},{y + reach * math.sin(r):.0f}" fill="{color}" fill-opacity="0.08" stroke="{color}" stroke-width="2" stroke-dasharray="8 5"/>',
+            f'<g transform="translate({x},{y}) rotate({h})"><rect x="-18" y="-13" width="30" height="26" rx="3" fill="{color}"/><polygon points="12,-9 26,-15 26,15 12,9" fill="{color}"/></g>',
+            text(x + ldx, y + ldy, label, 14, color, 'start', 700)]
+
+
+# Exterior
+plan = base_plan('A: from the LEFT · B: from the RIGHT')
+plan += view(225, 690, -90, 56, 640, 'VIEW A — at the SUV, looking at the house', VIEW_A, -200, 40)
+plan += view(330, 200, 90, 56, 540, 'VIEW B — back to the house, looking out', VIEW_B, 30, 30)
+plan += practical(392, 140, 'night: door lantern')
+plan += setup_marks(['SH02', 'SH04'], VIEW_A) + setup_marks(['SH03', 'SH05'], VIEW_B)
+panel = sheet_panel(760, 60, [
+    ('DAY · VIEW A', ['facade, steps centre', 'SUV rear, tailgate', 'open toward camera', 'sun from LEFT'], DAY, INK),
+    ('DAY · VIEW B', ['house behind camera', 'SUV seen from FRONT', 'drive curves away', 'sun from RIGHT'], DAYB, INK),
+    ('NIGHT · VIEW A', ['same framing', 'door lantern lit', '2 windows glow warm', 'blue night sky'], NIGHT, '#f3ead8'),
+    ('NIGHT · VIEW B', ['same framing', 'cool moon from RIGHT', 'warm spill from the', 'house behind camera'], NIGHT, '#f3ead8'),
+], ['View A: SH02 (EWS), SH04 (MCU, side-on).', 'View B: SH03, SH05 (reverse, tracking).', 'Master plate = day A. Reverse plate = day B.'])
+locmaps['LOC_EXT'] = loc_svg('EXTERIOR', 'Exterior — arrival', 'Two opposite views of the drive, day and night', plan, panel,
+                             ['The sun is on the LEFT of view A, so it is on the RIGHT of view B — never the same side in both.',
+                              'The house is always ahead of anyone walking to it; the SUV is always behind them.'])
+
+# Hall
+plan = hall_plan()
+plan += view(330, 672, -90, 60, 600, 'VIEW A — from the front door', VIEW_A, 30, 10)
+plan += view(330, 356, 90, 70, 340, 'VIEW B — from the stair foot, back', VIEW_B, -300, -70)
+plan += practical(440, 350, 'night: lamp by the stair')
+plan += setup_marks(['SH17'], VIEW_A) + setup_marks(['SH06', 'SH07'], VIEW_B)
+panel = sheet_panel(760, 60, [
+    ('DAY · VIEW A', ['stair straight ahead', 'service door RIGHT', 'window + sun LEFT', 'dust sheets, boxes'], DAY, INK),
+    ('DAY · VIEW B', ['front door centre,', 'open, bright beyond', 'service door LEFT', 'window + sun RIGHT'], DAYB, INK),
+    ('NIGHT · VIEW A', ['same framing', 'window black-blue', 'lamp by the stair', 'deep soft shadow'], NIGHT, '#f3ead8'),
+    ('NIGHT · VIEW B', ['same framing', 'front door CLOSED', 'lamp spill from', 'behind camera'], NIGHT, '#f3ead8'),
+], ['View A: SH17 (WS).', 'View B: SH06 (MS, low), SH07 (WS, high).', 'Master = the approved hall plate (day A).'])
+locmaps['LOC_HALL'] = loc_svg('ENTRANCE HALL', 'Entrance hall', 'From the front door, and back from the stair foot', plan, panel,
+                              ['Service door: RIGHT wall in view A, LEFT wall in view B. Window and sun bar: LEFT in A, RIGHT in B.',
+                               'SH06 and SH07 look in the view-B direction; they must upload this sheet, not only the view-A plate.'])
+
+# Corridor
+plan = upper_plan(show_room=False)
+plan += view(400, 632, -90, 36, 610, 'VIEW A — landing end → far window', VIEW_A, 30, -44)
+plan += view(400, 44, 90, 36, 600, 'VIEW B — far window → landing', VIEW_B, 30, 4)
+plan += practical(432, 480, 'night: sconce (east wall)')
+plan += practical(265, 690, 'night: landing lamp', 'end', -12, 4)
+plan += setup_marks(['SH12', 'SH15'], VIEW_A) + setup_marks(['SH08', 'SH10', 'SH11'], VIEW_B) + setup_marks(['SH09', 'SH14'], SIDE)
+panel = sheet_panel(760, 60, [
+    ('DAY · VIEW A', ['far window ahead', 'nursery door open', 'on the LEFT wall', '2/3 of the way'], DAY, INK),
+    ('DAY · VIEW B', ['landing at the end', 'nursery door open', 'on the RIGHT wall,', '~3 m from camera'], DAYB, INK),
+    ('NIGHT · VIEW A', ['same framing', 'window black-blue', 'sconce on RIGHT wall', 'lamp spill from door'], NIGHT, '#f3ead8'),
+    ('NIGHT · VIEW B', ['same framing', 'sconce on LEFT wall', 'landing lamp glows', 'at the far end'], NIGHT, '#f3ead8'),
+], ['View A: SH12 (WS), SH15 (MS).', 'View B: SH08 (WS), SH10 (MS), SH11 (MCU).', 'Side (grey): SH09, SH14 into the doorway.'])
+locmaps['LOC_COR'] = loc_svg('UPPER CORRIDOR', 'Upper corridor', 'Landing end and far-window end', plan, panel,
+                             ['Nursery door: LEFT wall in view A, RIGHT wall in view B. The sconce is on the east wall: RIGHT in A, LEFT in B.',
+                              'The nursery door stays open in all four panels; its state per shot is set in the shot prompt.'])
+
+# Nursery
+plan = upper_plan()
+plan += view(94, 264, 52, 72, 400, 'VIEW A — NURSERY FIXED (high corner)', VIEW_A, 90, -70)
+plan += view(250, 604, -90, 64, 360, 'VIEW B — far end, eye level', VIEW_B, -200, 50)
+plan += practical(103, 604, 'night: lamp', 'end', -26, 4)
+plan += setup_marks(['SH16'], VIEW_B) + setup_marks(['SH13'], SIDE)
+panel = sheet_panel(760, 60, [
+    ('DAY · VIEW A', ['= approved plate', 'door lower-LEFT', 'bed on RIGHT wall', 'lamp far-RIGHT'], DAY, INK),
+    ('DAY · VIEW B', ['window far-LEFT,', 'empty corner above', 'bed on LEFT wall', 'door on RIGHT wall'], DAYB, INK),
+    ('NIGHT · VIEW A', ['same framing', 'lamp ON far-right', 'door CLOSED', 'corners dark'], NIGHT, '#f3ead8'),
+    ('NIGHT · VIEW B', ['same framing', 'lamp ON near LEFT', 'door CLOSED', 'corners dark'], NIGHT, '#f3ead8'),
+], ['View A: SH01 and every NURSERY FIXED frame.', 'View B: SH16 (MWS). Side (grey): SH13.', 'Veiled Woman: view A only, never view B.'])
+locmaps['LOC_NUR'] = loc_svg('NURSERY', 'Nursery', 'The high corner view and its reverse from the far end', plan, panel,
+                             ['Bed along the west wall: RIGHT of frame in view A, LEFT in view B. Door on the east wall: LEFT in A, RIGHT in B.',
+                              'No camera in the corner in any panel: the sheet is the bare room; the mounted camera is added per shot (from SH13 on).'])
+
+# Service hall
+plan = svc_plan()
+plan += view(230, 380, 0, 50, 400, 'VIEW A — facing the board', VIEW_A, 10, 110)
+plan += view(560, 380, 180, 50, 420, 'VIEW B — back to the board', VIEW_B, -340, 190)
+plan += setup_marks(['SH18', 'SH19', 'SH20'], VIEW_A)
+panel = sheet_panel(760, 60, [
+    ('DAY · VIEW A', ['bell board centre', 'lower door RIGHT', 'high window LEFT', 'cold shaft of light'], DAY, INK),
+    ('DAY · VIEW B', ['passage to the hall', 'door open, bright', 'high window RIGHT', 'board behind camera'], DAYB, INK),
+    ('NIGHT · VIEW A', ['same framing', 'bare bulb above', 'the board, lit', 'walls fall dark'], NIGHT, '#f3ead8'),
+    ('NIGHT · VIEW B', ['same framing', 'hall door CLOSED', 'bulb spill from', 'behind camera'], NIGHT, '#f3ead8'),
+], ['View A: SH18, SH21 (WS), SH19 (INSERT),', 'SH20 (MS).', 'View B: not used yet — for entrances later.'])
+locmaps['LOC_SVC'] = loc_svg('SERVICE HALL', 'Service hall and bell board', 'Facing the board, and back toward the hall', plan, panel,
+                             ['Lower service door: immediately RIGHT of the board in view A. High window: LEFT in A, RIGHT in B.',
+                              'BELL BOARD FIXED is clamped left of the board, facing it.'])
+
+maps.update(locmaps)
+
 os.makedirs(OUT, exist_ok=True)
 for k, v in maps.items():
-    with open(os.path.join(OUT, f'{k}_map.svg'), 'w') as f:
+    with open(os.path.join(OUT, f'{k}_map.svg' if k.startswith('SH') else f'{k}.svg'), 'w') as f:
         f.write(v)
 print('wrote', list(maps))

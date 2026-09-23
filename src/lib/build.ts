@@ -22,6 +22,8 @@ const STAGE: Record<string, string> = {
   lineup: '1 · Characters',
   prop: '2 · Props',
   location: '3 · Location plates',
+  sheet: '3 · Location plates',
+  map: '0 · Maps (download from the app)',
   overlay: '6 · Post graphics',
 };
 

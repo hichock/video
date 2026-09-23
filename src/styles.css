@@ -245,20 +245,23 @@ tr.cut td { color: var(--muted); text-decoration: line-through; }
 .shotmap img { display: block; width: 100%; height: auto; }
 .shotmap figcaption { padding: 8px 12px; font-size: 13px; color: var(--muted); background: var(--surface); border-top: 1px solid var(--rule); }
 
-/* Shot maps gallery */
-.mapgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-top: 16px; }
-.mapcell { margin: 0; border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
-.mapcell a { display: block; background: #fff; }
-.mapcell img { display: block; width: 100%; height: auto; }
-.mapcell figcaption { padding: 10px 12px; font-size: 13px; display: grid; gap: 6px; border-top: 1px solid var(--rule); }
-.mapcell .setup { font-weight: 600; }
-.mapcell .dim { color: var(--muted); }
-.nomap { aspect-ratio: 1160 / 900; display: grid; place-items: center; color: var(--muted); background: var(--surface-2); font-size: 13px; padding: 16px; text-align: center; }
+/* Maps tab: one full-width row per map */
+.seg { display: inline-flex; gap: 0; border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; margin: 4px 0 12px; }
+.seg button { border: 0; background: var(--surface); color: var(--ink); padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-selected='true'] { background: var(--ink); color: var(--surface); }
+.maprow { margin: 18px 0 28px; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--surface); scroll-margin-top: 110px; }
+.maprow > header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 14px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.maprow > header .dim { color: var(--muted); font-size: 14px; }
+.maprow > a { display: block; background: #fff; }
+.maprow img { display: block; width: 100%; max-width: 1400px; height: auto; margin: 0 auto; }
+.maprow details { padding: 10px 14px; border-top: 1px solid var(--rule); }
+.maprow summary { cursor: pointer; font-size: 14px; }
+.nomap { padding: 40px 16px; text-align: center; color: var(--muted); background: var(--surface-2); font-size: 14px; }
 .sizestrip { display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0; }
-.sizechip { display: grid; justify-items: center; min-width: 44px; padding: 4px 6px; border-radius: 4px; font-size: 11px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--rule); }
+.sizechip { display: grid; justify-items: center; min-width: 44px; padding: 4px 6px; border-radius: 4px; font-size: 11px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--rule); text-decoration: none; }
 .sizechip b { font-size: 12px; }
 .sizechip.size-EWS, .sizechip.size-WS { background: var(--night-soft); color: var(--night); }
 .sizechip.size-MWS, .sizechip.size-MS { background: var(--brass-soft); color: var(--brass); }
 .sizechip.size-MCU, .sizechip.size-CU, .sizechip.size-ECU { background: var(--rec-soft); color: var(--rec); }
 .sizechip.size-INSERT { background: var(--ok-soft); color: var(--ok); }
-@media (max-width: 420px) { .mapgrid { grid-template-columns: 1fr; } }
