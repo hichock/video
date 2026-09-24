@@ -149,7 +149,9 @@ const sheet = (id: CharId, job = 'identity: face, hair, build and full wardrobe'
 const bg = (id: CharId) => sheet(id, 'identity of a smaller background figure');
 const up = (file: string, job: string): Upload => ({ file, job });
 const mapUp = (id: string): Upload =>
-  up(`MAP_${id}.png`, 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image');
+  Number(id.slice(2)) >= 8
+    ? up(`MAP_${id}.png`, 'FIRST FRAME ONLY: where the camera stands and looks, where each person stands at this exact moment and which way they face, and where things land in the frame. It shows no movement. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')
+    : up(`MAP_${id}.png`, 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image');
 const LINEUP_BG = up('CH_LINEUP.png', 'identities of the small background figures and everyone’s relative heights');
 
 const STAY_PEOPLE = 'Faces, hair, body size and full wardrobe stay exactly as in the start frame.';
@@ -500,13 +502,13 @@ export const SHOTS: Shot[] = [
     size: 'WS',
     setup: 'COR-REV far-window end',
     blocking:
-      'Wide, full figures. Reverse corridor view from the far-window end looking back toward the landing. The two women walk side by side toward camera, the landing behind them. The copper-haired woman is on frame-RIGHT, nearest the wall with the open white nursery door; the very tall woman with locs on frame-left. They are about three steps short of the nursery door, which is on the right wall a little ahead of them, between them and the camera. The nursery door is ALREADY standing wide open — the family left it open; nobody opens or touches it. Daylight from behind the camera, soft on their faces.',
+      'Wide, full figures, the two women SMALL in the frame. Reverse corridor view from near the far window, looking back down the corridor to the landing. Depth, from the camera outward: (1) the white nursery door on the RIGHT wall, close to the camera, about three metres away — large at the right edge of the frame and ALREADY standing wide open, with nobody at it or near it; (2) a long EMPTY stretch of corridor runner, about four metres, with nobody on it; (3) the two women side by side, about seven metres from the camera, roughly halfway between the nursery door and the landing, walking toward the camera — they have NOT reached the door; (4) the landing and the top of the main stair behind them at the far end. The copper-haired woman walks on the right-hand side of the corridor (frame-right of centre), the very tall woman with locs on the left (frame-left of centre). Daylight from the window behind the camera, soft on their faces.',
     states: [{ thing: 'nurseryDoor', start: 'ALREADY WIDE OPEN' }],
     people: [
-      { id: 'clara', view: 'front', where: 'on frame-RIGHT, nearest the wall with the open nursery door, walking toward the camera', doing: 'eyes ahead down the corridor, composed and guarded' },
-      { id: 'naomi', view: 'front', where: 'on frame-LEFT beside her, walking toward the camera, clearly taller', doing: 'eyes on her companion, not on the camera' },
+      { id: 'clara', view: 'front', where: 'far down the corridor, about seven metres from the camera and four metres short of the nursery door, on the right-hand side of the corridor (frame-right of centre), small in frame, full figure', doing: 'walking toward the camera, eyes ahead down the corridor, composed and guarded' },
+      { id: 'naomi', view: 'front', where: 'beside her on the left-hand side of the corridor (frame-left of centre), same distance from the camera, small in frame, full figure, clearly taller', doing: 'walking toward the camera, eyes on her companion, not on the camera' },
     ],
-    check: ['The nursery door is ALREADY wide open on the RIGHT wall, a few steps ahead of the women — nobody is touching it', 'The landing is visible behind them at the far end'],
+    check: ['The women are FAR from the camera and SMALL: about halfway between the door and the landing', 'An EMPTY stretch of corridor floor between the women and the open door — nobody at or near the door', 'The open nursery door is close to the camera at the RIGHT edge', 'The landing is visible behind them at the far end'],
     map: '/maps/SH08_map.png',
     kf: {
       mode: 'generate',
@@ -514,8 +516,7 @@ export const SHOTS: Shot[] = [
         up('LOC_CORRIDOR_REV_DAY.png', 'the corridor, nursery door position and light — keep'),
         sheet('clara'),
         sheet('naomi'),
-        up('LOC_NURSERY_DOORWAY_DAY.png', 'what is visible through the nursery doorway'),
-        up('MAP_SH08.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image'),
+        mapUp('SH08'),
       ],
       frame: 'Walking, not posing, not an interview. The woman with locs is clearly taller, eyes on her companion.',
       saveAs: 'KF_SH08.png',
@@ -524,8 +525,8 @@ export const SHOTS: Shot[] = [
       camera: 'Gimbal moving slowly backward ahead of them; they never stop walking.',
       setting: 'Bright upper corridor of the manor, daytime.',
       beats: [
-        { t: [0, 2.5], text: `${Cap('clara')} and ${D('naomi')} walk side by side toward the camera, easy pace, not stopping.` },
-        { t: [2.5, 5], text: `As they reach the open doorway, ${D('clara')} slows just enough to look to her left through it into the room, her face going still and guarded.` },
+        { t: [0, 3], text: `${Cap('clara')} and ${D('naomi')} walk side by side down the corridor toward the camera, covering the empty stretch toward the open door at an easy pace, not stopping.` },
+        { t: [3, 5], text: `As they reach the open doorway, ${D('clara')} slows just enough to look to her left through it into the room, her face going still and guarded.` },
       ],
       stays: [STAY_PEOPLE],
     },
@@ -590,7 +591,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH10_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi'), up('MAP_SH10.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
+      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor and light — keep'), sheet('clara'), sheet('naomi'), mapUp('SH10')],
       frame: 'Controlled and direct on the outside; grief held underneath.',
       saveAs: 'KF_SH10.png',
     },
@@ -718,7 +719,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH13_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket'), up('MAP_SH13.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket'), mapUp('SH13')],
       frame: 'Concentrated, quick, precise hands.',
       saveAs: 'KF_SH13.png',
     },
@@ -762,7 +763,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH14_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('owen'), up('CH_LINEUP.png', 'identities of the woman in the corner and the woman with locs, and everyone’s heights'), up('MAP_SH14.png', 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')],
+      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('owen'), up('CH_LINEUP.png', 'identities of the woman in the corner and the woman with locs, and everyone’s heights'), mapUp('SH14')],
       frame: 'Relaxed crew banter while everyone keeps working.',
       saveAs: 'KF_SH14.png',
     },

@@ -32,9 +32,13 @@ frame-left of the door; the corridor opening is frame-right."*
 Every plate and keyframe for that space repeats the relevant part of the map, word for word.
 
 **Per-shot map image.** For shots with movement or several people, draw a top-down plan of
-that shot: camera position, field of view and movement; each person as a dot with a facing
-arrow and a dashed path to an end mark; the sun or key light; plus a small 9:16 frame
-preview showing which third each thing lands in. Check the frame preview against the plan
+that shot's FIRST FRAME only: camera position and field of view; each person as a dot with
+a facing arrow where they stand at the very start; door and prop states; the sun or key
+light; plus a small 9:16 frame preview showing which third each thing lands in. No paths,
+end marks or camera moves: the map is uploaded with the keyframe (the first frame), and an
+end mark pulls people to where the action ends — in the SH08 test the women were generated
+at the door they only reach later. Movement belongs in the video prompt. State distances
+from the camera in metres and say what is EMPTY between people and the next landmark. Check the frame preview against the plan
 before using it: in a reverse view, left and right swap. Upload the map with the keyframe
 and tell the model it is a diagram for positions only, not something to draw
 (`scripts/shot_maps.py`, `public/maps/`).
