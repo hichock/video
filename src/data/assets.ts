@@ -27,6 +27,10 @@ export interface Asset {
   check?: string[];
 }
 
+/** The servant-bell board, locked. Every prompt that shows the board repeats this. */
+export const BELL_BOARD =
+  'The servant-bell board is a dark mahogany indicator case about 80 cm wide and 60 cm tall, hung on the back wall at head height. Its front is a neat grid of NINE small square open windows in 3 rows of 3 — no glass and no bells inside the case. In each window hangs one small round brass flag on a pivot: in the neutral UP position the flag is tipped back and the window looks dark and empty; in the DOWN position its round brass face swings forward and fills the window. Directly under EACH window is its own small cream enamel label with one room name in black capitals, all nine the same size and style and all readable: top row HALL · DRAWING · DINING; middle row LIBRARY · NURSERY · BLUE ROOM; bottom row STUDY · BEDROOM 1 · BEDROOM 2. NURSERY is simply the centre label, under the centre window — part of the grid, never a separate sign or plaque. One brass bell on a curled spring is mounted on top of the case. There are no other signs, plaques or labels on that wall.';
+
 // ---------------------------------------------------------------------------
 // Locked maps. One per space. Every keyframe prompt for that space repeats it.
 // ---------------------------------------------------------------------------
@@ -42,7 +46,7 @@ export const MAPS = {
   },
   serviceHall: {
     title: 'Service hall and bell board',
-    text: 'Ground floor, reached through the hall service door. Facing the back wall: the antique mahogany servant-bell board with NURSERY readable in the middle row, a hinged lower wooden panel at knee height below it (the cut wiring is behind it), and the narrow LOWER SERVICE DOOR immediately to the RIGHT of the board. Small high window on the left gives a cold shaft of light. BELL BOARD FIXED is clamped to the left of the board, slightly above it, facing it.',
+    text: 'Ground floor, reached through the hall service door. Facing the back wall: the antique mahogany servant-bell board (nine small windows in a 3×3 grid, each with its own room label under it; NURSERY is the centre one), a separate hinged lower wooden panel low on the wall at knee height, well below the board with bare wall between them (the cut wiring is behind it), and the narrow LOWER SERVICE DOOR immediately to the RIGHT of the board. Small high window on the left gives a cold shaft of light. BELL BOARD FIXED is clamped to the left of the board, slightly above it, facing it.',
   },
   stair: {
     title: 'Back service stair (never flip)',
@@ -207,13 +211,14 @@ export const LOCATION_SHEETS: LocationSheet[] = [
     map: '/maps/LOC_SVC.png',
     place: 'the ground-floor service hall of an old English manor, with an antique servant-bell board',
     master: 'LOC_BELLBOARD_DAY.png',
-    viewA: 'exactly the uploaded bell-board photo: from the passage entrance, eye level, 35mm, facing the back wall: the mahogany bell board with NURSERY readable in the middle row, the hinged lower wooden panel below it, the narrow lower service door immediately to its RIGHT, the small high window on the LEFT wall.',
-    viewB: 'the camera turned round 180°: standing with its back to the bell board, eye level, 35mm, looking back along the short passage to the plain panelled door into the entrance hall at the far end, standing open with the brighter hall beyond; the small high window is now on the RIGHT wall.',
+    viewA: 'exactly the uploaded bell-board photo: from the passage entrance, eye level, 35mm, facing the back wall: the mahogany bell board (nine labelled windows, NURSERY the centre label), the separate hinged lower wooden panel low on the wall below it, the narrow lower service door immediately to its RIGHT, the small high window on the LEFT wall.',
+    viewB: 'the camera turned round 180°: standing with its back to the bell board, eye level, 35mm, looking back along the short passage to the plain panelled door into the entrance hall at the far end, standing open; through it a glimpse of the same entrance hall as the uploaded hall photo — black-and-white stone floor, furniture under white dust sheets, pale rectangles where portraits hung: no portraits, no flowers, no rugs; the small high window is now on the RIGHT wall.',
     swap: 'The high window is on the LEFT in view A and on the RIGHT in view B.',
     dayLight: 'one cold shaft of daylight from the small high window, the rest in cool shade.',
     nightLight: 'one bare warm bulb above the bell board is lit and the walls fall into darkness; in view B the bulb is behind the camera, the passage lit only by its spill and a faint cool edge from the high window.',
     rowChanges: 'The door to the entrance hall stands open in the day row and is closed in the night row.',
-    layout: MAPS.serviceHall.text,
+    layout: `${MAPS.serviceHall.text} ${BELL_BOARD}`,
+    extraUploads: [{ file: 'LOC_HALL_DAY.png', job: 'what the entrance hall looks like through the open door in view B' }],
     look: 'Chipped whitewashed walls, worn stone floor, an old enamel sign. Muted, slightly desaturated palette, deep soft shadows, a heavy stillness.',
     shotsA: ['SH18', 'SH19', 'SH20', 'SH21'],
     shotsB: [],
@@ -263,6 +268,7 @@ const sheetAssets: Asset[] = LOCATION_SHEETS.flatMap((l): Asset[] => [
       'Within each column the night panel has exactly the same framing as the day panel',
       'Nothing moves between panels except the light and the listed changes',
       'Same materials, furniture and mood as the master plate — muted, frozen in time',
+      'Signs and labels appear only where the layout puts them — no extra plaques, no new portraits or flowers',
     ],
     group: 'Location sheets',
     note: `Generate at the highest resolution your image model offers. At 4K each panel is about 1080×1920: crop a panel and use it directly as a plate. At lower resolution, upload the sheet as the reference for any plate or keyframe that looks in that direction or at night. View A: ${l.shotsA.join(', ') || '—'}. View B: ${l.shotsB.join(', ') || 'not used yet'}.${l.shotsSide?.length ? ` Side angles: ${l.shotsSide.join(', ')}.` : ''}`,
@@ -397,8 +403,8 @@ export const ASSETS: Asset[] = [
     kind: 'location',
     title: 'Service hall with bell board, day',
     ref: 'the daytime photo of the service hall with the antique mahogany servant-bell board, the lower wooden panel under it and the narrow service door to its right',
-    prompt: `Photorealistic location plate, vertical 9:16, no people. Ground-floor service hall of an old English manor, camera at eye level, 35mm, facing the back wall: a mounted antique mahogany servant-bell board with rows of small glass windows, each with a small brass flag and a painted room label; the label NURSERY is clearly readable in the middle row; the brass is slightly tarnished; every flag is in the neutral up position. Below the board, at knee height, a hinged lower wooden panel, closed. Immediately to the RIGHT of the board, a narrow plain panelled service door, closed. Chipped whitewashed walls, worn stone floor, an old enamel sign, a small high window on the LEFT giving one cold shaft of daylight. ${LOOKS.dayInterior}`,
-    check: ['NURSERY readable in the middle row', 'Lower wooden panel below the board', 'Narrow service door immediately RIGHT of the board'],
+    prompt: `Photorealistic location plate, vertical 9:16, no people. Ground-floor service hall of an old English manor, camera at eye level, 35mm, facing the back wall. ${BELL_BOARD} The brass is slightly tarnished; every flag is in the neutral UP position. Low on the wall at knee height, well below the board with bare wall between them, a separate hinged wooden panel, closed. Immediately to the RIGHT of the board, a narrow plain panelled service door, closed. Chipped whitewashed walls, worn stone floor, a small high window on the LEFT giving one cold shaft of daylight. ${LOOKS.dayInterior}`,
+    check: ['Board = nine small open windows in a 3×3 grid, each with its OWN label directly under it', 'NURSERY is the centre label, same as the other eight — no separate sign or plaque anywhere', 'Every brass flag UP (windows dark)', 'Separate lower panel at knee height, bare wall between it and the board', 'Narrow service door immediately RIGHT of the board'],
     group: 'Hall & service side',
     note: `${MAPS.serviceHall.text} Use a text-capable image model so NURSERY is readable; fix the label in post if needed.`,
   },
@@ -408,7 +414,7 @@ export const ASSETS: Asset[] = [
     title: 'BELL BOARD FIXED view, day',
     ref: 'the locked camera view of the bell board in daylight',
     editOf: 'LOC_BELLBOARD_DAY.png',
-    prompt: 'Edit the uploaded photo of the servant-bell board: reframe to a tight locked view that shows only the whole board, from slightly to the left of it and slightly above, as seen by a small camera clamped beside it. All brass flags in the neutral up position. NURSERY label sharp and readable in the middle row. Same daylight. Slightly cold, desaturated security-camera image, fine sensor noise. No people, no text overlay.',
+    prompt: 'Edit the uploaded photo of the servant-bell board: reframe to a tight locked view that shows only the whole board, from slightly to the left of it and slightly above, as seen by a small camera clamped beside it. Keep the board exactly: nine windows in a 3×3 grid, each with its own label; NURSERY is the centre label, sharp and readable. All brass flags in the neutral UP position (windows dark). Same daylight. Slightly cold, desaturated security-camera image, fine sensor noise. No people, no text overlay.',
     uploads: [{ file: 'LOC_BELLBOARD_DAY.png', job: 'the board itself: exact labels, brass and wood' }],
     group: 'Hall & service side',
     note: 'Used only as the day screen image on the monitor in SH24.',
@@ -419,7 +425,7 @@ export const ASSETS: Asset[] = [
     title: 'BELL BOARD FIXED, night, flag neutral',
     ref: 'the locked night view of the bell board with every flag up',
     editOf: 'LOC_BELLBOARD_FIXED_DAY.png',
-    prompt: 'Edit the uploaded locked view of the bell board: identical framing and geometry, nothing moved. Night: lit only by one bare warm bulb above the board; the walls around fall into darkness. Every brass flag in the neutral up position. NURSERY label readable. Slightly cold, desaturated security-camera image, fine sensor noise. No text overlay.',
+    prompt: 'Edit the uploaded locked view of the bell board: identical framing and geometry, nothing moved. Night: lit only by one bare warm bulb above the board; the walls around fall into darkness. Every brass flag in the neutral UP position (windows dark). The centre NURSERY label readable. Slightly cold, desaturated security-camera image, fine sensor noise. No text overlay.',
     uploads: [{ file: 'LOC_BELLBOARD_FIXED_DAY.png', job: 'exact framing and board' }],
     group: 'Hall & service side',
     note: 'Start frame of SH26; right screen in SH25.',
@@ -430,7 +436,7 @@ export const ASSETS: Asset[] = [
     title: 'BELL BOARD FIXED, night, NURSERY down',
     ref: 'the locked night view of the bell board with the NURSERY flag down',
     editOf: 'LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL.png',
-    prompt: 'Edit the uploaded night view of the bell board: change ONLY the brass flag under the NURSERY label so it has dropped into the down position, showing its brass face in its little window. Nothing else changes — same framing, light, labels and every other flag.',
+    prompt: 'Edit the uploaded night view of the bell board: change ONLY the brass flag in the centre window, directly above the NURSERY label, so it has swung DOWN: its round brass face now fills that little window. The other eight windows stay dark. Nothing else changes — same framing, light, labels and every other flag.',
     uploads: [{ file: 'LOC_BELLBOARD_FIXED_NIGHT_NEUTRAL.png', job: 'everything except the NURSERY flag' }],
     group: 'Hall & service side',
     note: 'End frame of SH26; right screen in SH27, SH43, SH44.',

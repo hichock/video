@@ -149,6 +149,15 @@ These failed in real tests. Each one is now a hard rule.
   things in 3 seconds means at least one of them goes wrong.
 - **Character sheets pull their pose.** Say that sheets are for identity only.
 - **Seen from behind = no face description,** only hair, build and clothes.
+- **Text props are designed in full, never by their one important word.** Writing “NURSERY
+  readable in the middle row” produced a stray NURSERY plaque on a board of unlabelled bells.
+  Describe the object’s structure (a 3×3 grid of windows, each with its own label under it),
+  spell out EVERY label, say which one matters by position (“the centre label”), and add
+  “no other signs or plaques”. Keep the description in one locked constant (`BELL_BOARD`).
+- **Don’t name extra set dressing that could be confused with a story prop** (an “old enamel
+  sign” next to a board that must carry one readable label). Glimpses of other rooms must
+  repeat that room’s look (the hall through a door: dust sheets, pale rectangles, no
+  portraits or flowers).
 - **Old references override new text.** If a sheet or plate changed, regenerate it before
   generating anything that uploads it.
 

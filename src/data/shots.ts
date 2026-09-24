@@ -960,9 +960,9 @@ export const SHOTS: Shot[] = [
     size: 'MS',
     setup: 'SVC-B over his shoulder',
     blocking:
-      'Handheld from the host, just behind the huge bearded man’s right shoulder: he stands square in front of the board, facing it, so we see the back of his right shoulder and his right profile, his right index finger on the small brass flag under the readable NURSERY label. Beside the board on the left, the small woman in rust faces the board at an angle, tightening a compact camera onto a simple spring clamp on a pipe, aimed at the board. The narrow lower service door is to the right of the board.',
+      'Handheld from the host, just behind the huge bearded man’s right shoulder: he stands square in front of the board, facing it, so we see the back of his right shoulder and his right profile, his right index finger on the small brass flag in the centre window of the board, directly above the readable NURSERY label. Beside the board on the left, the small woman in rust faces the board at an angle, tightening a compact camera onto a simple spring clamp on a pipe, aimed at the board. The narrow lower service door is to the right of the board.',
     people: [
-      { id: 'owen', view: 'back34', where: 'standing square in front of the board; the camera is just behind his right shoulder so his right profile shows', doing: 'the NURSERY flag is still in the neutral UP position; eyes on the mechanism', hands: 'right index finger resting on the brass flag under the NURSERY label, not yet pressing' },
+      { id: 'owen', view: 'back34', where: 'standing square in front of the board; the camera is just behind his right shoulder so his right profile shows', doing: 'the NURSERY flag is still in the neutral UP position; eyes on the mechanism', hands: 'right index finger resting on the brass flag in the centre window, just above the NURSERY label, not yet pressing' },
       { id: 'mara', view: 'front34', where: 'on the left of the board, beside it', doing: 'tightening a compact camera onto a spring clamp on a pipe, eyes on the clamp', hands: 'both hands on the spring clamp and the compact camera' },
     ],
     check: ['NURSERY label readable', 'The lower service door is to the RIGHT of the board'],
@@ -978,7 +978,7 @@ export const SHOTS: Shot[] = [
       setting: 'Service hall at the antique servant-bell board.',
       beats: [
         { t: [0, 1], text: `${Cap('mara')} tightens the clamp on the camera.` },
-        { t: [1, 2], text: `${Cap('owen')} pushes the brass flag under the NURSERY label down with one finger.` },
+        { t: [1, 2], text: `${Cap('owen')} pushes the brass flag in the centre window, above the NURSERY label, down with one finger.` },
         { t: [2, 3], text: 'He holds it down; the NURSERY label is clearly readable.' },
         { t: [3, 4], text: 'He pushes it back up to neutral by hand: a dry brass click.' },
         { t: [4, 7], text: `Looking at the mechanism, not at the camera, practical and unhurried, in ${V('owen')}: ${q('D17')}` },
@@ -1226,7 +1226,7 @@ export const SHOTS: Shot[] = [
       setting: 'No person present anywhere.',
       beats: [
         { t: [0, 1], text: 'Nothing moves.' },
-        { t: [1, 1.5], text: 'The small brass flag under the NURSERY label drops sharply by itself and settles in the down position.' },
+        { t: [1, 1.5], text: 'The small brass flag in the centre window, above the NURSERY label, drops sharply by itself: its round brass face swings down into the window and settles.' },
         { t: [1.5, 3], text: 'Stillness.' },
       ],
       stays: [STAY_LOCKED, 'Every other flag stays exactly where it is. No hand, shadow or person appears.'],

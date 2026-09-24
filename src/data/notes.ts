@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'The bell board had one floating NURSERY sign (service-hall sheet test)',
+    body: 'The prompts only said “NURSERY readable in the middle row” and added “an old enamel sign” to the wall, but never described the board. The model drew a board of bells with blank brass tags plus a separate NURSERY plaque between the rows. The glimpse of the hall through the door also got a portrait, flowers and a rug the real hall does not have.',
+    fix: 'One locked BELL_BOARD description, used by every prompt that shows it: nine open windows in a 3×3 grid, each with a brass flag and its OWN label directly under it, all nine names spelled out, NURSERY the centre one, no other signs. The enamel sign is gone. Flags are UP = window dark, DOWN = brass face fills the window, so the flag scenes read clearly. The view-B hall glimpse now uploads the hall plate and says no portraits, flowers or rugs.',
+  },
+  {
     title: 'Reverse angles and night views were invented from text',
     body: 'Only one direction of each location existed as an approved image. Every reverse (SH06/SH07 looking back at the front door, the corridor from the far window, SH16 from the far end of the nursery) and every night plate was generated from words, so the far wall, the light side and the furniture drifted between angles.',
     fix: 'Each main location now has a location map (view A, view B at 180°, light by day and night, every shot setup) and ONE 2×2 location sheet prompt: day/night × view A/view B, generated from the approved master plate. Reverse and night plates and keyframes upload the sheet and name the panel they need. Classical rules that were missing (establishing shots, lead room, light direction, exit/entry sides, eye trace…) are in the continuity rules §7e; establishing and lead room are now automatic.',

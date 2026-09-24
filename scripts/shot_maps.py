@@ -552,7 +552,7 @@ def svc_plan():
         # bell board on the east wall, lower panel under it
         f'<rect x="586" y="320" width="14" height="100" fill="#5b3f2a" stroke="{INK}"/>',
         text(578, 300, 'BELL BOARD', 13, INK, 'end', 700),
-        text(578, 314, 'NURSERY in the middle row', 11, MUTED, 'end', 400),
+        text(578, 314, '3×3 labelled windows, NURSERY = centre', 11, MUTED, 'end', 400),
         f'<rect x="572" y="350" width="12" height="40" fill="#8a6a45" stroke="{INK}"/>',
         # lower service door right of the board (south of it when facing east)
         f'<rect x="592" y="440" width="16" height="60" fill="#8a6a45" stroke="{INK}"/>',
