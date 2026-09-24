@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'SH14 had too much for one image: four people plus a doorway',
+    body: 'The reverse from inside the nursery asked for the woman on the stool, the man in the doorway and two people passing in the corridor beyond. The image model put the passers-by in a door frame of its own, on the wrong wall.',
+    fix: 'The corridor pass (script D3) is now its own short shot, SH13A: the approved reverse corridor view, the bearded man walking past the open door, the woman with locs behind him, nobody in the doorway. SH14 keeps only D4–D5 with two people, the small woman on the stool and the tall man inside the room, angled so the door stays out of frame. SH13A is lettered, as inserted shots are on set, so nothing after it is renumbered.',
+  },
+  {
     title: 'Consecutive shots repeated the same view',
     body: 'The coverage check compared camera positions and shot sizes but not the direction the camera faces. So SH10 → SH11 (medium then close-up, both straight down the corridor), SH06 → SH07 (both looking at the front door) and SH13 → SH14 (both looking through the doorway at the corner) passed, although each cut showed the same view again.',
     fix: 'Every shot now has a compass heading, and QA fails when consecutive shots in one place face within 30° of each other. SH07 now looks up the stair behind the host (SH06 looks back at the front door). SH11 is a three-quarter single 45° off the corridor axis, with the taller woman soft in the foreground. SH14 is the true reverse of SH13, from the far end of the nursery. SH16 moved to the corridor, square to the doorway, so it does not repeat SH14. Maps and location maps are redrawn to match.',

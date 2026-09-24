@@ -182,7 +182,7 @@ export const LOCATION_SHEETS: LocationSheet[] = [
     layout: MAPS.corridor.text,
     look: LOOKS.dayInterior,
     shotsA: ['SH12', 'SH15'],
-    shotsB: ['SH08', 'SH10'],
+    shotsB: ['SH08', 'SH10', 'SH13A'],
     shotsSide: ['SH09', 'SH11', 'SH16'],
   },
   {
@@ -650,7 +650,7 @@ export const ASSETS: Asset[] = [
   ...sheetAssets,
 
   // --- Shot maps (top-down plans, uploaded as blocking references) -------
-  ...['02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'].map(
+  ...['02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '13A', '14', '15', '16', '17', '18', '19', '20'].map(
     (n): Asset => ({
       file: `MAP_SH${n}.png`,
       kind: 'map',

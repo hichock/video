@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ALL_BEATS, SCRIPT, SCRIPT_META } from './data/script';
 import { CHARACTERS, CAST, type CharId } from './data/characters';
 import { ASSETS, LOCATION_SHEETS, MAPS } from './data/assets';
-import { SHOTS, compass } from './data/shots';
+import { SHOTS, compass, inTestScope } from './data/shots';
 import { DECISIONS, OLD_PACK_PROBLEMS, PROCESS_NOTE } from './data/notes';
 import { runQA, fmtTime, type Finding } from './lib/qa';
 import { buildOrder, exportMarkdown, linesLost, timeline } from './lib/build';
@@ -102,7 +102,7 @@ export default function App() {
 
 /** Quick visual check: location maps and every shot map, one full-width row each, in cut order. */
 function ShotMaps({ findings }: { findings: Finding[] }) {
-  const scope = SHOTS.slice(0, 20);
+  const scope = SHOTS.filter((s) => inTestScope(s.id));
   const coverage = findings.filter((f) => f.rule === 'Coverage' && scope.some((s) => s.id === f.shot));
   const [view, setView] = useStored<'shots' | 'locations'>('maps-view', 'shots');
   return (

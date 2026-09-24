@@ -153,8 +153,13 @@ export const q = (beatId: string) => {
 const sheet = (id: CharId, job = 'identity: face, hair, build and full wardrobe'): Upload => ({ file: CHARACTERS[id].sheetFile, job });
 const bg = (id: CharId) => sheet(id, 'identity of a smaller background figure');
 const up = (file: string, job: string): Upload => ({ file, job });
+/** Shot number without any letter suffix: 'SH13A' → 13. */
+export const shotNum = (id: string) => parseInt(id.slice(2), 10);
+/** The test scope: SH01–SH20, including inserted lettered shots such as SH13A. */
+export const inTestScope = (id: string) => shotNum(id) <= 20;
+
 const mapUp = (id: string): Upload =>
-  Number(id.slice(2)) >= 8
+  shotNum(id) >= 8
     ? up(`MAP_${id}.png`, 'FIRST FRAME ONLY: where the camera stands and looks, where each person stands at this exact moment and which way they face, and where things land in the frame. It shows no movement. It is a diagram — do NOT draw it, no arrows, circles or labels in the image')
     : up(`MAP_${id}.png`, 'BLOCKING ONLY: where the camera stands and looks, where each person stands, which way they face and move, and where things land in the frame. It is a diagram — do NOT draw it, no arrows, circles or labels in the image');
 const LINEUP_BG = up('CH_LINEUP.png', 'identities of the small background figures and everyone’s relative heights');
@@ -759,10 +764,50 @@ export const SHOTS: Shot[] = [
     note: 'Operator is established in SH12 (Elias follows her in raising the handheld).',
   },
   {
+    id: 'SH13A',
+    section: 'D',
+    covers: ['D3'],
+    title: 'Corridor: Owen walks past the open nursery door with BELL BOARD FIXED and his pouch; Naomi crosses behind him with her recorder.',
+    cam: 'cinematic',
+    location: 'LOC_CORRIDOR_REV_DAY.png',
+    time: 'day',
+    lens: '35mm',
+    size: 'MWS',
+    setup: 'COR-REV2 past the door, looking back to the landing',
+    heading: 180,
+    blocking:
+      'Plate framing (the approved reverse corridor view): camera in the corridor a few metres past the nursery door, looking back toward the landing; the open nursery door on the RIGHT wall ahead. The huge bearded man walks AWAY from the camera down the middle of the corridor, just reaching the open door on his right, framed from the knees up, his back to us. A few steps behind him, nearer the camera and to the left, the very tall woman with locs walks the same way, looking down at the recorder in her hands. Nobody is in the doorway; the room beyond it is not visible from here.',
+    states: [{ thing: 'nurseryDoor', start: 'ALREADY WIDE OPEN' }, { thing: 'bellCam', start: 'IN HIS RIGHT HAND', between: 'the bearded man took it out of his case at the far end of the corridor' }],
+    people: [
+      { id: 'owen', view: 'back', where: 'centre of the corridor, midground, just reaching the open door on the right wall, walking away from the camera', doing: 'walking steadily toward the landing, not turning his head', hands: 'compact black camera in his right hand, held out slightly so it shows beside his right hip; canvas tool pouch in his left hand, visible' },
+      { id: 'naomi', view: 'back34', where: 'a few steps behind him, nearer the camera, left of centre', doing: 'walking the same way, head bowed to her recorder', hands: 'silver cassette recorder held in both hands in front of her, its edge visible beside her body' },
+    ],
+    check: ['Same corridor view as the approved reverse plate: open door on the RIGHT wall, landing at the far end', 'Both walk AWAY from the camera; nobody stands in the doorway', 'His compact camera and pouch are visible from behind'],
+    map: '/maps/SH13A_map.png',
+    kf: {
+      mode: 'generate',
+      uploads: [up('LOC_CORRIDOR_REV_DAY.png', 'the corridor, the open nursery door on the right and the light — keep exactly'), sheet('owen'), sheet('naomi'), mapUp('SH13A')],
+      frame: 'Working, unhurried, nobody posing.',
+      saveAs: 'KF_SH13A.png',
+    },
+    video: {
+      camera: 'Static camera.',
+      setting: 'Bright upper corridor, daytime.',
+      beats: [
+        { t: [0, 3], text: `${Cap('owen')} walks on past the open nursery door toward the landing without turning his head; ${D('naomi')} crosses the corridor behind him, eyes on her recorder.` },
+      ],
+      stays: [STAY_PEOPLE, STAY_CORRIDOR, 'Nobody enters or stands in the doorway.'],
+    },
+    order: 3,
+    edit: 2,
+    sound: 'off',
+    audio: 'Footsteps on the runner, a soft recorder click.',
+  },
+  {
     id: 'SH14',
     section: 'D',
-    covers: ['D3', 'D4', 'D5'],
-    title: 'Reverse from inside the nursery: Owen passes the doorway with BELL BOARD FIXED and his pouch, Naomi behind. ELIAS: “Very polite house so far.” MARA: “You’ve been here twenty minutes.”',
+    covers: ['D4', 'D5'],
+    title: 'Inside the nursery: ELIAS: “Very polite house so far.” MARA: “You’ve been here twenty minutes.”',
     cam: 'tripod',
     location: 'LOC_NURSERY_FIXED_DAY.png',
     time: 'day',
@@ -771,34 +816,31 @@ export const SHOTS: Shot[] = [
     setup: 'NUR-FAR far end of the nursery, looking back',
     heading: 0,
     blocking:
-      'The REVERSE of SH13, from inside the nursery: camera at eye level at the far end of the room, looking back toward the window corner and the door. The white iron bed runs along the LEFT wall toward the window at its far end; high in the corner above the window, upper left, the small woman in rust on a step stool tightening the compact camera onto its bracket, the black monitor case on the floor below her. The open white door is in the RIGHT-hand wall near the far end; the tall man in olive stands in the doorway, turned toward her, his handheld raised on her. Through the doorway behind him, the corridor: the huge bearded man passing across the gap, a few steps behind him the very tall woman with locs. The chest with the grey box on the rug in the middle of the room.',
-    states: [{ thing: 'nurseryDoor', start: 'ALREADY WIDE OPEN' }, { thing: 'nurseryCam', start: 'ON ITS WALL BRACKET, BEING TIGHTENED' }, { thing: 'monitorCase', start: 'ON THE FLOOR BESIDE THE STOOL' }, { thing: 'bellCam', start: 'IN HIS RIGHT HAND', between: 'the bearded man took it out of his case at the far end of the corridor' }],
+      'The REVERSE of SH13, from inside the nursery: camera at eye level at the far end of the room, looking back toward the window corner. Only two people. The white iron bed runs along the LEFT wall toward the window at its far end; high in the corner above the window, upper left, the small woman in rust on a step stool tightening the compact camera onto its bracket, the black monitor case on the floor below her. The tall man in olive stands INSIDE the room, right of centre on the bare floor beside the rug, turned toward her, his handheld raised on her. The chest with the grey box on the rug in the middle. The right edge of the frame is plain wallpaper: no door, no doorway and nobody else in the frame.',
+    states: [{ thing: 'nurseryCam', start: 'ON ITS WALL BRACKET, BEING TIGHTENED' }, { thing: 'monitorCase', start: 'ON THE FLOOR BESIDE THE STOOL' }],
     people: [
       { id: 'mara', view: 'back34', where: 'upper left, on the step stool in the corner above the window', doing: 'arms up, still tightening the compact camera on its bracket', hands: 'both hands on the camera on its bracket, clearly visible' },
-      { id: 'elias', view: 'profileL', where: 'in the open doorway in the right-hand wall, midground', doing: 'turned toward the corner, watching her work', hands: 'handheld camera raised in both hands toward her, visible in profile' },
-      { id: 'owen', view: 'small', where: 'through the doorway, in the corridor behind the tall man, crossing the gap from left to right', doing: 'walking past, eyes ahead down the corridor', hands: 'compact black camera in his right hand, canvas tool pouch in his left' },
-      { id: 'naomi', view: 'small', where: 'through the doorway, in the corridor a few steps behind him', doing: 'walking, looking down at her recorder', hands: 'silver cassette recorder in both hands' },
+      { id: 'elias', view: 'profileL', where: 'inside the room, right of centre, on the bare floor beside the rug, full figure', doing: 'turned toward the corner, watching her work, a small fond grin', hands: 'handheld camera raised in both hands toward her, visible in profile' },
     ],
-    check: ['Reverse of SH13: from the far end of the room looking back at the corner and the door', 'Small woman upper-left on the stool in the corner; bed along the LEFT wall', 'Tall man in the doorway in the RIGHT-hand wall, turned toward her', 'The bearded man and the woman with locs small in the corridor through the doorway'],
+    check: ['Reverse of SH13: from the far end of the room looking back at the window corner', 'ONLY two people: the small woman on the stool upper-left, the tall man inside the room right of centre', 'No door, no doorway, nobody else in the frame', 'Bed along the LEFT wall; chest with the grey box in the middle'],
     map: '/maps/SH14_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOCSHEET_NUR.png', 'the TOP-RIGHT panel (day, view B) is this room from exactly this end — keep the room'), sheet('elias'), sheet('mara'), up('CH_LINEUP.png', 'identities of the bearded man and the woman with locs seen small through the doorway, and everyone’s heights'), mapUp('SH14')],
-      frame: 'Relaxed crew banter while everyone keeps working.',
+      uploads: [up('LOCSHEET_NUR.png', 'the TOP-RIGHT panel (day, view B) is this room from exactly this end — keep the room'), sheet('elias'), sheet('mara'), mapUp('SH14')],
+      frame: 'Relaxed crew banter while both keep working.',
       saveAs: 'KF_SH14.png',
     },
     video: {
       camera: 'Locked tripod inside the nursery.',
-      setting: 'Sunlit nursery, looking back toward the window corner and the open door.',
+      setting: 'Sunlit nursery, looking back toward the window corner.',
       beats: [
-        { t: [0, 2], text: `Through the doorway ${D('owen')} walks past across the gap from left to right with the compact camera and tool pouch, not turning his head; ${D('naomi')} follows a few steps behind, checking her recorder.` },
-        { t: [2, 4], text: `In the doorway ${D('elias')}, watching the woman in the corner work, says lightly and fondly in ${V('elias')}: ${q('D4')}` },
-        { t: [4, 7], text: `Up in the corner, without looking down and still tightening the same mount, ${D('mara')} answers dryly in ${V('mara')}: ${q('D5')}` },
+        { t: [0, 2], text: `${Cap('elias')}, watching the woman in the corner work, says lightly and fondly in ${V('elias')}: ${q('D4')}` },
+        { t: [2, 5], text: `Up in the corner, without looking down and still tightening the same mount, ${D('mara')} answers dryly in ${V('mara')}: ${q('D5')}` },
       ],
-      stays: [STAY_PEOPLE, 'The bearded man never turns his head; nobody stops working.'],
+      stays: [STAY_PEOPLE, 'Only these two people are ever in the room; no door or doorway comes into view.'],
     },
-    order: 7,
-    edit: 3.5,
+    order: 5,
+    edit: 3,
     sound: 'native',
     audio: 'Elias and Mara lines, native then voice-swapped.',
   },

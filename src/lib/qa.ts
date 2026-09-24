@@ -4,7 +4,7 @@
 import { ALL_BEATS, BEAT_BY_ID, BEAT_INDEX, SCRIPT } from '../data/script';
 import { ASSETS } from '../data/assets';
 import { CHARACTERS, NAMES } from '../data/characters';
-import { SHOTS, THINGS, visibleOf, type Shot, type Thing } from '../data/shots';
+import { SHOTS, THINGS, inTestScope, visibleOf, type Shot, type Thing } from '../data/shots';
 import { keyframePrompt, producedFiles, refFor, videoPrompt, womanPrompt } from './prompts';
 
 export type Severity = 'error' | 'warn' | 'info';
@@ -222,7 +222,7 @@ export function runQA(): Finding[] {
     if (!prev || s.matchCut) return;
     if (setupKey(prev.setup) === setupKey(s.setup) && prev.size === s.size) {
       // Test scope is SH01–SH20; later shots are flagged for rework but do not block the build yet.
-      add(i < 20 ? 'error' : 'warn', 'Coverage', `Same setup (${setupKey(s.setup)}) and size (${s.size}) as ${prev.id} — the cut will jump. Change the size or the angle.`, s.id);
+      add(inTestScope(s.id) ? 'error' : 'warn', 'Coverage', `Same setup (${setupKey(s.setup)}) and size (${s.size}) as ${prev.id} — the cut will jump. Change the size or the angle.`, s.id);
     }
     const prev2 = SHOTS[i - 2];
     if (prev2 && prev2.size === prev.size && prev.size === s.size) add('warn', 'Coverage', `Third ${s.size} in a row (${prev2.id}, ${prev.id}, ${s.id})`, s.id);
@@ -236,7 +236,7 @@ export function runQA(): Finding[] {
     if (setupKey(s.setup).split('-')[0] !== setupKey(prev.setup).split('-')[0]) return;
     const d = Math.abs(((s.heading - prev.heading + 540) % 360) - 180);
     if (d < 30)
-      add(i < 20 ? 'error' : 'warn', 'Coverage', `Same view as ${prev.id}: the camera faces the same way (${prev.heading}° → ${s.heading}°) in the same place. Turn it 30°+, put a cutaway between, or make it one continuous shot.`, s.id);
+      add(inTestScope(s.id) ? 'error' : 'warn', 'Coverage', `Same view as ${prev.id}: the camera faces the same way (${prev.heading}° → ${s.heading}°) in the same place. Turn it 30°+, put a cutaway between, or make it one continuous shot.`, s.id);
   });
 
   // 16c. Establish every new location: one of its first two shots must be wide enough to show
@@ -251,7 +251,7 @@ export function runQA(): Finding[] {
   for (const [loc, list] of seenLoc) {
     const first = list.slice(0, 2);
     if (!first.some((s) => ['EWS', 'WS', 'MWS'].includes(s.size))) {
-      const inScope = SHOTS.indexOf(first[0]) < 20;
+      const inScope = inTestScope(first[0].id);
       add(inScope ? 'error' : 'warn', 'Coverage', `Location ${loc} is never established: its first shots (${first.map((s) => `${s.id} ${s.size}`).join(', ')}) are all close. Make one of them WS/MWS.`, first[0].id);
     }
   }
@@ -270,10 +270,10 @@ export function runQA(): Finding[] {
   }
 
   // 16e. Test scope (SH01–SH20): flag uploads that are keyframes of later shots, so they get built first.
-  SHOTS.slice(0, 20).forEach((s) => {
+  SHOTS.filter((x) => inTestScope(x.id)).forEach((s) => {
     const later = s.kf.uploads.map((u) => u.file).filter((f) => {
-      const m = /^KF_(SH\d+)/.exec(f);
-      return m && SHOTS.findIndex((x) => x.id === m[1]) >= 20;
+      const m = /^KF_(SH\d+[A-Z]?)/.exec(f);
+      return m && !inTestScope(m[1]);
     });
     if (later.length) add('warn', 'Build order', `Needs later-shot images first: ${later.join(', ')} (see Build order).`, s.id);
   });

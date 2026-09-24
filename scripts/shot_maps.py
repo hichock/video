@@ -460,27 +460,41 @@ maps['SH13'] = svg('SH13', 'First frame: the small woman on the stool in the cor
                    ['This corner is the NURSERY FIXED position seen in the approved high-corner plate.',
                     'The camera’s tiny preview screen faces us (replaced in post).'])
 
+# ---------------- SH13A ----------------
+plan = upper_plan()
+plan += camera(400, 140, 90, 44, 560, 'CAMERA 35mm, a few m past the door', None, ldx=30, ldy=-6)
+plan += person('owen', 402, 300, 90, note=['back to camera, just reaching', 'the open door; camera + pouch'], label_dx=40, label_dy=30)
+plan += person('naomi', 386, 232, 90, note=['behind him, nearer camera,', 'eyes on her recorder'], label_dx=-270, label_dy=-70)
+frame = frame_panel(760, 60, [
+    ('box', 0.4, 0.2, 0.2, 0.2, 'LANDING (far end)', '#efe7da'),
+    ('box', 0.8, 0.08, 0.2, 0.8, 'OPEN DOOR (empty)', '#ffffff'),
+    ('fig', 0.52, 0.3, 0.1, 0.42, 'BEARDED (back)', COL['owen']),
+    ('fig', 0.32, 0.34, 0.16, 0.6, 'CAMEL (back 3/4)', COL['naomi'], -240),
+], ['FIRST FRAME: the approved reverse corridor', 'view. Both walk AWAY toward the landing;', 'he is just reaching the open door on the', 'RIGHT. Nobody in the doorway.'])
+maps['SH13A'] = svg('SH13A', 'First frame: the bearded man reaching the open door, the woman with locs behind him (MWS, 35mm)',
+                    'Corridor, looking back to the landing', plan, frame,
+                    ['Script D3 on its own, before the banter inside the room (SH14).',
+                     'Same direction as SH08 but not consecutive with it; the room is not visible from here.'])
+
 # ---------------- SH14 ----------------
 plan = upper_plan()
-plan += camera(250, 604, -90, 64, 380, 'CAMERA 28mm, far end, locked', None, ldx=-235, ldy=46)
+plan += camera(200, 604, -95, 50, 380, 'CAMERA 28mm, far end, locked', None, ldx=-185, ldy=46)
 plan += person('mara', 110, 280, -135, note=['on the stool in the corner,', 'hands on the camera'], label_dx=40, label_dy=60)
 plan.append('<rect x="128" y="292" width="22" height="16" fill="#111"/>')
-plan += person('elias', 366, 300, 190, note=['in the doorway, turned to her,', 'handheld raised'], label_dx=40, label_dy=110)
-plan += person('owen', 404, 282, 90, note=['in the corridor, crossing', 'the doorway gap'], label_dx=26, label_dy=-6)
-plan += person('naomi', 404, 214, 90, note=['a few steps behind him'], label_dx=26, label_dy=-10)
+plan += person('elias', 255, 420, -150, note=['inside the room, turned to her,', 'handheld raised'], label_dx=40, label_dy=-40)
+plan.append(text(372, 360, 'door OUT of frame', 12, INK, 'start', 700))
 frame = frame_panel(760, 60, [
     ('box', 0.0, 0.28, 0.2, 0.62, 'BED', '#ffffff'),
     ('box', 0.04, 0.08, 0.2, 0.18, 'WINDOW', '#6f8fb8'),
-    ('box', 0.4, 0.66, 0.2, 0.1, 'CHEST + BOX', '#5b3f2a'),
-    ('box', 0.78, 0.14, 0.2, 0.46, 'DOORWAY', '#ffffff'),
-    ('fig', 0.93, 0.2, 0.03, 0.08, '', COL['owen']),
-    ('fig', 0.84, 0.24, 0.09, 0.32, 'OLIVE', COL['elias'], 10),
+    ('box', 0.36, 0.7, 0.2, 0.1, 'CHEST + BOX', '#5b3f2a'),
+    ('box', 0.86, 0.1, 0.14, 0.7, 'PLAIN WALL', '#efe7da'),
+    ('fig', 0.66, 0.28, 0.12, 0.46, 'OLIVE (profile)', COL['elias'], 10),
     ('fig', 0.2, 0.1, 0.1, 0.26, 'RUST (on stool)', COL['mara'], 8),
-], ['REVERSE of SH13: from the far end of the', 'room. Small woman upper-left in the', 'corner; tall man in the doorway RIGHT;', 'the others pass in the corridor beyond.'])
-maps['SH14'] = svg('SH14', 'First frame: from the far end of the nursery — the woman in the corner, the man in the doorway (MWS, 28mm)',
+], ['REVERSE of SH13, only two people:', 'small woman upper-left on the stool,', 'tall man inside the room right of centre.', 'No door and nobody else in frame.'])
+maps['SH14'] = svg('SH14', 'First frame: the woman on the stool and the man filming her — only two people (MWS, 28mm)',
                    'Inside the nursery, far end, looking back', plan, frame,
-                   ['SH13 looks at the corner from the doorway; this is its reverse, so the cut changes the view completely.',
-                    'Through the doorway the bearded man crosses left to right (toward the landing).'])
+                   ['The door is out of frame to the right; the camera is angled so only plain wall shows there.',
+                    'The corridor pass (script D3) is its own shot, SH13A.'])
 
 # ---------------- SH15 ----------------
 plan = upper_plan()
@@ -730,13 +744,13 @@ plan += view(400, 632, -90, 36, 610, 'VIEW A — landing end → far window', VI
 plan += view(400, 44, 90, 36, 600, 'VIEW B — far window → landing', VIEW_B, 30, 4)
 plan += practical(432, 480, 'night: sconce (east wall)')
 plan += practical(265, 690, 'night: landing lamp', 'end', -12, 4)
-plan += setup_marks(['SH12', 'SH15'], VIEW_A) + setup_marks(['SH08', 'SH10'], VIEW_B) + setup_marks(['SH09', 'SH11', 'SH16'], SIDE)
+plan += setup_marks(['SH12', 'SH15'], VIEW_A) + setup_marks(['SH08', 'SH10', 'SH13A'], VIEW_B) + setup_marks(['SH09', 'SH11', 'SH16'], SIDE)
 panel = sheet_panel(760, 60, [
     ('DAY · VIEW A', ['far window ahead', 'nursery door open', 'on the LEFT wall', '2/3 of the way'], DAY, INK),
     ('DAY · VIEW B', ['landing at the end', 'nursery door open', 'on the RIGHT wall,', '~3 m from camera'], DAYB, INK),
     ('NIGHT · VIEW A', ['same framing', 'window black-blue', 'sconce on RIGHT wall', 'lamp spill from door'], NIGHT, '#f3ead8'),
     ('NIGHT · VIEW B', ['same framing', 'sconce on LEFT wall', 'landing lamp glows', 'at the far end'], NIGHT, '#f3ead8'),
-], ['View A: SH12 (WS), SH15 (MS).', 'View B: SH08 (WS), SH10 (MS).', 'Side (grey): SH09, SH11 (diagonal), SH16.'])
+], ['View A: SH12 (WS), SH15 (MS).', 'View B: SH08 (WS), SH10 (MS), SH13A (MWS).', 'Side (grey): SH09, SH11 (diagonal), SH16.'])
 locmaps['LOC_COR'] = loc_svg('UPPER CORRIDOR', 'Upper corridor', 'Landing end and far-window end', plan, panel,
                              ['Nursery door: LEFT wall in view A, RIGHT wall in view B. The sconce is on the east wall: RIGHT in A, LEFT in B.',
                               'The nursery door stays open in all four panels; its state per shot is set in the shot prompt.'])
