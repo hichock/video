@@ -169,7 +169,7 @@ function ShotMaps({ findings }: { findings: Finding[] }) {
               {s.map ? (
                 <a href={s.map} target="_blank" rel="noreferrer"><img src={s.map} alt={`Top-down map of ${s.id}`} loading="lazy" /></a>
               ) : (
-                <div className="nomap">No map — {s.cam === 'fixed-nursery' ? 'this is a crop of the locked NURSERY FIXED frame (view A of the nursery location map)' : 'not drawn yet'}</div>
+                <div className="nomap">No map — {s.cam === 'fixed-nursery' ? 'this is a crop of the locked NURSERY FIXED frame (view A of the nursery location map)' : s.setup.startsWith('TITLE') ? 'title card: start and end frames are in the shot list' : 'not drawn yet'}</div>
               )}
             </article>
           ))}

@@ -148,7 +148,7 @@ export const OLD_PACK_PROBLEMS: Note[] = [
 export const DECISIONS: Note[] = [
   {
     title: 'Show title card between SH01 and SH02 (producer decision)',
-    body: 'A ~3 s title card (series title, episode title, the five crew members) is added between the cold open and the arrival. The script (A7) asks for a hard cut from the broken breath straight to bright daylight, so the card sits inside that cut. Alternative that keeps the script exactly: lay the same titles over the first seconds of SH02 instead.',
+    body: 'A ~4.5 s animated title card (SH01A: start frame = the empty hall, end frame = series title, episode title and the five crew; titles fade in, then the crew, then the brass bell rings once) is added between the cold open and the arrival. The script (A7) asks for a hard cut from the broken breath straight to bright daylight, so the card sits inside that cut. Alternative that keeps the script exactly: lay the same titles over the first seconds of SH02 instead.',
   },
   {
     title: 'One compact case: the fixed-camera case is the monitor case',
