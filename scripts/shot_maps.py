@@ -356,7 +356,7 @@ def upper_plan(show_room=True):
 # ---------------- SH08 ----------------
 START_ONLY = True
 plan = upper_plan()
-plan += camera(400, 140, 90, 50, 540, 'CAMERA 35mm, near the far window', None, ldx=30, ldy=-6)
+plan += camera(400, 140, 90, 50, 540, 'CAMERA 35mm, ~3 m past the door', None, ldx=30, ldy=-6)
 plan += person('clara', 382, 500, -90, note=['~7 m from camera, halfway between', 'the landing and the door, on the', 'door side; walking toward camera'], label_dx=64, label_dy=36)
 plan += person('naomi', 420, 510, -90, note=['beside her, taller, eyes on her'], label_dx=26, label_dy=-30)
 plan.append(text(446, 330, 'door: ALREADY OPEN, nobody here', 12, INK, 'start', 700))

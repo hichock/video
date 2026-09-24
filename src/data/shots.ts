@@ -160,6 +160,7 @@ const mapUp = (id: string): Upload =>
 const LINEUP_BG = up('CH_LINEUP.png', 'identities of the small background figures and everyone’s relative heights');
 
 const STAY_PEOPLE = 'Faces, hair, body size and full wardrobe stay exactly as in the start frame.';
+const STAY_CORRIDOR = 'The corridor stays exactly as in the start frame: plain walls and the one open nursery doorway; no new doors, door frames or openings appear anywhere.';
 const STAY_LOCKED = 'The camera stays perfectly locked like a security camera: no zoom, no drift, no shake.';
 const STAY_NO_FIGURE = 'The room stays empty apart from her: no figure, shadow or shape appears anywhere.';
 const STAY_NO_TURN = 'She never turns around and never looks behind her.';
@@ -534,13 +535,13 @@ export const SHOTS: Shot[] = [
       saveAs: 'KF_SH08.png',
     },
     video: {
-      camera: 'Gimbal moving slowly backward ahead of them; they never stop walking.',
+      camera: 'Almost static: the camera holds its place, at most a slight drift back; they walk toward it and never stop.',
       setting: 'Bright upper corridor of the manor, daytime.',
       beats: [
         { t: [0, 3], text: `${Cap('clara')} and ${D('naomi')} walk side by side down the corridor toward the camera, covering the empty stretch toward the open door at an easy pace, not stopping.` },
         { t: [3, 5], text: `As they reach the open doorway, ${D('clara')} slows just enough to look to her left through it into the room, her face going still and guarded.` },
       ],
-      stays: [STAY_PEOPLE],
+      stays: [STAY_PEOPLE, STAY_CORRIDOR],
     },
     order: 5,
     edit: 3,
@@ -610,14 +611,14 @@ export const SHOTS: Shot[] = [
       saveAs: 'KF_SH10.png',
     },
     video: {
-      camera: 'Gimbal moving backward ahead of them.',
+      camera: 'Almost static: a very slow drift back of about a metre as they come on at a slow, unhurried walk; their size stays about the same.',
       setting: 'Bright upper corridor, daytime.',
       beats: [
         { t: [0, 1.5], text: `${Cap('naomi')}, still walking, eyes on her, asks gently in ${V('naomi')}: ${q('C4')}` },
-        { t: [1.5, 2.5], text: `${Cap('clara')} keeps looking through the doorway but keeps moving past it without slowing.` },
+        { t: [1.5, 2.5], text: `${Cap('clara')} glances to her left into the open doorway beside her and walks on past it without slowing; the doorway slips behind them on frame-right.` },
         { t: [2.5, 8], text: `Walking, controlled and direct, in ${V('clara')}: ${q('C6')} On the last words a thin, tight half-smile that does not reach her eyes. ${Cap('naomi')} listens, walking, eyes on her.` },
       ],
-      stays: [STAY_PEOPLE],
+      stays: [STAY_PEOPLE, STAY_CORRIDOR],
     },
     order: 8,
     edit: 6,
@@ -652,14 +653,14 @@ export const SHOTS: Shot[] = [
       saveAs: 'KF_SH11.png',
     },
     video: {
-      camera: 'Gimbal moving backward at an angle ahead of them, tight on her face.',
+      camera: 'Almost static: a slow drift back of about a metre at her slow pace, tight on her face.',
       setting: 'Bright upper corridor, daytime.',
       beats: [
         { t: [0, 1.5], text: `${Cap('clara')} looks back once over her left shoulder toward the open doorway behind her — at the box inside — then turns forward again.` },
         { t: [1.5, 7], text: `Quieter, still walking, her voice thinning, in ${V('clara')}: ${q('C8')}` },
         { t: [7, 8], text: `In the soft foreground ${D('naomi')} glances back toward the doorway, then keeps pace beside her and says nothing.` },
       ],
-      stays: [STAY_PEOPLE],
+      stays: [STAY_PEOPLE, STAY_CORRIDOR],
     },
     order: 8,
     edit: 6,

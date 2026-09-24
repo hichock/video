@@ -142,6 +142,10 @@ export const OLD_PACK_PROBLEMS: Note[] = [
 
 export const DECISIONS: Note[] = [
   {
+    title: 'Show title card between SH01 and SH02 (producer decision)',
+    body: 'A ~3 s title card (series title, episode title, the five crew members) is added between the cold open and the arrival. The script (A7) asks for a hard cut from the broken breath straight to bright daylight, so the card sits inside that cut. Alternative that keeps the script exactly: lay the same titles over the first seconds of SH02 instead.',
+  },
+  {
     title: 'One compact case: the fixed-camera case is the monitor case',
     body: 'The script calls it the “compact fixed-camera case” on arrival (B6) and the “small monitor case” in the nursery and on the landing (D10, D26). They are treated as one small black hard case: the two-screen monitor is built into it and the two small fixed cameras travel in its lid. So one prop follows the small woman from the car to the landing, and the continuity ledger can track it. Change this if the bible means two different cases.',
   },
