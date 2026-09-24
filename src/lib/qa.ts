@@ -278,6 +278,12 @@ export function runQA(): Finding[] {
     if (later.length) add('warn', 'Build order', `Needs later-shot images first: ${later.join(', ')} (see Build order).`, s.id);
   });
 
+  // 16f. Video prompts must fit the video model's prompt box.
+  for (const s of SHOTS) {
+    const n = videoPrompt(s).length;
+    if (n > 2500) add('error', 'Prompt length', `Video prompt is ${n} characters; the limit is 2500.`, s.id);
+  }
+
   // 17. Runtime vs script
   const total = SHOTS.reduce((a, s) => a + s.edit, 0);
   add('info', 'Runtime', `Full script cut: ${total.toFixed(1)}s (${fmtTime(total)}). Script expects ~2:38–2:45.`);

@@ -157,22 +157,66 @@ export function womanPrompt(s: Shot): string {
 
 export const fmt = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
 
+/** Short prop names for video prompts (the keyframe prompt carries the full names). */
+const THING_SHORT: Record<string, string> = {
+  frontDoor: 'the front door',
+  hallServiceDoor: 'the hall service door',
+  nurseryDoor: 'the nursery door',
+  lowerPanel: 'the lower panel under the board',
+  lowerServiceDoor: 'the lower service door',
+  owenCase: 'the bearded man’s heavy case',
+  monitorCase: 'the small woman’s compact case',
+  nurseryCam: 'the nursery camera',
+  bellCam: 'the bell-board camera',
+};
+
 /** Door and prop states, written so the model cannot invent an action that is not in the shot. */
 export function stateLines(s: Shot, forVideo: boolean): string {
   if (!s.states?.length) return '';
+  const name = (t: string) => (forVideo ? THING_SHORT[t] : THINGS[t as keyof typeof THINGS]);
   const items = s.states.map((st) => {
     const end = st.end ?? st.start;
     if (end === st.start) {
       const rule = /Door|Panel/.test(st.thing)
-        ? 'it stays exactly so for the whole shot; nobody opens, closes or touches it'
+        ? 'stays so; nobody touches it'
         : /HAND/.test(st.start)
-          ? 'it stays in that hand for the whole shot; it is never put down or handed over'
-          : 'it stays exactly there for the whole shot; nobody picks it up or moves it';
-      return `${THINGS[st.thing]}: ${st.start} — ${rule}.`;
+          ? 'stays in that hand; never put down'
+          : 'stays there; nobody moves it';
+      return `${name(st.thing)}: ${st.start} — ${rule}.`;
     }
-    return forVideo ? `${THINGS[st.thing]}: ${st.start} at the start → ${end} by the end, only as described in the beats.` : `${THINGS[st.thing]}: ${st.start} (it changes only later, during the video).`;
+    return forVideo ? `${name(st.thing)}: ${st.start} → ${end}, only as in the beats.` : `${name(st.thing)}: ${st.start} (it changes only later, during the video).`;
   });
   return `${forVideo ? 'STATES' : 'STATE IN THIS FRAME (fixed)'}:\n${items.map((t) => `• ${t}`).join('\n')}`;
+}
+
+/** Short handle used for a person after their full description has appeared once in a video prompt. */
+const HANDLE: Record<string, string> = {
+  elias: 'the tall man',
+  mara: 'the small woman',
+  naomi: 'the woman with locs',
+  owen: 'the bearded man',
+  clara: 'the copper-haired woman',
+  woman: 'the veiled figure',
+};
+
+/** Keep each person's full description at its first mention only; later mentions use the handle. */
+function shortenRepeats(text: string): string {
+  let out = text;
+  for (const [id, ch] of Object.entries(CHARACTERS)) {
+    const full = ch.short;
+    const cap = full[0].toUpperCase() + full.slice(1);
+    const handle = HANDLE[id];
+    if (!handle) continue;
+    let seen = false;
+    out = out.replace(new RegExp(`${cap.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}|${full.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g'), (m) => {
+      if (!seen) {
+        seen = true;
+        return m;
+      }
+      return m === cap ? handle[0].toUpperCase() + handle.slice(1) : handle;
+    });
+  }
+  return out;
 }
 
 export function videoPrompt(s: Shot): string {
@@ -181,7 +225,7 @@ export function videoPrompt(s: Shot): string {
   lines.push(`${v.camera} ${v.setting}`);
   if (s.people.length) {
     lines.push(`Start frame: ${s.people.map((p) => `${CHARACTERS[p.id].short} — ${VIEW_SHORT[p.view]}, ${p.where}; ${p.doing}${p.hands ? `; ${p.hands}` : ''}`).join('. ')}.`);
-    lines.push('Every action continues FORWARD from the start frame; nothing that is already done in the start frame is undone or repeated.');
+    lines.push('Everything continues FORWARD from the start frame; nothing already done is undone or repeated.');
   }
   const st = stateLines(s, true);
   if (st) lines.push(st);
@@ -190,7 +234,7 @@ export function videoPrompt(s: Shot): string {
   const stays = [...v.stays];
   if (s.people.some((p) => p.view !== 'hands')) stays.push('Nobody looks into the lens.');
   lines.push(stays.join(' '));
-  return lines.join('\n');
+  return shortenRepeats(lines.join('\n'));
 }
 
 export function klingSettings(s: Shot): string {
