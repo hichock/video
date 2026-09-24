@@ -546,7 +546,7 @@ export const SHOTS: Shot[] = [
     lens: '35mm',
     size: 'INSERT',
     setup: 'COR-DOOR through the doorway',
-    blocking: 'Plate framing: from the corridor straight through the open white door into the nursery. The iron bed straight ahead along the far wall (foot to the right), the window and curtains ahead-right, the chest with the grey box ahead-left on the rug, the bedside table and lamp at the bed head, the dust-sheeted armchair deep left; the high corner ahead-right above the window is still empty.',
+    blocking: 'Plate framing (the approved frame): from the corridor through the open white door and down the length of the nursery. The door leaf open on the LEFT; the bed along the RIGHT wall, foot nearest the door; the window with thin curtains on the right wall beside the foot of the bed; the chest with the grey box at the centre on the rug; the lamp table at the bed head at the far end; the dust-sheeted armchair far-left. No camera mounted yet.',
     states: [{ thing: 'nurseryDoor', start: 'ALREADY WIDE OPEN' }],
     people: [],
     map: '/maps/SH09_map.png',
@@ -557,7 +557,7 @@ export const SHOTS: Shot[] = [
       saveAs: 'LOC_NURSERY_DOORWAY_DAY.png',
     },
     video: {
-      camera: 'Gimbal gliding slowly left to right past the open doorway at eye level.',
+      camera: 'Gimbal drifting slowly and slightly to the right at eye level, as if walking past the open doorway.',
       setting: 'A small, sunlit child’s room seen from the corridor.',
       beats: [
         { t: [0, 3], text: 'The camera glides past the open doorway, holding one clean view into the room: the simple white iron bed, the low wooden chest, the grey archival box on its lid. Dust hangs in the pale light. Nothing in the room moves.' },
@@ -704,7 +704,7 @@ export const SHOTS: Shot[] = [
     title: 'Handheld from Elias at the doorway: Mara mounts NURSERY FIXED in the high corner; its preview shows door, box and open depth.',
     cam: 'handheld',
     operator: 'elias',
-    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    location: 'LOC_NURSERY_FIXED_DAY.png',
     time: 'day',
     lens: '35mm',
     size: 'MS',
@@ -719,7 +719,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH13_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'the room seen from the doorway — keep'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket'), mapUp('SH13')],
+      uploads: [up('LOC_NURSERY_FIXED_DAY.png', 'the same room: wallpaper, window, bed and chest — this shot looks from the doorway straight across at the corner where that photo was taken from'), sheet('mara'), up('PROP_FIXED_CAM.png', 'the camera on its wall bracket'), mapUp('SH13')],
       frame: 'Concentrated, quick, precise hands.',
       saveAs: 'KF_SH13.png',
     },
@@ -745,7 +745,7 @@ export const SHOTS: Shot[] = [
     covers: ['D3', 'D4', 'D5'],
     title: 'Corridor angle: Owen passes with BELL BOARD FIXED and his pouch, Naomi behind with her recorder. ELIAS: “Very polite house so far.” MARA: “You’ve been here twenty minutes.”',
     cam: 'tripod',
-    location: 'LOC_NURSERY_DOORWAY_DAY.png',
+    location: 'LOC_CORRIDOR_DAY.png',
     time: 'day',
     lens: '35mm',
     size: 'MWS',
@@ -763,7 +763,7 @@ export const SHOTS: Shot[] = [
     map: '/maps/SH14_map.png',
     kf: {
       mode: 'generate',
-      uploads: [up('LOC_NURSERY_DOORWAY_DAY.png', 'corridor, doorway and room — keep'), sheet('elias'), sheet('owen'), up('CH_LINEUP.png', 'identities of the woman in the corner and the woman with locs, and everyone’s heights'), mapUp('SH14')],
+      uploads: [up('LOC_CORRIDOR_DAY.png', 'the corridor, the white nursery door and its surround, wallpaper and floor — seen here from across the corridor, facing the open doorway'), sheet('elias'), sheet('owen'), up('CH_LINEUP.png', 'identities of the woman in the corner and the woman with locs, and everyone’s heights'), mapUp('SH14')],
       frame: 'Relaxed crew banter while everyone keeps working.',
       saveAs: 'KF_SH14.png',
     },

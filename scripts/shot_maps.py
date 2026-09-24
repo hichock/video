@@ -376,20 +376,22 @@ maps['SH08'] = svg('SH08', 'First frame: the two women far down the corridor; th
 
 # ---------------- SH09 ----------------
 plan = upper_plan()
-plan += camera(426, 300, 180, 64, 330, 'CAMERA 35mm, at the doorway', None)
+plan += camera(384, 262, 128, 50, 380, 'CAMERA 35mm, just outside the door', None, ldx=20, ldy=-22)
 frame = frame_panel(760, 60, [
-    ('box', 0.08, 0.0, 0.84, 1.0, '', '#f4efe6'),
-    ('box', 0.62, 0.05, 0.3, 0.14, 'EMPTY CORNER (camera goes here later)', '#ffffff'),
-    ('box', 0.66, 0.2, 0.26, 0.28, 'WINDOW', '#6f8fb8'),
-    ('box', 0.12, 0.4, 0.78, 0.14, 'IRON BED (head left, foot right)', '#ffffff'),
-    ('box', 0.1, 0.36, 0.14, 0.1, 'LAMP', '#b08a62'),
-    ('box', 0.26, 0.62, 0.26, 0.1, 'CHEST + GREY BOX', '#5b3f2a'),
-    ('box', 0.0, 0.5, 0.1, 0.2, 'CHAIR', '#ffffff'),
-], ['FIRST FRAME: from the corridor straight', 'through the open door. No people.'])
-maps['SH09'] = svg('SH09', 'First frame: the room through the open doorway — bed, chest, archival box (INSERT)',
-                   'Camera in the corridor, back to the opposite wall, looking into the nursery (west)', plan, frame,
-                   ['Same room as the approved high-corner plate, seen from its side: bed straight ahead, window ahead-right, chest ahead-left.',
-                    'No people. The door leaf is open inward, on the LEFT of the doorway.'])
+    ('box', 0.0, 0.0, 0.14, 1.0, 'FRAME', '#f4efe6'),
+    ('box', 0.86, 0.0, 0.14, 1.0, 'FRAME', '#f4efe6'),
+    ('box', 0.14, 0.12, 0.2, 0.74, 'DOOR LEAF', '#ffffff'),
+    ('box', 0.34, 0.24, 0.46, 0.2, 'FAR WALL', '#efe7da'),
+    ('box', 0.35, 0.44, 0.12, 0.1, 'ARMCHAIR', '#ffffff'),
+    ('box', 0.52, 0.42, 0.06, 0.08, '', '#b08a62'),
+    ('box', 0.6, 0.5, 0.2, 0.12, 'BED', '#ffffff'),
+    ('box', 0.8, 0.26, 0.06, 0.3, '', '#6f8fb8'),
+    ('box', 0.44, 0.64, 0.18, 0.1, 'CHEST+BOX', '#5b3f2a'),
+], ['FIRST FRAME = the approved image: through', 'the open door and DOWN the room. Leaf LEFT;', 'bed along the RIGHT wall, foot nearest; chest', 'centre; lamp far end; armchair far-left;', 'window (blue) on the right wall.'])
+maps['SH09'] = svg('SH09', 'First frame: through the open door, down the length of the room (INSERT)',
+                   'Just outside the door, looking in and down the room', plan, frame,
+                   ['This matches the approved nursery plate: bed along the west wall, foot at the window end, lamp and armchair at the far end.',
+                    'No people. SH13 and SH14 look straight across at the window corner instead.'])
 
 # ---------------- SH10 ----------------
 plan = upper_plan()

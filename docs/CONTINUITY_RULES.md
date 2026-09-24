@@ -162,6 +162,12 @@ These failed in real tests. Each one is now a hard rule.
   sign” next to a board that must carry one readable label). Glimpses of other rooms must
   repeat that room’s look (the hall through a door: dust sheets, pale rectangles, no
   portraits or flowers).
+- **When every model keeps giving the same “wrong” view, check whether it is right.** SH09
+  asked for the nursery seen straight across from the doorway, while uploading the approved
+  plate. The models kept producing the view down the length of the room — which is exactly
+  what that plate implies from that door. Derive other angles from the approved plate’s
+  geometry, and when a generated frame is consistent, adopt it as the reference instead of
+  forcing a view the references contradict.
 - **Old references override new text.** If a sheet or plate changed, regenerate it before
   generating anything that uploads it.
 
