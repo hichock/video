@@ -4,7 +4,7 @@
 
 import { ASSETS, HYGIENE, LOOKS, type Asset, type Upload } from '../data/assets';
 import { CHARACTERS, CAST, type CharId } from '../data/characters';
-import { SHOTS, visibleOf, SIZE_TEXT, type Person, type Shot, type View } from '../data/shots';
+import { SHOTS, THINGS, visibleOf, SIZE_TEXT, type Person, type Shot, type View } from '../data/shots';
 
 /** How reused shot stills are described when uploaded (never by file name). */
 export const KF_REFS: Record<string, string> = {
@@ -94,8 +94,9 @@ const FACE_VISIBLE: View[] = ['front', 'front34', 'profileL', 'profileR'];
 
 function personLine(p: Person): string {
   const ch = CHARACTERS[p.id];
-  const body = FACE_VISIBLE.includes(p.view) ? ch.look : p.view === 'hands' ? 'large tattooed hand and forearm' : `${ch.fromBehind} (face not shown)`;
   const hands = p.hands ? `\n  Hands: ${p.hands}.` : '';
+  if (p.view === 'hands') return `• ${ch.short} — ${VIEW_TEXT[p.view]}.\n  Where: ${p.where}.\n  Doing: ${p.doing}.${hands}\n  Only the hand, forearm and sleeve cuff show — match them to the character sheet; nothing else of this person is in frame.`;
+  const body = FACE_VISIBLE.includes(p.view) ? ch.look : `${ch.fromBehind} (face not shown)`;
   return `• ${ch.short} — ${VIEW_TEXT[p.view]}.\n  Where: ${p.where}.\n  Doing: ${p.doing}.${hands}\n  Looks: ${body}.\n  Wearing: ${ch.wardrobe}.`;
 }
 
@@ -124,6 +125,8 @@ export function keyframePrompt(s: Shot): string {
   if (k.mode === 'edit') parts.push(k.frame);
   parts.push(`REFERENCES (uploaded images; their order is not guaranteed):\n${k.uploads.map(refLine).join('\n')}`);
   parts.push(`BLOCKING (fixed — do not change): ${s.blocking}`);
+  const st = stateLines(s, false);
+  if (st) parts.push(st);
   if (k.mode === 'generate') parts.push(`THE MOMENT: ${k.frame}`);
   const people = peopleBlock(s.people);
   if (people) parts.push(people);
@@ -154,6 +157,24 @@ export function womanPrompt(s: Shot): string {
 
 export const fmt = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
 
+/** Door and prop states, written so the model cannot invent an action that is not in the shot. */
+export function stateLines(s: Shot, forVideo: boolean): string {
+  if (!s.states?.length) return '';
+  const items = s.states.map((st) => {
+    const end = st.end ?? st.start;
+    if (end === st.start) {
+      const rule = /Door|Panel/.test(st.thing)
+        ? 'it stays exactly so for the whole shot; nobody opens, closes or touches it'
+        : /HAND/.test(st.start)
+          ? 'it stays in that hand for the whole shot; it is never put down or handed over'
+          : 'it stays exactly there for the whole shot; nobody picks it up or moves it';
+      return `${THINGS[st.thing]}: ${st.start} — ${rule}.`;
+    }
+    return forVideo ? `${THINGS[st.thing]}: ${st.start} at the start → ${end} by the end, only as described in the beats.` : `${THINGS[st.thing]}: ${st.start} (it changes only later, during the video).`;
+  });
+  return `${forVideo ? 'STATES' : 'STATE IN THIS FRAME (fixed)'}:\n${items.map((t) => `• ${t}`).join('\n')}`;
+}
+
 export function videoPrompt(s: Shot): string {
   const v = s.video;
   const lines: string[] = [];
@@ -162,6 +183,8 @@ export function videoPrompt(s: Shot): string {
     lines.push(`Start frame: ${s.people.map((p) => `${CHARACTERS[p.id].short} — ${VIEW_SHORT[p.view]}, ${p.where}; ${p.doing}${p.hands ? `; ${p.hands}` : ''}`).join('. ')}.`);
     lines.push('Every action continues FORWARD from the start frame; nothing that is already done in the start frame is undone or repeated.');
   }
+  const st = stateLines(s, true);
+  if (st) lines.push(st);
   for (const b of v.beats) lines.push(`${fmt(b.t[0])}–${fmt(b.t[1])}s: ${b.text}`);
   if (v.vo) lines.push('Nobody on screen speaks; no one moves their mouth to talk.');
   const stays = [...v.stays];

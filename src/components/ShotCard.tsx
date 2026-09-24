@@ -1,5 +1,5 @@
 import { BEAT_BY_ID, SECTION_OF } from '../data/script';
-import { MAPS } from '../data/assets';
+import { ASSETS, MAPS } from '../data/assets';
 import type { Shot } from '../data/shots';
 import type { Finding } from '../lib/qa';
 import { fmtTime } from '../lib/qa';
@@ -111,6 +111,20 @@ export function ShotCard({
         )}
         <PromptBlock title={`Keyframe · Nano Banana 2 → ${shot.kf.mode === 'plate' || shot.kf.mode === 'startEnd' ? 'no new image' : shot.kf.saveAs}`} text={keyframePrompt(shot)} />
         {(shot.kf.mode === 'generate' || shot.kf.mode === 'edit') && <Checklist id={shot.id} items={approvalChecklist(shot)} />}
+        {(shot.kf.mode === 'plate' || shot.kf.mode === 'startEnd') &&
+          [shot.kf.uploads[0].file, shot.kf.mode === 'startEnd' ? shot.kf.endFrame : undefined]
+            .map((f) => ASSETS.find((x) => x.file === f))
+            .filter((x): x is NonNullable<typeof x> => !!x && !!x.prompt)
+            .map((x) => (
+              <div key={x.file}>
+                <PromptBlock
+                  title={`Start frame image · Nano Banana 2 → ${x.file}`}
+                  text={x.prompt!}
+                  footer={x.uploads?.length ? `Upload: ${x.uploads.map((u) => `${u.file} (${u.job})`).join(' · ')}` : 'No uploads.'}
+                />
+                {x.check && <Checklist id={`plate-${x.file}`} items={x.check} />}
+              </div>
+            ))}
         {w && <PromptBlock title={`Veiled Woman layer → ${shot.woman!.file}`} text={w} footer="Mask the figure out of this still and composite it over the clip. She never moves." />}
         {shot.woman?.cleanPrompt && <PromptBlock title={`Clean start frame → ${shot.woman.cleanSaveAs}`} text={shot.woman.cleanPrompt} />}
         <PromptBlock title="Video · Kling 3.0" text={videoPrompt(shot)} footer={klingSettings(shot)} />

@@ -639,7 +639,7 @@ function Changes() {
           {OLD_PACK_PROBLEMS.map((n) => (
             <div className="note" key={n.title}>
               <h3>{n.title}</h3>
-              <p>{n.body}</p>
+              <p style={{ whiteSpace: 'pre-line' }}>{n.body}</p>
               {n.fix && <p className="fix">{n.fix}</p>}
             </div>
           ))}
@@ -652,7 +652,7 @@ function Changes() {
           {DECISIONS.map((n) => (
             <div className="note" key={n.title}>
               <h3>{n.title}</h3>
-              <p>{n.body}</p>
+              <p style={{ whiteSpace: 'pre-line' }}>{n.body}</p>
               {n.fix && <p className="ask">{n.fix}</p>}
             </div>
           ))}

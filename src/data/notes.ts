@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'Full audit of SH01–SH20: states, props and hands that did not carry over',
+    body: 'Reading every generated prompt in order found:\n• SH08: the nursery door is open in the script (“the open nursery door”) but the prompt never said it was already open and untouched, so a model could have her open it. The prompt also said 24mm while the lens was 35mm, and put the women “one step before” a door they walk 2.5s to reach.\n• SH02–SH04: the small woman lifted her case out in SH02, then it was back in the boot in SH04. The bearded man was “unloading” in SH03 and dragging a case out in SH04 after he had already set it down.\n• SH02: the bearded man was facing frame-right and turning to frame-left in the same frame.\n• SH06→SH07: the case moved from his left hand to his right. SH17→SH18: the pouch and camera moved hands.\n• SH07 and SH12: raising a camera that was already raised.\n• SH12→SH16: the monitor case appeared on the nursery floor with nobody carrying it in.\n• SH18: the small woman picked up a camera across the room in one second.\n• SH19: a hands-only insert was sent the full wardrobe, cap included.\n• SH09 showed no image prompt, because it uses a plate.\n• SH01 needs three later-shot images first; this was nowhere stated.',
+    fix: 'All fixed in the shot data. Doors and key props now have a start and end state per shot that is printed in both prompts. A continuity check fails the build when a state jumps without an explanation. Plate-mode shots show the plate’s own prompt and checklist on the shot card. Hands-only views get only hand, forearm and cuff. The test scope warns when it needs images from later shots.',
+  },
+  {
     title: 'The bell board had one floating NURSERY sign (service-hall sheet test)',
     body: 'The prompts only said “NURSERY readable in the middle row” and added “an old enamel sign” to the wall, but never described the board. The model drew a board of bells with blank brass tags plus a separate NURSERY plaque between the rows. The glimpse of the hall through the door also got a portrait, flowers and a rug the real hall does not have.',
     fix: 'One locked BELL_BOARD description, used by every prompt that shows it: nine open windows in a 3×3 grid, each with a brass flag and its OWN label directly under it, all nine names spelled out, NURSERY the centre one, no other signs. The enamel sign is gone. Flags are UP = window dark, DOWN = brass face fills the window, so the flag scenes read clearly. The view-B hall glimpse now uploads the hall plate and says no portraits, flowers or rugs.',
@@ -126,6 +131,10 @@ export const OLD_PACK_PROBLEMS: Note[] = [
 ];
 
 export const DECISIONS: Note[] = [
+  {
+    title: 'One compact case: the fixed-camera case is the monitor case',
+    body: 'The script calls it the “compact fixed-camera case” on arrival (B6) and the “small monitor case” in the nursery and on the landing (D10, D26). They are treated as one small black hard case: the two-screen monitor is built into it and the two small fixed cameras travel in its lid. So one prop follows the small woman from the car to the landing, and the continuity ledger can track it. Change this if the bible means two different cases.',
+  },
   {
     title: 'Video prompts carry only on-screen dialogue (producer decision)',
     body: 'Host VO (SH03, SH04, SH06) and off-screen lines (Elias through the door in SH32, Owen from the monitor in SH34, Naomi through the door in SH47) are no longer in the video prompts. This replaces the earlier rule that every scripted line must be in the video prompt. VO shots now say “nobody on screen speaks”; off-screen moments are written as silent listening beats.',

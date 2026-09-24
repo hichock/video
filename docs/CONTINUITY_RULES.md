@@ -184,6 +184,15 @@ Keep one row per shot, updated when a take is approved:
 
 Before generating shot N+1, read the log row for shot N.
 
+**The ledger in code.** Every door and key prop visible in a shot has a `states` entry in
+`shots.ts`: its state at the start and at the end (e.g. the nursery door `ALREADY WIDE
+OPEN`; the heavy case `ON THE GRAVEL` → `IN HIS LEFT HAND`). The prompts print these as a
+fixed STATE block, so a model cannot invent an action (opening a door that is already
+open, putting back a case that is already out). `npm test` fails when a shot starts a
+thing in a different state from where the last shot left it, unless the shot says what
+happened off screen (`between`). Doors: say whether the script has them open or closed
+and who, if anyone, touches them.
+
 ## 9. Keyframe approval (before spending on video)
 
 Reject and reroll the keyframe unless:

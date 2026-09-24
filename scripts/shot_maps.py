@@ -157,7 +157,7 @@ maps = {}
 plan = base_plan('from frame-LEFT')
 plan += camera(300, 690, -90, 62, 560, 'CAMERA 24mm, eye level', move_to=(290, 610))
 plan += person('owen', 178, 462, 0, note='case ALREADY OUT → set on gravel', label_dx=-170, label_dy=38)
-plan += person('mara', 272, 462, 180, note='case STILL INSIDE → lifts out', label_dx=18, label_dy=30)
+plan += person('mara', 272, 462, 180, note='case STILL INSIDE → stays in (lifted in SH04)', label_dx=18, label_dy=30)
 plan += person('elias', 350, 330, -90, end=(338, 215), note=['walks AWAY toward the steps,', 'camera visible in his RIGHT hand,', 'stops short of the steps'], label_dx=22, label_dy=4)
 plan.append(f'<circle cx="160" cy="430" r="7" fill="{COL["owen"]}" opacity="0.5"/>')
 frame = frame_panel(760, 60 - 40 + 40, [
@@ -171,13 +171,13 @@ frame = frame_panel(760, 60 - 40 + 40, [
 maps['SH02'] = svg('SH02', 'Crew already unloading; the tall man heads for the door',
                    'Camera behind the SUV, slightly right, looking at the house', plan, frame,
                    ['Nobody looks at the camera. The tall man’s face is never seen.',
-                    'Bearded man: case already out of the car → lowers it onto the gravel by the rear wheel. Small woman: case still in the boot → lifts it out.'])
+                    'Bearded man: case already out → lowers it onto the gravel by the rear wheel. Small woman: compact case stays IN the boot (she lifts it in SH04).'])
 
 # ---------------- SH03 ----------------
 plan = base_plan('= frame-RIGHT in this reverse view')
 plan += camera(330, 185, 90, 50, 520, 'CAMERA 35mm, back to the house', move_to=(330, 160))
 plan += person('elias', 330, 262, -90, end=(330, 215), note=['walks TOWARD camera (= toward house),', 'camera at chest height,', 'eyes ABOVE the lens'], label_dx=22, label_dy=0)
-plan += person('owen', 205, 470, -90, note='at the tailgate, half hidden by the SUV', label_dx=-190, label_dy=40)
+plan += person('owen', 205, 470, -90, note=['picks his case up off', 'the gravel by the rear wheel'], label_dx=-190, label_dy=40)
 plan += person('mara', 250, 470, -90, label_dx=20, label_dy=38)
 frame = frame_panel(760, 60, [
     ('box', 0.0, 0.0, 1.0, 0.45, 'DRIVE, LAWNS, TREES (house is BEHIND camera)', '#efe8d8'),
@@ -195,11 +195,9 @@ maps['SH03'] = svg('SH03', 'The tall man walks toward the house — VO 1',
 plan = base_plan('= AHEAD of camera (backlight)')
 plan += camera(420, 470, 180, 55, 330, 'CAMERA 50mm, side-on to the SUV', move_to=(420, 430))
 plan += person('mara', 238, 478, -90, end=(292, 300), via=[(292, 478)], note=['faces INTO the boot (frame-right),', 'lifts the case out, then walks along', 'the camera side of the SUV', 'toward the house (frame-right)'], label_dx=-10, label_dy=64)
-plan += person('owen', 196, 500, -90, note='left edge, partly cut off', label_dx=-175, label_dy=34)
 frame = frame_panel(760, 60, [
     ('box', 0.55, 0.05, 0.45, 0.35, 'MANOR + STEPS (soft)', '#cfc6b3'),
     ('box', 0.0, 0.38, 1.0, 0.3, 'SUV side-on: REAR/open boot LEFT, nose RIGHT', '#27402f'),
-    ('fig', 0.05, 0.4, 0.1, 0.4, 'BEARDED', COL['owen']),
     ('fig', 0.36, 0.3, 0.16, 0.5, 'RUST (profile, facing right)', COL['mara'], 22),
 ], ['Open boot on frame-LEFT, nose toward the', 'house on frame-RIGHT. Low sun ahead:', 'she is backlit. She exits frame-RIGHT.'])
 maps['SH04'] = svg('SH04', 'The small woman lifts the camera case, checks the latch — VO 2',
@@ -355,18 +353,19 @@ def upper_plan(show_room=True):
 # ---------------- SH08 ----------------
 plan = upper_plan()
 plan += camera(400, 200, 90, 52, 470, 'CAMERA 35mm, backing north', move_to=(400, 170))
-plan += person('clara', 380, 380, -90, end=(380, 305), note=['walks toward camera on the', 'nursery-door side; slows at', 'the door and looks in'], label_dx=-250, label_dy=30)
+plan += person('clara', 380, 380, -90, end=(380, 305), note=['walks toward camera on the', 'nursery-door side; slows at', 'the door and looks in'], label_dx=-290, label_dy=-170)
 plan += person('naomi', 422, 390, -90, end=(422, 315), note=['taller, walks beside her,', 'eyes on her'], label_dx=26, label_dy=40)
 frame = frame_panel(760, 60, [
     ('box', 0.3, 0.12, 0.4, 0.34, 'CORRIDOR → LANDING', '#efe7da'),
-    ('box', 0.8, 0.2, 0.2, 0.55, 'NURSERY DOOR (open)', '#ffffff'),
-    ('fig', 0.4, 0.4, 0.1, 0.4, 'CAMEL (left)', COL['naomi']),
-    ('fig', 0.6, 0.43, 0.09, 0.36, 'ICE-BLUE (right)', COL['clara']),
-], ['Looking back toward the landing.', 'Open nursery door on the RIGHT wall', 'right beside the copper-haired woman.'])
+    ('box', 0.84, 0.14, 0.16, 0.7, 'DOOR: ALREADY OPEN', '#ffffff'),
+    ('fig', 0.42, 0.42, 0.09, 0.36, 'CAMEL (left)', COL['naomi'], 16),
+    ('fig', 0.6, 0.44, 0.08, 0.33, 'ICE-BLUE (right)', COL['clara']),
+], ['Looking back toward the landing.', 'The nursery door is ALREADY wide open on', 'the RIGHT wall, a few steps AHEAD of the', 'women (nearer camera). Nobody touches it.'])
 maps['SH08'] = svg('SH08', 'Naomi and Clara walk the upper corridor; Clara slows at the nursery door',
                    'Reverse corridor view from the far-window end, looking south', plan, frame,
                    ['The women came up the main stair and walk north toward the far window (and the camera).',
-                    'Copper-haired woman on frame-RIGHT = the door side (her left). Taller woman on frame-LEFT.'])
+                    'Copper-haired woman on frame-RIGHT = the door side (her left). Taller woman on frame-LEFT.',
+                    'Script C2: “the OPEN nursery door” — it is already open in the start frame; nobody opens or touches it.'])
 
 # ---------------- SH09 ----------------
 plan = upper_plan()
@@ -419,7 +418,7 @@ maps['SH11'] = svg('SH11', 'Clara: “Her last letter is in that box…” (MCU,
 # ---------------- SH12 ----------------
 plan = upper_plan()
 plan += camera(410, 660, -90, 40, 640, 'CAMERA 24mm, LOCKED', None, ldx=30, ldy=-24)
-plan += person('mara', 392, 440, -90, end=(372, 310), via=[(392, 340)], note=['walks AWAY, turns in at the door', '(camera + bracket in her hands)'], label_dx=26, label_dy=-30)
+plan += person('mara', 392, 440, -90, end=(372, 310), via=[(392, 340)], note=['walks AWAY, turns in at the door:', 'camera+bracket right hand,', 'monitor case left hand'], label_dx=26, label_dy=-30)
 plan += person('elias', 420, 480, -90, end=(385, 330), label_dx=26, label_dy=24, note=['a step behind, handheld'])
 plan += person('clara', 385, 120, -90, end=(430, 70), label_dx=-250, label_dy=0, note=['far away, walk on and turn out', 'through a door on the right'])
 plan += person('naomi', 415, 130, -90, end=(436, 90), label_dx=26, label_dy=60)
@@ -442,6 +441,8 @@ maps['SH12'] = svg('SH12', 'Transition: Mara carries NURSERY FIXED in, Elias fol
 plan = upper_plan()
 plan += camera(372, 300, 188, 58, 300, 'HANDHELD from the doorway (host, unseen)', None)
 plan += person('mara', 104, 276, -135, note=['on a step stool in the corner', 'above the window, arms up,', 'mounting the camera'], label_dx=24, label_dy=34)
+plan.append('<rect x="128" y="292" width="22" height="16" fill="#111"/>')
+plan.append(text(154, 318, 'monitor case on the floor', 11, INK, 'start', 400))
 frame = frame_panel(760, 60, [
     ('box', 0.58, 0.28, 0.36, 0.32, 'WINDOW', '#6f8fb8'),
     ('box', 0.0, 0.55, 0.75, 0.16, 'IRON BED', '#ffffff'),

@@ -4,7 +4,7 @@
 import { ALL_BEATS, BEAT_BY_ID, BEAT_INDEX, SCRIPT } from '../data/script';
 import { ASSETS } from '../data/assets';
 import { CHARACTERS, NAMES } from '../data/characters';
-import { SHOTS, visibleOf, type Shot } from '../data/shots';
+import { SHOTS, THINGS, visibleOf, type Shot, type Thing } from '../data/shots';
 import { keyframePrompt, producedFiles, refFor, videoPrompt, womanPrompt } from './prompts';
 
 export type Severity = 'error' | 'warn' | 'info';
@@ -244,6 +244,28 @@ export function runQA(): Finding[] {
       add(inScope ? 'error' : 'warn', 'Coverage', `Location ${loc} is never established: its first shots (${first.map((s) => `${s.id} ${s.size}`).join(', ')}) are all close. Make one of them WS/MWS.`, first[0].id);
     }
   }
+
+  // 16d. Continuity ledger: every door and key prop starts where the last shot that showed it left it,
+  // unless the shot says what happened off screen (continuity rules §8).
+  const ledger = new Map<Thing, { shot: string; end: string }>();
+  for (const s of SHOTS) {
+    for (const st of s.states ?? []) {
+      const prev = ledger.get(st.thing);
+      if (prev && prev.end !== st.start && !st.between)
+        add('error', 'Continuity', `${THINGS[st.thing]} starts ${st.start}, but ${prev.shot} left it ${prev.end}. Fix the state or say what happened in between.`, s.id);
+      if (prev && prev.end === st.start && st.between) add('warn', 'Continuity', `${THINGS[st.thing]}: "between" given but nothing changed since ${prev.shot}`, s.id);
+      ledger.set(st.thing, { shot: s.id, end: st.end ?? st.start });
+    }
+  }
+
+  // 16e. Test scope (SH01–SH20): flag uploads that are keyframes of later shots, so they get built first.
+  SHOTS.slice(0, 20).forEach((s) => {
+    const later = s.kf.uploads.map((u) => u.file).filter((f) => {
+      const m = /^KF_(SH\d+)/.exec(f);
+      return m && SHOTS.findIndex((x) => x.id === m[1]) >= 20;
+    });
+    if (later.length) add('warn', 'Build order', `Needs later-shot images first: ${later.join(', ')} (see Build order).`, s.id);
+  });
 
   // 17. Runtime vs script
   const total = SHOTS.reduce((a, s) => a + s.edit, 0);
