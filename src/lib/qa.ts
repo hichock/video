@@ -228,6 +228,17 @@ export function runQA(): Finding[] {
     if (prev2 && prev2.size === prev.size && prev.size === s.size) add('warn', 'Coverage', `Third ${s.size} in a row (${prev2.id}, ${prev.id}, ${s.id})`, s.id);
   });
 
+  // 16b2. Same view: consecutive shots in one place must turn the camera 30°+ (inserts exempt).
+  SHOTS.forEach((s, i) => {
+    const prev = SHOTS[i - 1];
+    if (!prev || s.matchCut || s.heading === undefined || prev.heading === undefined) return;
+    if (s.size === 'INSERT' || prev.size === 'INSERT') return;
+    if (setupKey(s.setup).split('-')[0] !== setupKey(prev.setup).split('-')[0]) return;
+    const d = Math.abs(((s.heading - prev.heading + 540) % 360) - 180);
+    if (d < 30)
+      add(i < 20 ? 'error' : 'warn', 'Coverage', `Same view as ${prev.id}: the camera faces the same way (${prev.heading}° → ${s.heading}°) in the same place. Turn it 30°+, put a cutaway between, or make it one continuous shot.`, s.id);
+  });
+
   // 16c. Establish every new location: one of its first two shots must be wide enough to show
   // the geography (continuity rules §7d). The cold open is exempt.
   const seenLoc = new Map<string, Shot[]>();

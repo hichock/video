@@ -277,28 +277,26 @@ maps['SH06'] = svg('SH06', 'Owen carries the heavy case in and checks the servic
                    ['Front door AHEAD of the camera (backlight). Stair BEHIND the camera — not in frame.',
                     'Start frame: his right hand a hand’s width from the knob; the door is still closed.'])
 
+START_ONLY = True  # SH07 onward: first frame only
 plan = hall_plan()
-plan += camera(330, 80, 90, 60, 620, 'CAMERA 24mm, HIGH', None, ldx=90, ldy=-6)
-plan += person('clara', 355, 190, -90, end=(355, 110), label_dx=26, label_dy=0, note=['climbing TOWARD camera,', 'frame-RIGHT of the pair'])
-plan += person('naomi', 305, 200, -90, end=(305, 120), label_dx=-250, label_dy=-90, note=['climbing TOWARD camera,', 'frame-LEFT, taller'])
-plan += person('owen', 330, 330, -90, end=(330, 270), label_dx=26, label_dy=-40, note=['at the stair foot, starts up'])
-plan += person('elias', 300, 450, -90, note=['in the hall, handheld raised', 'toward the stair'], label_dx=26, label_dy=40)
-plan += person('mara', 330, 670, -90, end=(330, 600), label_dx=26, label_dy=-10, note=['just coming in at the front door'])
+plan += camera(372, 500, -90, 60, 470, 'CAMERA 24mm, behind his right shoulder', None, ldx=-330, ldy=110)
+plan += person('elias', 392, 455, -95, note=['right foreground, back to camera,', 'handheld raised on the stair'], label_dx=26, label_dy=-6)
+plan += person('clara', 300, 200, -90, note=['halfway up, LEFT,', 'climbing away'], label_dx=-250, label_dy=-90)
+plan += person('naomi', 362, 210, -90, note=['halfway up, RIGHT, taller'], label_dx=26, label_dy=-20)
+plan += person('owen', 350, 338, -90, note=['foot of the stair, right of', 'centre; case in LEFT hand'], label_dx=-300, label_dy=40)
 frame = frame_panel(760, 60, [
-    ('box', 0.2, 0.5, 0.6, 0.5, 'STAIR (looking down it)', '#d9cfbf'),
-    ('box', 0.4, 0.06, 0.2, 0.14, 'FRONT DOOR', '#fff6d8'),
-    ('box', 0.0, 0.2, 0.12, 0.2, 'SERVICE DOOR', '#8a6a45'),
-    ('box', 0.86, 0.18, 0.14, 0.24, 'WINDOW', '#6f8fb8'),
-    ('fig', 0.4, 0.28, 0.02, 0.05, 'OLIVE', COL['elias']),
-    ('fig', 0.5, 0.12, 0.015, 0.035, 'RUST', COL['mara'], -4),
-    ('fig', 0.5, 0.42, 0.04, 0.08, 'BEARDED', COL['owen'], -62),
-    ('fig', 0.36, 0.58, 0.1, 0.3, 'CAMEL', COL['naomi']),
-    ('fig', 0.64, 0.6, 0.09, 0.27, 'ICE-BLUE', COL['clara']),
-], ['WIDE, HIGH ANGLE from the top of the stair.', 'Women climb TOWARD camera (faces seen).', 'Everyone else small below in the hall.', 'Service door LEFT wall, window RIGHT.'])
-maps['SH07'] = svg('SH07', 'Naomi and Clara go up; the crew follow below (WS, 24mm, high)',
-                   'NEW ANGLE: top of the central stair, looking down into the hall', plan, frame,
-                   ['Reverse of SH06: from up here the front door is at the far end and the service door is on the LEFT wall.',
-                    'Owen continues from SH06: already at the stair foot, not coming in again.'])
+    ('box', 0.2, 0.04, 0.56, 0.56, 'STAIR (going up, away)', '#d9cfbf'),
+    ('box', 0.0, 0.22, 0.1, 0.3, 'WINDOW', '#6f8fb8'),
+    ('box', 0.9, 0.3, 0.1, 0.34, 'SERVICE DOOR', '#8a6a45'),
+    ('fig', 0.4, 0.2, 0.045, 0.13, 'ICE-BLUE', COL['clara']),
+    ('fig', 0.54, 0.18, 0.05, 0.15, 'CAMEL', COL['naomi']),
+    ('fig', 0.56, 0.44, 0.08, 0.2, 'BEARDED', COL['owen']),
+    ('fig', 0.8, 0.34, 0.3, 0.68, 'OLIVE (back, handheld up)', COL['elias'], -140),
+], ['FIRST FRAME. Looking UP the stair; the', 'front door is behind the camera (SH06', 'looked the other way). Women climb', 'away; tall man in the right foreground.'])
+maps['SH07'] = svg('SH07', 'First frame: behind the tall man, looking up the stair; the women halfway up (WS, 24mm)',
+                   'Mid-hall, looking north up the stair', plan, frame,
+                   ['Opposite direction to SH06, so the cut reads as a new view.',
+                    'The small woman walks in from behind the camera on the left only during the video.'])
 
 # ===========================================================================
 # Upper floor: corridor + nursery (SH08-SH15). North up.
@@ -410,18 +408,18 @@ maps['SH10'] = svg('SH10', 'First frame: both women level with the open doorway,
 
 # ---------------- SH11 ----------------
 plan = upper_plan()
-plan += camera(400, 90, 90, 22, 520, 'CAMERA 85mm, TIGHT', None, ldx=30, ldy=-4)
-plan += person('clara', 385, 190, -90, note=['~2 m past the door,', 'eyes forward'], label_dx=-270, label_dy=30)
-plan += person('naomi', 422, 200, -90, note=['soft shoulder at frame-LEFT edge'], label_dx=26, label_dy=40)
+plan += camera(436, 118, 124, 24, 300, 'CAMERA 85mm, ahead + to her side', None, ldx=20, ldy=-20)
+plan += person('clara', 385, 190, -90, note=['~2 m past the door, eyes forward,', 'seen three-quarter'], label_dx=-290, label_dy=-40)
+plan += person('naomi', 422, 200, -90, note=['soft shoulder, left foreground'], label_dx=26, label_dy=40)
 frame = frame_panel(760, 60, [
-    ('box', 0.7, 0.2, 0.3, 0.5, 'DOORWAY (soft)', '#ffffff'),
-    ('fig', 0.0, 0.28, 0.3, 0.9, '', COL['naomi']),
-    ('fig', 0.58, 0.3, 0.56, 0.9, 'ICE-BLUE (chest-up)', COL['clara'], -200),
-], ['MEDIUM CLOSE-UP single, 85mm.', 'Her face upper-centre, eyes forward.', 'Taller woman only a soft shoulder, LEFT edge.', 'Open doorway soft behind her, frame-RIGHT.'])
-maps['SH11'] = svg('SH11', 'First frame: the copper-haired woman chest-up, the door behind her (MCU, 85mm)',
-                   'Same axis as SH08/SH10, much tighter', plan, frame,
-                   ['Size ladder on one axis: SH08 wide → SH10 medium → SH11 close-up.',
-                    'They have passed the nursery door; it is behind them on frame-RIGHT.'])
+    ('box', 0.78, 0.2, 0.22, 0.46, 'DOORWAY (soft)', '#ffffff'),
+    ('fig', 0.04, 0.3, 0.32, 0.9, '', COL['naomi']),
+    ('fig', 0.6, 0.3, 0.5, 0.9, 'ICE-BLUE (3/4, chest-up)', COL['clara'], -200),
+], ['MEDIUM CLOSE-UP, 85mm, 45° off their', 'walking line (SH10 was straight on).', 'Taller woman a soft shoulder, LEFT;', 'the doorway soft behind her.'])
+maps['SH11'] = svg('SH11', 'First frame: the copper-haired woman three-quarter, 45° off the corridor axis (MCU, 85mm)',
+                   'Ahead of them, off to the taller woman’s side', plan, frame,
+                   ['A new angle, not a tighter version of SH10: the camera moves 45° round to her side.',
+                    'They have passed the nursery door; it is soft in the background behind her.'])
 
 # ---------------- SH12 ----------------
 plan = upper_plan()
@@ -464,22 +462,25 @@ maps['SH13'] = svg('SH13', 'First frame: the small woman on the stool in the cor
 
 # ---------------- SH14 ----------------
 plan = upper_plan()
-plan += camera(434, 300, 180, 46, 360, 'CAMERA 35mm, locked, back to the east wall', None)
-plan += person('elias', 368, 300, 185, note=['in the doorway, filming the corner'], label_dx=-200, label_dy=60)
-plan += person('mara', 104, 276, -135, label_dx=24, label_dy=34)
-plan += person('owen', 400, 230, 90, note=['just entering at frame-RIGHT,', 'facing frame-LEFT (landing);', 'camera + tool pouch'], label_dx=24, label_dy=-10)
-plan += person('naomi', 404, 170, 90, note=['a few steps behind him,', 'recorder in her hands'], label_dx=-250, label_dy=-10)
+plan += camera(250, 604, -90, 64, 380, 'CAMERA 28mm, far end, locked', None, ldx=-235, ldy=46)
+plan += person('mara', 110, 280, -135, note=['on the stool in the corner,', 'hands on the camera'], label_dx=40, label_dy=60)
+plan.append('<rect x="128" y="292" width="22" height="16" fill="#111"/>')
+plan += person('elias', 366, 300, 190, note=['in the doorway, turned to her,', 'handheld raised'], label_dx=40, label_dy=110)
+plan += person('owen', 404, 282, 90, note=['in the corridor, crossing', 'the doorway gap'], label_dx=26, label_dy=-6)
+plan += person('naomi', 404, 214, 90, note=['a few steps behind him'], label_dx=26, label_dy=-10)
 frame = frame_panel(760, 60, [
-    ('box', 0.3, 0.08, 0.4, 0.8, 'NURSERY DOORWAY', '#f4efe6'),
-    ('fig', 0.62, 0.16, 0.04, 0.1, '', COL['mara']),
-    ('fig', 0.5, 0.26, 0.15, 0.52, 'OLIVE (back)', COL['elias']),
-    ('fig', 0.82, 0.18, 0.22, 0.74, 'BEARDED → LEFT', COL['owen'], -40),
-    ('fig', 0.99, 0.2, 0.18, 0.7, 'CAMEL', COL['naomi'], 22),
-], ['Camera faces the doorway. Landing is', 'frame-LEFT, far window frame-RIGHT.', 'Both in the corridor face frame-LEFT.'])
-maps['SH14'] = svg('SH14', 'First frame: tall man in the doorway; bearded man entering at frame-right (MWS, 35mm)',
-                   'Corridor angle straight into the nursery doorway (west)', plan, frame,
-                   ['Screen direction: toward the landing = frame-LEFT; the two in the corridor face that way.',
-                    'The small woman is seen through the doorway, high in the far corner ahead-right.'])
+    ('box', 0.0, 0.28, 0.2, 0.62, 'BED', '#ffffff'),
+    ('box', 0.04, 0.08, 0.2, 0.18, 'WINDOW', '#6f8fb8'),
+    ('box', 0.4, 0.66, 0.2, 0.1, 'CHEST + BOX', '#5b3f2a'),
+    ('box', 0.78, 0.14, 0.2, 0.46, 'DOORWAY', '#ffffff'),
+    ('fig', 0.93, 0.2, 0.03, 0.08, '', COL['owen']),
+    ('fig', 0.84, 0.24, 0.09, 0.32, 'OLIVE', COL['elias'], 10),
+    ('fig', 0.2, 0.1, 0.1, 0.26, 'RUST (on stool)', COL['mara'], 8),
+], ['REVERSE of SH13: from the far end of the', 'room. Small woman upper-left in the', 'corner; tall man in the doorway RIGHT;', 'the others pass in the corridor beyond.'])
+maps['SH14'] = svg('SH14', 'First frame: from the far end of the nursery — the woman in the corner, the man in the doorway (MWS, 28mm)',
+                   'Inside the nursery, far end, looking back', plan, frame,
+                   ['SH13 looks at the corner from the doorway; this is its reverse, so the cut changes the view completely.',
+                    'Through the doorway the bearded man crosses left to right (toward the landing).'])
 
 # ---------------- SH15 ----------------
 plan = upper_plan()
@@ -501,20 +502,21 @@ maps['SH15'] = svg('SH15', 'First frame: bearded man just past the door, walking
 
 # ---------------- SH16 ----------------
 plan = upper_plan()
-plan += camera(250, 600, -90, 64, 380, 'CAMERA 28mm, LOCKED', None, ldx=-160, ldy=46)
-plan += person('mara', 110, 280, -135, note=['on the stool in the corner,', 'hands on the mounted camera;', 'monitor case on the floor below'], label_dx=40, label_dy=60)
+plan += camera(434, 300, 180, 46, 360, 'CAMERA 35mm, locked, facing the doorway', None, ldx=-40, ldy=60)
+plan += person('mara', 110, 280, -135, note=['through the doorway, ahead-right,', 'on the stool: final twist'], label_dx=40, label_dy=60)
+plan.append('<rect x="128" y="292" width="22" height="16" fill="#111"/>')
+plan.append(text(154, 318, 'monitor case on the floor', 11, INK, 'start', 400))
 frame = frame_panel(760, 60, [
-    ('box', 0.0, 0.3, 0.2, 0.6, 'IRON BED (left wall)', '#ffffff'),
-    ('box', 0.04, 0.1, 0.22, 0.18, 'WINDOW', '#6f8fb8'),
-    ('box', 0.4, 0.66, 0.2, 0.1, 'CHEST + BOX', '#5b3f2a'),
-    ('box', 0.8, 0.16, 0.18, 0.46, 'OPEN DOOR', '#ffffff'),
-    ('fig', 0.2, 0.12, 0.1, 0.26, 'RUST (back 3/4, on stool)', COL['mara'], 6),
-], ['MEDIUM-WIDE from the far end of the room.', 'Bed along the LEFT wall, door on the RIGHT.', 'Small woman upper-left on the stool,', 'monitor case on the floor below her.'])
-maps['SH16'] = svg('SH16', 'First frame: the small woman on the stool, monitor case on the floor below (MWS, 28mm)',
-                   'NEW ANGLE: inside the nursery from the far end, looking north', plan, frame,
-                   ['Reverse of the NURSERY FIXED view: the camera corner is now ahead-left, high.',
-                    'The door on the RIGHT wall is open.'])
-
+    ('box', 0.22, 0.08, 0.56, 0.82, 'DOORWAY (empty)', '#f4efe6'),
+    ('box', 0.58, 0.26, 0.14, 0.2, 'WINDOW', '#6f8fb8'),
+    ('box', 0.26, 0.5, 0.48, 0.12, 'BED (foot right)', '#ffffff'),
+    ('box', 0.28, 0.66, 0.18, 0.08, 'CHEST', '#5b3f2a'),
+    ('fig', 0.6, 0.12, 0.06, 0.18, 'RUST (on stool)', COL['mara'], 6),
+], ['FIRST FRAME: from the corridor straight', 'into the empty doorway. Small woman', 'ahead-right, high in the corner.'])
+maps['SH16'] = svg('SH16', 'First frame: through the empty doorway, the small woman on the stool in the corner (MWS, 35mm)',
+                   'Corridor, square to the doorway', plan, frame,
+                   ['Everyone else has gone toward the landing (frame-left).',
+                    'SH15 looked north along the corridor; this faces the doorway (west).'])
 
 # ---------------- SH17 ----------------
 plan = hall_plan()
@@ -711,16 +713,16 @@ plan = hall_plan()
 plan += view(330, 672, -90, 60, 600, 'VIEW A — from the front door', VIEW_A, 30, 10)
 plan += view(330, 356, 90, 70, 340, 'VIEW B — from the stair foot, back', VIEW_B, -300, -70)
 plan += practical(440, 350, 'night: lamp by the stair')
-plan += setup_marks(['SH17'], VIEW_A) + setup_marks(['SH06', 'SH07'], VIEW_B)
+plan += setup_marks(['SH07', 'SH17'], VIEW_A) + setup_marks(['SH06'], VIEW_B)
 panel = sheet_panel(760, 60, [
     ('DAY · VIEW A', ['stair straight ahead', 'service door RIGHT', 'window + sun LEFT', 'dust sheets, boxes'], DAY, INK),
     ('DAY · VIEW B', ['front door centre,', 'open, bright beyond', 'service door LEFT', 'window + sun RIGHT'], DAYB, INK),
     ('NIGHT · VIEW A', ['same framing', 'window black-blue', 'lamp by the stair', 'deep soft shadow'], NIGHT, '#f3ead8'),
     ('NIGHT · VIEW B', ['same framing', 'front door CLOSED', 'lamp spill from', 'behind camera'], NIGHT, '#f3ead8'),
-], ['View A: SH17 (WS).', 'View B: SH06 (MS, low), SH07 (WS, high).', 'Master = the approved hall plate (day A).'])
+], ['View A: SH07, SH17 (WS).', 'View B: SH06 (MS, low).', 'Master = the approved hall plate (day A).'])
 locmaps['LOC_HALL'] = loc_svg('ENTRANCE HALL', 'Entrance hall', 'From the front door, and back from the stair foot', plan, panel,
                               ['Service door: RIGHT wall in view A, LEFT wall in view B. Window and sun bar: LEFT in A, RIGHT in B.',
-                               'SH06 and SH07 look in the view-B direction; they must upload this sheet, not only the view-A plate.'])
+                               'SH06 looks in the view-B direction; it must upload this sheet, not only the view-A plate.'])
 
 # Corridor
 plan = upper_plan(show_room=False)
@@ -728,13 +730,13 @@ plan += view(400, 632, -90, 36, 610, 'VIEW A — landing end → far window', VI
 plan += view(400, 44, 90, 36, 600, 'VIEW B — far window → landing', VIEW_B, 30, 4)
 plan += practical(432, 480, 'night: sconce (east wall)')
 plan += practical(265, 690, 'night: landing lamp', 'end', -12, 4)
-plan += setup_marks(['SH12', 'SH15'], VIEW_A) + setup_marks(['SH08', 'SH10', 'SH11'], VIEW_B) + setup_marks(['SH09', 'SH14'], SIDE)
+plan += setup_marks(['SH12', 'SH15'], VIEW_A) + setup_marks(['SH08', 'SH10'], VIEW_B) + setup_marks(['SH09', 'SH11', 'SH16'], SIDE)
 panel = sheet_panel(760, 60, [
     ('DAY · VIEW A', ['far window ahead', 'nursery door open', 'on the LEFT wall', '2/3 of the way'], DAY, INK),
     ('DAY · VIEW B', ['landing at the end', 'nursery door open', 'on the RIGHT wall,', '~3 m from camera'], DAYB, INK),
     ('NIGHT · VIEW A', ['same framing', 'window black-blue', 'sconce on RIGHT wall', 'lamp spill from door'], NIGHT, '#f3ead8'),
     ('NIGHT · VIEW B', ['same framing', 'sconce on LEFT wall', 'landing lamp glows', 'at the far end'], NIGHT, '#f3ead8'),
-], ['View A: SH12 (WS), SH15 (MS).', 'View B: SH08 (WS), SH10 (MS), SH11 (MCU).', 'Side (grey): SH09, SH14 into the doorway.'])
+], ['View A: SH12 (WS), SH15 (MS).', 'View B: SH08 (WS), SH10 (MS).', 'Side (grey): SH09, SH11 (diagonal), SH16.'])
 locmaps['LOC_COR'] = loc_svg('UPPER CORRIDOR', 'Upper corridor', 'Landing end and far-window end', plan, panel,
                              ['Nursery door: LEFT wall in view A, RIGHT wall in view B. The sconce is on the east wall: RIGHT in A, LEFT in B.',
                               'The nursery door stays open in all four panels; its state per shot is set in the shot prompt.'])
@@ -744,13 +746,13 @@ plan = upper_plan()
 plan += view(94, 264, 52, 72, 400, 'VIEW A — NURSERY FIXED (high corner)', VIEW_A, 90, -70)
 plan += view(250, 604, -90, 64, 360, 'VIEW B — far end, eye level', VIEW_B, -200, 50)
 plan += practical(103, 604, 'night: lamp', 'end', -26, 4)
-plan += setup_marks(['SH16'], VIEW_B) + setup_marks(['SH13'], SIDE)
+plan += setup_marks(['SH14'], VIEW_B) + setup_marks(['SH13'], SIDE)
 panel = sheet_panel(760, 60, [
     ('DAY · VIEW A', ['= approved plate', 'door lower-LEFT', 'bed on RIGHT wall', 'lamp far-RIGHT'], DAY, INK),
     ('DAY · VIEW B', ['window far-LEFT,', 'empty corner above', 'bed on LEFT wall', 'door on RIGHT wall'], DAYB, INK),
     ('NIGHT · VIEW A', ['same framing', 'lamp ON far-right', 'door CLOSED', 'corners dark'], NIGHT, '#f3ead8'),
     ('NIGHT · VIEW B', ['same framing', 'lamp ON near LEFT', 'door CLOSED', 'corners dark'], NIGHT, '#f3ead8'),
-], ['View A: SH01 and every NURSERY FIXED frame.', 'View B: SH16 (MWS). Side (grey): SH13.', 'Veiled Woman: view A only, never view B.'])
+], ['View A: SH01 and every NURSERY FIXED frame.', 'View B: SH14 (MWS). Side (grey): SH13.', 'Veiled Woman: view A only, never view B.'])
 locmaps['LOC_NUR'] = loc_svg('NURSERY', 'Nursery', 'The high corner view and its reverse from the far end', plan, panel,
                              ['Bed along the west wall: RIGHT of frame in view A, LEFT in view B. Door on the east wall: LEFT in A, RIGHT in B.',
                               'No camera in the corner in any panel: the sheet is the bare room; the mounted camera is added per shot (from SH13 on).'])

@@ -163,8 +163,8 @@ export const LOCATION_SHEETS: LocationSheet[] = [
     rowChanges: 'The front door stands open in the day row and is closed in the night row.',
     layout: MAPS.hall.text,
     look: 'Worn black-and-white stone floor, dark wood banister, furniture under white dust sheets, stacked cardboard removal boxes against the wall, pale rectangles on the wallpaper where portraits hung, a tall long-case clock stopped. Elegant and real, not a ruin, but frozen in time. Muted, slightly desaturated palette, deep soft shadows in corners, a heavy stillness. No cobwebs, no candles, no horror props.',
-    shotsA: ['SH17'],
-    shotsB: ['SH06', 'SH07'],
+    shotsA: ['SH07', 'SH17'],
+    shotsB: ['SH06'],
   },
   {
     id: 'COR',
@@ -182,8 +182,8 @@ export const LOCATION_SHEETS: LocationSheet[] = [
     layout: MAPS.corridor.text,
     look: LOOKS.dayInterior,
     shotsA: ['SH12', 'SH15'],
-    shotsB: ['SH08', 'SH10', 'SH11'],
-    shotsSide: ['SH09', 'SH14'],
+    shotsB: ['SH08', 'SH10'],
+    shotsSide: ['SH09', 'SH11', 'SH16'],
   },
   {
     id: 'NUR',
@@ -201,7 +201,7 @@ export const LOCATION_SHEETS: LocationSheet[] = [
     layout: NURSERY_LAYOUT,
     look: 'Muted, slightly desaturated palette, deep soft shadows, a heavy stillness. No people, no dolls, no toys, no horror props.',
     shotsA: ['SH01'],
-    shotsB: ['SH16'],
+    shotsB: ['SH14'],
     shotsSide: ['SH13'],
   },
   {

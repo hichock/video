@@ -1,6 +1,6 @@
 import { BEAT_BY_ID, SECTION_OF } from '../data/script';
 import { ASSETS, MAPS } from '../data/assets';
-import type { Shot } from '../data/shots';
+import { compass, type Shot } from '../data/shots';
 import type { Finding } from '../lib/qa';
 import { fmtTime } from '../lib/qa';
 import { approvalChecklist, fmt, keyframePrompt, klingSettings, refFor, videoPrompt, womanPrompt } from '../lib/prompts';
@@ -50,6 +50,7 @@ export function ShotCard({
           <span className="pill brass">{shot.size}</span>
           <span className="pill">{shot.lens}</span>
           <span className="pill">setup {shot.setup}</span>
+          {shot.heading !== undefined && <span className="pill">camera faces {compass(shot.heading)}</span>}
           <span className="pill">order {fmt(shot.order)}s</span>
           <span className="pill">edit {fmt(shot.edit)}s</span>
           <span className={`pill ${shot.sound === 'native' ? 'ok' : ''}`}>{shot.sound === 'native' ? 'native audio' : 'sound off'}</span>

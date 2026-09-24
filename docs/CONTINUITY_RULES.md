@@ -233,6 +233,12 @@ bible or script asks for it. Plan coverage like a crew would:
   exception is a deliberate match cut (`matchCut: true`, e.g. SH24 → SH25 day → night).
   QA fails the build on this for SH01–SH20.
 - Avoid three shots of the same size in a row (QA warning).
+- **Never cut between two shots that look the same way in the same place.** A tighter shot on
+  the same axis (SH10 medium → SH11 close-up, both straight down the corridor) reads as a
+  jump, not a new shot. Each shot has a `heading` (compass direction the camera faces); QA
+  fails when consecutive shots in one location differ by less than 30°. Fix it by turning
+  the camera (a diagonal or a reverse), by putting a cutaway or insert between, or by making
+  it one continuous shot with a push-in.
 - Within a scene, walk the size ladder on one axis (wide → medium → close, as
   SH08 → SH10 → SH11) and use reverses (SH06 looks back at the front door, SH07 looks down
   from the stair) so a new room or a new beat gets a new angle.

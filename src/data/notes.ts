@@ -9,6 +9,11 @@ export interface Note {
 
 export const OLD_PACK_PROBLEMS: Note[] = [
   {
+    title: 'Consecutive shots repeated the same view',
+    body: 'The coverage check compared camera positions and shot sizes but not the direction the camera faces. So SH10 → SH11 (medium then close-up, both straight down the corridor), SH06 → SH07 (both looking at the front door) and SH13 → SH14 (both looking through the doorway at the corner) passed, although each cut showed the same view again.',
+    fix: 'Every shot now has a compass heading, and QA fails when consecutive shots in one place face within 30° of each other. SH07 now looks up the stair behind the host (SH06 looks back at the front door). SH11 is a three-quarter single 45° off the corridor axis, with the taller woman soft in the foreground. SH14 is the true reverse of SH13, from the far end of the nursery. SH16 moved to the corridor, square to the doorway, so it does not repeat SH14. Maps and location maps are redrawn to match.',
+  },
+  {
     title: 'SH09 asked for a view the approved plate contradicts',
     body: 'The doorway plate asked for the room seen straight across (bed side-on along the far wall) while uploading the approved high-corner photo. Every model instead produced the view down the length of the room: door leaf on the left, bed along the right wall with its foot nearest, chest centre, lamp and armchair at the far end. That view is geometrically correct for this room and this door.',
     fix: 'The generated frame is adopted as LOC_NURSERY_DOORWAY_DAY and its prompt, checklist, the SH09 blocking and the SH09 map now describe it. SH13 and SH14, which look straight across at the window corner, no longer use it as their frame: SH13 uses the high-corner plate for the room, SH14 the corridor plate. The night doorway edit was aligned (the camera corner is just out of view on the right); SH30 must be staged to show the red REC light when we get there.',

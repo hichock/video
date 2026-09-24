@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ALL_BEATS, SCRIPT, SCRIPT_META } from './data/script';
 import { CHARACTERS, CAST, type CharId } from './data/characters';
 import { ASSETS, LOCATION_SHEETS, MAPS } from './data/assets';
-import { SHOTS } from './data/shots';
+import { SHOTS, compass } from './data/shots';
 import { DECISIONS, OLD_PACK_PROBLEMS, PROCESS_NOTE } from './data/notes';
 import { runQA, fmtTime, type Finding } from './lib/qa';
 import { buildOrder, exportMarkdown, linesLost, timeline } from './lib/build';
@@ -141,7 +141,7 @@ function ShotMaps({ findings }: { findings: Finding[] }) {
             {scope.map((s) => (
               <a key={s.id} href={`#map-${s.id}`} className={`sizechip size-${s.size}`} title={`${s.id} · ${s.setup}`}>
                 <b>{s.id.slice(2)}</b>
-                {s.size}
+                {s.size}{s.heading !== undefined ? ` ${compass(s.heading)}` : ''}
               </a>
             ))}
           </div>
@@ -162,6 +162,7 @@ function ShotMaps({ findings }: { findings: Finding[] }) {
                 <span className="pill mono">{s.id}</span>
                 <span className="pill brass">{s.size}</span>
                 <span className="pill">{s.lens}</span>
+                {s.heading !== undefined && <span className="pill">faces {compass(s.heading)}</span>}
                 <b>{s.setup}</b>
                 <span className="dim">{s.title}</span>
               </header>
